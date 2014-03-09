@@ -2,18 +2,20 @@
 <application xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.zeroturnaround.com" xsi:schemaLocation="http://www.zeroturnaround.com http://www.zeroturnaround.com/alderaan/rebel-2_0.xsd">
 
 	<classpath>
-		<dir name="C:/Programmazione/eclipse-workspace/work-workspace/raspsonar/target/classes">
+		<dir name="/home/cecchisandrone/git/raspberrypi/raspsonar/target/classes">
+		</dir>
+		<dir name="/home/cecchisandrone/git/raspberrypi/raspsonar/target/test-classes">
 		</dir>
 	</classpath>
 
 	<web>
 		<link target="/">
-			<dir name="C:/Programmazione/eclipse-workspace/work-workspace/raspsonar/target/m2e-wtp/web-resources">
+			<dir name="/home/cecchisandrone/git/raspberrypi/raspsonar/target/m2e-wtp/web-resources">
 				<exclude name="/"/>
 			</dir>
 		</link>
 		<link target="/">
-			<dir name="C:/Programmazione/eclipse-workspace/work-workspace/raspsonar/src/main/webapp">
+			<dir name="/home/cecchisandrone/git/raspberrypi/raspsonar/src/main/webapp">
 			</dir>
 		</link>
 	</web>

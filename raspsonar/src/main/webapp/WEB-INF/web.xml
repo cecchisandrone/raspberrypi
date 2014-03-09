@@ -4,4 +4,12 @@
 
 <web-app>
   <display-name>Archetype Created Web Application</display-name>
+  <filter>
+  	<filter-name>MainFilter</filter-name>
+  	<filter-class>it.cecchi.raspsonar.filters.MainFilter</filter-class>
+  </filter>
+  <filter-mapping>
+  	<filter-name>MainFilter</filter-name>
+  	<url-pattern>*</url-pattern>
+  </filter-mapping>
 </web-app>
