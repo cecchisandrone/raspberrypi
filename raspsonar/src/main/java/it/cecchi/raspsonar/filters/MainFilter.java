@@ -10,15 +10,14 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 public class MainFilter implements Filter {
-	
-	public void destroy() {	
+
+	public void destroy() {
 
 	}
 
-	public void doFilter(ServletRequest arg0, ServletResponse arg1,
-			FilterChain arg2) throws IOException, ServletException {
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
 		System.out.println("test filter");
-		doFilter(arg0, arg1, arg2);
+		chain.doFilter(request, response);
 	}
 
 	public void init(FilterConfig arg0) throws ServletException {

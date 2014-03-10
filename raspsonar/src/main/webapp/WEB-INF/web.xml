@@ -6,7 +6,7 @@
   <display-name>Archetype Created Web Application</display-name>
   <filter>
   	<filter-name>MainFilter</filter-name>
-  	<filter-class>it.cecchi.raspsonar.filters.MainFlter</filter-class>
+  	<filter-class>it.cecchi.raspsonar.filters.MainFilter</filter-class>
   </filter>
   <filter-mapping>
   	<filter-name>MainFilter</filter-name>
