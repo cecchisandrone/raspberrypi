@@ -1,4 +1,6 @@
-package it.cecchi.raspsonar.filters;
+package it.cecchi.raspsonar.http;
+
+import it.cecchi.raspsonar.gpio.ControlGpioExample;
 
 import java.io.IOException;
 
@@ -16,7 +18,13 @@ public class MainFilter implements Filter {
 	}
 
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-		System.out.println("test filter");
+		try {
+			//ControlGpioExample.main(null);
+			System.out.println("test");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		chain.doFilter(request, response);
 	}
 
