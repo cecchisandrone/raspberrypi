@@ -1,5 +1,5 @@
 <html>
 <body>
-<h2>Welcome to RaspSonar webapp</h2>
+<h2>Welcome to RaspSonar</h2>
 </body>
 </html>
