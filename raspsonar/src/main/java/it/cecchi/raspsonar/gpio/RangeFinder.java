@@ -36,11 +36,11 @@ public class RangeFinder {
 	
 			// range finder pins
 			GpioPinDigitalOutput triggerPin = gpio
-					.provisionDigitalOutputPin(RaspiPin.GPIO_00,
+					.provisionDigitalOutputPin(RaspiPin.GPIO_04,
 							"Range Finder Trigger", PinState.LOW);
 	
 			GpioPinDigitalInput echoPin = gpio.provisionDigitalInputPin(
-					RaspiPin.GPIO_03, "Range Pulse Result",
+					RaspiPin.GPIO_05, "Range Pulse Result",
 					PinPullResistance.PULL_DOWN);
 					
 			rangeFinder = new RangeFinder(triggerPin,echoPin);
