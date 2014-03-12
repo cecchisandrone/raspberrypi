@@ -26,10 +26,8 @@ public class RangeFinder {
 	
 	public static RangeFinder getInstance() {
 
-		// Return existing instance
-		if (rangeFinder != null) {
-			
-			// Instantiate the range finder
+		// Instantiate the range finder
+		if (rangeFinder == null) {
 	
 			// Setup GPIO Pins
 			GpioController gpio = GpioFactory.getInstance();
@@ -45,51 +43,42 @@ public class RangeFinder {
 					
 			rangeFinder = new RangeFinder(triggerPin,echoPin);
 		}
-
+		
 		return rangeFinder;
 	}
 
 	/**
 	 * 
-	 * Trigger the Range Finder and return the result
+	 * Trigger the Range Finder and return the result in cm
 	 * 
 	 * @return
 	 */
 	public double getRange() {
-		System.out.println("Range Finder Triggered");
-		try {
-			// fire the trigger pulse
+				
+		try {	
+			// Sensor settling
+			triggerPin.low();
+			Thread.sleep(500);
+		
+			// Fire the trigger pulse
 			triggerPin.high();
-
-			Thread.sleep(20);
+			Thread.sleep(1);
+			triggerPin.low();
+			
 		} catch (InterruptedException e) {
-
-			e.printStackTrace();
-			System.out.println("Exception triggering range finder");
+			e.printStackTrace();			
 		}
-		triggerPin.low();
-
-		// wait for the result
-
-		double startTime = System.currentTimeMillis();
-		double stopTime = 0;
-		do {
-
-			stopTime = System.currentTimeMillis();
-			if ((System.currentTimeMillis() - startTime) >= 40) {
-				break;
-			}
-		} while (echoPin.getState() != PinState.HIGH);
-
-		// calculate the range. If the loop stopped after 38 ms set the result
-		// to -1 to show it timed out.
-
-		if ((stopTime - startTime) <= 38) {
-			result = (stopTime - startTime) * 165.7;
-		} else {
-			System.out.println("Timed out");
-			result = -1;
-		}
-		return result;
+		
+		// Wait for the result signal
+		long startTime = 0, stopTime = 0;		
+		do {			
+			startTime = System.nanoTime();
+		} while (echoPin.getState() == PinState.LOW);
+		
+		do {			
+			stopTime = System.nanoTime();
+		} while (echoPin.getState() == PinState.HIGH);
+		
+		return ((stopTime - startTime) * 340.0) / 20000000.0;		
 	}
 }
