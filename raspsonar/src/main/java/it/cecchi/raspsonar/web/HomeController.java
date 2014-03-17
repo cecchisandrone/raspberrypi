@@ -12,6 +12,6 @@ public class HomeController {
     @RequestMapping(value = "/")
     public String home() {
         System.out.println("HomeController: Passing through...");
-        return "views/home.jsp";
+        return "home";
     }
 }
