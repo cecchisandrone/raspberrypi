@@ -13,7 +13,7 @@
 	<!-- Scans within the base package of the application for @Components to 
 		configure as beans -->
 	<!-- @Controller, @Service, @Configuration, etc. -->
-	<context:component-scan base-package="it.cecchi.raspsonar.web" />
+	<context:component-scan base-package="it.cecchi.raspsonar" />
 
 	<!-- Enables the Spring MVC @Controller programming model -->
 	<mvc:annotation-driven />
