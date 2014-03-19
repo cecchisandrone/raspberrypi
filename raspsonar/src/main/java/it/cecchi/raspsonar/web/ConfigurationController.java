@@ -1,6 +1,18 @@
 package it.cecchi.raspsonar.web;
 
+import it.cecchi.raspsonar.service.SonarService;
+import it.cecchi.raspsonar.service.SonarService.PropertyName;
+import it.cecchi.raspsonar.service.SonarServiceException;
+
+import java.util.Properties;
+
+import javax.validation.Valid;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,17 +24,52 @@ import org.springframework.web.servlet.ModelAndView;
 @SessionAttributes
 public class ConfigurationController {
 
-	@RequestMapping(value = "/saveConfiguration", method = RequestMethod.POST)
-	public String addContact(@ModelAttribute("configuration") Configuration configuration, BindingResult result) {
+	@Autowired
+	private SonarService sonarService;
 
-		System.out.println("Email:" + configuration.getEmail());
+	@Autowired
+	private MailSender mailSender;
 
-		return "redirect:configuration";
+	@RequestMapping(value = "/editConfiguration", method = RequestMethod.POST)
+	public String updateConfiguration(@Valid @ModelAttribute("configuration") Configuration configuration, BindingResult result, Model model) {
+
+		if (!result.hasErrors()) {
+			Properties p = sonarService.getProperties();
+			p.put(PropertyName.EMAIL.getPropertyName(), configuration.getEmail());
+			try {
+				sonarService.saveProperties(p);
+			} catch (SonarServiceException e) {
+				model.addAttribute("errorMessage", "Error while saving configuration. Reason: " + e.toString());
+			}
+			model.addAttribute("infoMessage", "Configuration updated");
+		}
+
+		return "configuration";
 	}
 
 	@RequestMapping("/editConfiguration")
 	public ModelAndView showConfiguration() {
 
-		return new ModelAndView("configuration", "configuration", new Configuration());
+		Properties p = sonarService.getProperties();
+		Configuration configuration = new Configuration();
+		configuration.setEmail(p.getProperty(PropertyName.EMAIL.getPropertyName()));
+		return new ModelAndView("configuration", "configuration", configuration);
+	}
+
+	@RequestMapping(value = "/configuration/mailTest", method = RequestMethod.GET)
+	public String testMail(@Valid @ModelAttribute("configuration") Configuration configuration, Model model) {
+
+		try {
+			SimpleMailMessage message = new SimpleMailMessage();
+			message.setFrom("raspsonar");
+			message.setSubject("raspsonar test mail");
+			message.setText("If you receive this mail, the mail configuration of raspsonar is correct");
+			message.setTo(configuration.getEmail());
+			mailSender.send(message);
+		} catch (Exception e) {
+			model.addAttribute("errorMessage", "Cannot send mail. Reason: " + e.toString());
+		}
+
+		return "configuration";
 	}
 }

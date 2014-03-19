@@ -16,7 +16,7 @@ public class HomeController {
 	@Autowired
 	private SonarService sonarService;
 
-	@RequestMapping(value = "/")
+	@RequestMapping(value = "/home")
 	public ModelAndView home() {
 
 		ModelAndView modelAndView = new ModelAndView("home");

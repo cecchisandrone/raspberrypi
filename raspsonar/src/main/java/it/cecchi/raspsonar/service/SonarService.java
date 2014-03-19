@@ -3,6 +3,7 @@ package it.cecchi.raspsonar.service;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -10,6 +11,20 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class SonarService {
+
+	public enum PropertyName {
+		EMAIL("email");
+
+		private String propertyName;
+
+		public String getPropertyName() {
+			return propertyName;
+		}
+
+		private PropertyName(String propertyName) {
+			this.propertyName = propertyName;
+		}
+	}
 
 	private static final String PROPERTIES_FILENAME = "raspsonar.properties";
 
@@ -35,5 +50,19 @@ public class SonarService {
 
 	public String getWaterLevel() {
 		return "121 cm";
+	}
+
+	public Properties getProperties() {
+		return properties;
+	}
+
+	public void saveProperties(Properties properties) throws SonarServiceException {
+		try {
+			properties.store(new FileOutputStream(configurationFile), "raspsonar configuration file");
+		} catch (FileNotFoundException e) {
+			throw new SonarServiceException("Can't find configuration file " + PROPERTIES_FILENAME);
+		} catch (IOException e) {
+			throw new SonarServiceException("Unable to save properties. Reason: " + e.toString());
+		}
 	}
 }
