@@ -1,4 +1,4 @@
-package it.cecchi.smarthome.web;
+package it.cecchi.smarthome.domain;
 
 import org.hibernate.validator.constraints.Email;
 

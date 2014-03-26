@@ -1,8 +1,9 @@
 package it.cecchi.smarthome.web;
 
+import it.cecchi.smarthome.domain.Configuration;
 import it.cecchi.smarthome.service.SonarService;
-import it.cecchi.smarthome.service.SonarServiceException;
 import it.cecchi.smarthome.service.SonarService.PropertyName;
+import it.cecchi.smarthome.service.SonarServiceException;
 
 import java.util.Properties;
 
@@ -57,7 +58,7 @@ public class ConfigurationController {
 	}
 
 	@RequestMapping(value = "/configuration/mailTest", method = RequestMethod.GET)
-	public String testMail(@Valid @ModelAttribute("configuration") Configuration configuration, Model model) {
+	public ModelAndView testMail(@Valid @ModelAttribute("configuration") Configuration configuration, Model model) {
 
 		try {
 			SimpleMailMessage message = new SimpleMailMessage();
@@ -70,6 +71,6 @@ public class ConfigurationController {
 			model.addAttribute("errorMessage", "Cannot send mail. Reason: " + e.toString());
 		}
 
-		return "configuration";
+		return new ModelAndView("configuration", "configuration", configuration);
 	}
 }

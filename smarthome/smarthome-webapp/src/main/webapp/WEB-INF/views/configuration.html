@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Configuration</title>
+</head>
+<body>
+	<h2>Configuration</h2>
+	<form th:action="@{/editConfiguration}" th:object="${configuration}">
+		<div th:if="${infoMessage != null}" style="color: green"><span th:text="${infoMessage}"/></div>
+		<div th:if="${errorMessage != null}" style="color: red"><span th:text="${errorMessage}"/></div>		
+		<table>
+			<tr>
+				<td>Email address:</td>
+				<td><input size="40" th:field="*{email}" /></td>				
+				<td><a href="#" th:href="@{/configuration/mailTest}">Test</a></td>
+				<td><input type="submit" value="Test" formmethod="get" formaction="/configuration/mailTest"/></td>
+			</tr>
+			<tr>
+				<td colspan="2"><input type="submit" value="Save configuration" /></td>
+			</tr>
+		</table>
+	</form>
+</body>
+</html>

@@ -38,6 +38,16 @@
 			<artifactId>mail</artifactId>
 			<version>1.4</version>
 		</dependency>
+		<dependency>
+		    <groupId>org.thymeleaf</groupId>
+		    <artifactId>thymeleaf</artifactId>
+		    <version>2.1.2.RELEASE</version>		    
+		</dependency>
+		<dependency>
+		    <groupId>org.thymeleaf</groupId>
+		    <artifactId>thymeleaf-spring3</artifactId>
+		    <version>2.1.2.RELEASE</version>		    
+		</dependency> 
 	</dependencies>
 	<build>
 		<finalName>smarthome</finalName>
@@ -47,7 +57,7 @@
 				<artifactId>tomcat-maven-plugin</artifactId>
 				<version>1.1</version>
 				<configuration>
-					<url>http://192.168.178.70:8080/manager/text</url>
+					<url>http://${tomcat.url}/manager/text</url>
 					<server>TomcatServerRaspberry</server>
 				</configuration>
 			</plugin>
