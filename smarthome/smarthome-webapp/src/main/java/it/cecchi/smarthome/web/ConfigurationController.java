@@ -73,4 +73,10 @@ public class ConfigurationController {
 
 		return new ModelAndView("configuration", "configuration", configuration);
 	}
+
+	@RequestMapping(value = "/test", method = RequestMethod.GET)
+	public String test() {
+
+		return "layout/layout";
+	}
 }

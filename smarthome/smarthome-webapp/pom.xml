@@ -39,15 +39,31 @@
 			<version>1.4</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.thymeleaf</groupId>
-		    <artifactId>thymeleaf</artifactId>
-		    <version>2.1.2.RELEASE</version>		    
+			<groupId>org.thymeleaf</groupId>
+			<artifactId>thymeleaf</artifactId>
+			<version>2.1.2.RELEASE</version>
 		</dependency>
 		<dependency>
-		    <groupId>org.thymeleaf</groupId>
-		    <artifactId>thymeleaf-spring3</artifactId>
-		    <version>2.1.2.RELEASE</version>		    
-		</dependency> 
+			<groupId>org.thymeleaf</groupId>
+			<artifactId>thymeleaf-spring4</artifactId>
+			<version>2.1.2.RELEASE</version>
+		</dependency>
+		<dependency>
+			<groupId>org.thymeleaf.extras</groupId>
+			<artifactId>thymeleaf-extras-tiles2</artifactId>
+			<version>2.1.1.RELEASE</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>jcl-over-slf4j</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>		
+		<dependency>
+			<groupId>org.thymeleaf.extras</groupId>
+			<artifactId>thymeleaf-extras-tiles2-spring4</artifactId>
+			<version>2.1.1.RELEASE</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<finalName>smarthome</finalName>

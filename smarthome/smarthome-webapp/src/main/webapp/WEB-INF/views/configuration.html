@@ -6,17 +6,17 @@
 <body>
 	<h2>Configuration</h2>
 	<form th:action="@{/editConfiguration}" th:object="${configuration}">
-		<div th:if="${infoMessage != null}" style="color: green"><span th:text="${infoMessage}"/></div>
-		<div th:if="${errorMessage != null}" style="color: red"><span th:text="${errorMessage}"/></div>		
+		<div th:if="${infoMessage != null}" class="alert alert-warning alert-block"><span th:text="${infoMessage}"/></div>
+		<div th:if="${errorMessage != null}" class="alert alert-success alert-block"><span th:text="${errorMessage}"/></div>		
 		<table>
 			<tr>
-				<td>Email address:</td>
-				<td><input size="40" th:field="*{email}" /></td>				
-				<td><a href="#" th:href="@{/configuration/mailTest}">Test</a></td>
-				<td><input type="submit" value="Test" formmethod="get" formaction="/configuration/mailTest"/></td>
+				<fieldset>
+					<legend>Raspsonar</legend>
+					Email address: <input size="40" th:field="*{email}" /><a href="#" th:href="@{/configuration/mailTest}">Test</a><input type="submit" value="Test" formmethod="get" formaction="/configuration/mailTest"/>					
+				</fieldset>
 			</tr>
 			<tr>
-				<td colspan="2"><input type="submit" value="Save configuration" /></td>
+				<td colspan="2"><input type="submit" value="Save configuration" th:value="#{form.submit}" /></td>
 			</tr>
 		</table>
 	</form>
