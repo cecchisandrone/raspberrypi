@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout/layout">
+  <head>
+    <title>Home</title>
+  </head>
+  <body>
+    <!-- /* Content of this page will be decorated by the elements of layout.html */ -->
+    <div layout:fragment="content">    
+      <table class="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <td>ID</td>
+            <td>Title</td>
+            <td>Text</td>
+            <td>Due to</td>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:if="${tasks.empty}">
+            <td colspan="4">No tasks</td>
+          </tr>
+          <tr th:each="task : ${tasks}">
+            <td th:text="${task.id}">1</td>
+            <td><a href="view.html" th:href="@{'/' + ${task.id}}" th:text="${task.title}">Title ...</a></td>
+            <td th:text="${task.text}">Text ...</td>
+            <td th:text="${#calendars.format(task.dueTo)}">July 11, 2012 2:17:16 PM CDT</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

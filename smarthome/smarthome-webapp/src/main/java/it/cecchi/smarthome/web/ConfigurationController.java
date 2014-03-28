@@ -1,10 +1,14 @@
 package it.cecchi.smarthome.web;
 
 import it.cecchi.smarthome.domain.Configuration;
+import it.cecchi.smarthome.domain.Task;
 import it.cecchi.smarthome.service.SonarService;
 import it.cecchi.smarthome.service.SonarService.PropertyName;
 import it.cecchi.smarthome.service.SonarServiceException;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
 import javax.validation.Valid;
@@ -75,8 +79,17 @@ public class ConfigurationController {
 	}
 
 	@RequestMapping(value = "/test", method = RequestMethod.GET)
-	public String test() {
+	public ModelAndView test() {
 
-		return "layout/layout";
+		Task task1 = new Task(1, "title1", "text1", new Date());
+		Task task2 = new Task(1, "title2", "text2", new Date());
+		Task task3 = new Task(1, "title3", "text3", new Date());
+
+		List<Task> tasks = new ArrayList<Task>();
+		tasks.add(task1);
+		tasks.add(task2);
+		tasks.add(task3);
+
+		return new ModelAndView("testLayout", "tasks", tasks);
 	}
 }

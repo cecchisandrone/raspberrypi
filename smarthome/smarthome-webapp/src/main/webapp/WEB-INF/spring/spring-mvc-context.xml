@@ -18,7 +18,7 @@
 	<!-- the mvc resources tag does the magic -->
 	<mvc:resources mapping="/assets/**" location="/assets/" />
 
-	<bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">		
+	<bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
 		<property name="viewResolvers">
 			<list>
 				<!-- Used here for 'xml' and 'atom' views -->
@@ -33,40 +33,24 @@
 							<value>layout/*</value>
 						</array>
 					</property>
-					<property name="order" value="2" />					
+					<property name="order" value="2" />
 				</bean>
 				<!-- Used for Thymeleaf views with Tiles -->
-				<bean class="org.thymeleaf.spring4.view.ThymeleafViewResolver">
-					<property name="templateEngine" ref="templateEngine" />
-					<property name="order" value="3" />
-					<property name="viewClass" value="org.thymeleaf.spring4.view.ThymeleafView"/>					
-				</bean>				
+				<!-- <bean class="org.thymeleaf.spring4.view.ThymeleafViewResolver"> -->
+				<!-- <property name="templateEngine" ref="templateEngine" /> -->
+				<!-- <property name="order" value="3" /> -->
+				<!-- <property name="viewClass" value="org.thymeleaf.spring4.view.ThymeleafView"/> -->
+				<!-- </bean> -->
 			</list>
 		</property>
 		<property name="mediaTypes">
 			<map>
-				<entry key="html" value="text/html"/>
-				<entry key="pdf" value="application/pdf"/>
-				<entry key="xsl" value="application/vnd.ms-excel"/>
-				<entry key="xml" value="application/xml"/>
-				<entry key="json" value="application/json"/>
+				<entry key="html" value="text/html" />
+				<entry key="pdf" value="application/pdf" />
+				<entry key="xsl" value="application/vnd.ms-excel" />
+				<entry key="xml" value="application/xml" />
+				<entry key="json" value="application/json" />
 			</map>
-		</property>
-	</bean>
-
-	<!-- SET default mail properties -->
-	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
-		<property name="host" value="smtp.gmail.com" />
-		<property name="port" value="587" />
-		<property name="username" value="cecchisandrone@gmail.com" />
-		<property name="password" value="romatre82" />
-		<property name="javaMailProperties">
-			<props>
-				<prop key="mail.transport.protocol">smtp</prop>
-				<prop key="mail.smtp.auth">true</prop>
-				<prop key="mail.smtp.starttls.enable">true</prop>
-				<prop key="mail.debug">false</prop>
-			</props>
 		</property>
 	</bean>
 
@@ -79,25 +63,26 @@
 	</bean>
 
 	<bean id="templateEngine" class="org.thymeleaf.spring4.SpringTemplateEngine">
-		<property name="templateResolver" ref="templateResolver" />		
+		<property name="templateResolver" ref="templateResolver" />
 		<property name="additionalDialects">
-	        <set>
-	            <bean class="org.thymeleaf.extras.tiles2.dialect.TilesDialect"/>
-	        </set>
-	    </property>
+			<set>
+				<!-- <bean class="org.thymeleaf.extras.tiles2.dialect.TilesDialect"/> -->
+				<bean class="nz.net.ultraq.thymeleaf.LayoutDialect" />
+			</set>
+		</property>
 	</bean>
 
 	<bean class="org.thymeleaf.spring4.view.ThymeleafViewResolver">
 		<property name="templateEngine" ref="templateEngine" />
 		<property name="characterEncoding" value="UTF-8" />
 	</bean>
-	
-	<bean class="org.thymeleaf.extras.tiles2.spring4.web.configurer.ThymeleafTilesConfigurer">
-		<property name="definitions">
-			<array>
-				<value>/WEB-INF/views/layout/tiles-defs.xml</value>
-			</array>
-		</property>
-	</bean>
+
+	<!-- <bean class="org.thymeleaf.extras.tiles2.spring4.web.configurer.ThymeleafTilesConfigurer"> -->
+	<!-- <property name="definitions"> -->
+	<!-- <array> -->
+	<!-- <value>/WEB-INF/views/layout/tiles-defs.xml</value> -->
+	<!-- </array> -->
+	<!-- </property> -->
+	<!-- </bean> -->
 
 </beans>

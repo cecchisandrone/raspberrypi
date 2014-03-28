@@ -1,49 +1,33 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <!-- Tiles attribute will be put here at runtime -->
-    <title tiles:include="title">Title</title>
-    ...
-  </head>
-  <body>
-    <!--/* Standard layout can be mixed with Tiles */-->
-    <div th:replace="fragments/header :: header">
-      <!-- ============================================================================ -->
-      <!-- This content is only used for static prototyping purposes (natural templates)-->
-      <!-- and is therefore entirely optional, as this markup fragment will be included -->
-      <!-- from "fragments/header.html" at runtime.                                     -->
-      <!-- ============================================================================ -->
-      <div class="navbar navbar-inverse navbar-fixed-top">
-        <div class="container">
-          <div class="navbar-header">
-            <a class="navbar-brand" href="#">Static header</a>
-          </div>
-          <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-              <li class="active"><a href="#">Home</a></li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="container">
-      <!--/* Tiles attribute will be put here at runtime */-->
-      <div tiles:replace="content">
-        <!-- ============================================================================ -->
-        <!-- This content is only used for static prototyping purposes (natural templates)-->
-        <!-- and is therefore entirely optional, as this markup fragment will be included -->
-        <!-- from "fragments/header.html" at runtime.                                     -->
-        <!-- ============================================================================ -->
-        <h1>Static content for prototyping purposes only</h1>
-        <p>
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-          Praesent scelerisque neque neque, ac elementum quam dignissim interdum.
-          Phasellus et placerat elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-          Praesent scelerisque neque neque, ac elementum quam dignissim interdum.
-          Phasellus et placerat elit.
-        </p>
-      </div>
-      <div th:replace="fragments/footer :: footer">© 2014 The Static Templates</div>
-    </div>
-  </body>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+	<!--/*  Each token will be replaced by their respective titles in the resulting page. */-->
+	<title layout:title-pattern="$DECORATOR_TITLE - $CONTENT_TITLE" th:text="${@appProp['application.name']}"></title>
+	<meta charset="utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>smarthome</title>
+	<link rel="stylesheet" href="../../assets/bootstrap/css/bootstrap.css" th:href="@{/assets/bootstrap/css/bootstrap.css}" media="screen" />
+	<link rel="stylesheet" href="../../assets/css/custom.css" th:href="@{/assets/css/custom.css}" media="screen" />
+	<link rel="shortcut icon" href="../../assets/img/favicon.ico" th:href="@{/assets/img/favicon.ico}" />
+	<script src="http://code.jquery.com/jquery.js"></script>
+	<script src="../../../assets/bootstrap/js/bootstrap.min.js" th:src="@{/assets/bootstrap/js/bootstrap.min.js}"/>
+</head>
+<body>
+	<!--/* Standard layout can be mixed with Layout Dialect */-->
+	<div th:replace="../fragments/navBar">Navigation bar</div>
+	<div class="container">
+		<div layout:fragment="content">
+			<!-- ============================================================================ -->
+			<!-- This content is only used for static prototyping purposes (natural templates)-->
+			<!-- and is therefore entirely optional, as this markup fragment will be included -->
+			<!-- from "fragments/header.html" at runtime.                                     -->
+			<!-- ============================================================================ -->
+			<h1>Static content for prototyping purposes only</h1>
+			<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent scelerisque neque neque, ac elementum quam dignissim interdum. Phasellus et placerat elit. Lorem ipsum
+				dolor sit amet, consectetur adipiscing elit. Praesent scelerisque neque neque, ac elementum quam dignissim interdum. Phasellus et placerat elit.</p>
+		</div>
+		<div th:replace="../fragments/footer">Â© 2014 The Static Templates</div>
+	</div>
+</body>
 </html>
