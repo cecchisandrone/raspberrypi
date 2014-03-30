@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout/layout">
+<head>
+	<title>Dashboard</title>
+</head>
+<body>
+	<div layout:fragment="content" class="container">
+		<!-- Grid -->
+		<div class="row">
+			<div class="col-md-6">
+				<p><strong>Actual water level: </strong><span id="waterLevel" th:text="${waterLevel}" ></span></p>
+				<p><strong>Configuration folder: </strong><span id="confFolder" th:text="${configurationFolder}"></span></p>
+			</div>
+			<div class="col-md-6">			
+					
+			</div>
+		</div>
+	</div>       	
+</body>
+</html>

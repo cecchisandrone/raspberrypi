@@ -1,24 +1,46 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="layout/layout">
 <head>
 <title>Configuration</title>
 </head>
 <body>
-	<h2>Configuration</h2>
-	<form th:action="@{/editConfiguration}" th:object="${configuration}">
-		<div th:if="${infoMessage != null}" class="alert alert-warning alert-block"><span th:text="${infoMessage}"/></div>
-		<div th:if="${errorMessage != null}" class="alert alert-success alert-block"><span th:text="${errorMessage}"/></div>		
-		<table>
-			<tr>
-				<fieldset>
-					<legend>Raspsonar</legend>
-					Email address: <input size="40" th:field="*{email}" /><a href="#" th:href="@{/configuration/mailTest}">Test</a><input type="submit" value="Test" formmethod="get" formaction="/configuration/mailTest"/>					
-				</fieldset>
-			</tr>
-			<tr>
-				<td colspan="2"><input type="submit" value="Save configuration" th:value="#{form.submit}" /></td>
-			</tr>
-		</table>
-	</form>
+	<!-- /* Content of this page will be decorated by the elements of layout.html */ -->
+	<div layout:fragment="content">
+
+
+		<form th:action="@{/updateConfiguration}" th:object="${configuration}"
+			action="#" method="post">
+
+		    <div th:each="e : ${#fields.detailedErrors()}" th:class="${e.global}? 'alert alert-danger': 'alert alert-danger'">
+		        <span th:text="${e.global}? '*' : ${e.fieldName}">The field name</span> |
+		        <span th:text="${e.message}">The error message</span>
+		    </div>
+			
+			<div class="alert alert-success" th:if="${infoMessage != null}">
+				<span th:text="${infoMessage}" />
+			</div>
+			
+			<table>
+				<tr>
+					<fieldset>
+						<legend>Raspsonar</legend>
+						
+						<label th:for="email">Email address</label>
+						<input id="email" size="40" th:field="*{email}" /><a href="#"
+							th:href="@{/configuration/mailTest}">Test</a><input type="submit"
+							value="Test" formmethod="get"
+							formaction="/configuration/mailTest" />
+					</fieldset>
+				</tr>
+				<tr>
+					<td colspan="2"><input type="submit"
+						value="Update configuration" /></td>
+				</tr>
+			</table>
+		</form>
+	</div>
 </body>
 </html>

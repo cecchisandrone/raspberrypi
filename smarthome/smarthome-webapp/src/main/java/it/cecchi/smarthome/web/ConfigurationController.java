@@ -35,7 +35,7 @@ public class ConfigurationController {
 	@Autowired
 	private MailSender mailSender;
 
-	@RequestMapping(value = "/editConfiguration", method = RequestMethod.POST)
+	@RequestMapping(value = "/updateConfiguration", method = RequestMethod.POST)
 	public String updateConfiguration(@Valid @ModelAttribute("configuration") Configuration configuration, BindingResult result, Model model) {
 
 		if (!result.hasErrors()) {
@@ -52,13 +52,13 @@ public class ConfigurationController {
 		return "configuration";
 	}
 
-	@RequestMapping("/editConfiguration")
+	@RequestMapping("/configuration")
 	public ModelAndView showConfiguration() {
 
 		Properties p = sonarService.getProperties();
 		Configuration configuration = new Configuration();
 		configuration.setEmail(p.getProperty(PropertyName.EMAIL.getPropertyName()));
-		return new ModelAndView("configuration", "configuration", configuration);
+		return new ModelAndView(ViewNames.CONFIGURATION, "configuration", configuration);
 	}
 
 	@RequestMapping(value = "/configuration/mailTest", method = RequestMethod.GET)
@@ -75,7 +75,7 @@ public class ConfigurationController {
 			model.addAttribute("errorMessage", "Cannot send mail. Reason: " + e.toString());
 		}
 
-		return new ModelAndView("configuration", "configuration", configuration);
+		return new ModelAndView(ViewNames.CONFIGURATION, "configuration", configuration);
 	}
 
 	@RequestMapping(value = "/test", method = RequestMethod.GET)

@@ -12,15 +12,15 @@ import org.springframework.web.servlet.ModelAndView;
  * Handles requests for the application home page.
  */
 @Controller
-public class HomeController {
+public class DashboardController {
 
 	@Autowired
 	private SonarService sonarService;
 
-	@RequestMapping(value = {"/home", "/"}, method = RequestMethod.GET)
+	@RequestMapping(value = {"/dashboard", "/"}, method = RequestMethod.GET)
 	public ModelAndView home() {
 
-		ModelAndView modelAndView = new ModelAndView("home");
+		ModelAndView modelAndView = new ModelAndView(ViewNames.DASHBOARD);
 		modelAndView.addObject("waterLevel", sonarService.getWaterLevel());
 		modelAndView.addObject("configurationFolder", sonarService.getConfigurationFile());
 

@@ -2,10 +2,10 @@
 <html>
 <head>
     <title></title>
-    <script type="text/javascript">window.location.href = '<%=request.getContextPath()%>/home'</script>
+    <script type="text/javascript">window.location.href = '<%=request.getContextPath()%>/dashboard'</script>
 </head>
 <body>
 If you are not redirected automatically, click
-<a href="<%=request.getContextPath()%>/home">here</a>.
+<a href="<%=request.getContextPath()%>/dashboard">here</a>.
 </body>
 </html>
