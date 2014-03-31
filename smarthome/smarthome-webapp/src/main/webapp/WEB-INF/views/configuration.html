@@ -11,35 +11,23 @@
 	<div layout:fragment="content">
 
 
-		<form th:action="@{/updateConfiguration}" th:object="${configuration}"
+		<form class="form-horizontal" th:action="@{/updateConfiguration}" th:object="${configuration}"
 			action="#" method="post">
 
-		    <div th:each="e : ${#fields.detailedErrors()}" th:class="${e.global}? 'alert alert-danger': 'alert alert-danger'">
-		        <span th:text="${e.global}? '*' : ${e.fieldName}">The field name</span> |
-		        <span th:text="${e.message}">The error message</span>
-		    </div>
-			
-			<div class="alert alert-success" th:if="${infoMessage != null}">
-				<span th:text="${infoMessage}" />
-			</div>
-			
-			<table>
-				<tr>
-					<fieldset>
-						<legend>Raspsonar</legend>
-						
-						<label th:for="email">Email address</label>
-						<input id="email" size="40" th:field="*{email}" /><a href="#"
-							th:href="@{/configuration/mailTest}">Test</a><input type="submit"
-							value="Test" formmethod="get"
-							formaction="/configuration/mailTest" />
-					</fieldset>
-				</tr>
-				<tr>
-					<td colspan="2"><input type="submit"
-						value="Update configuration" /></td>
-				</tr>
-			</table>
+			<div th:include="../fragments/messages"/>
+		    
+			<fieldset>
+				<legend>Raspsonar</legend>						
+				<div class="control-group">
+					<label th:for="email" class="control-label">Email address</label>
+					<div class="controls">
+						<input id="email" size="40" th:field="*{email}" th:errorclass="error" />
+						<input name="mailTest" type="submit" value="Send test mail" />
+					</div>
+				</div>	
+			</fieldset>
+			<br/>
+			<input type="submit" class="btn btn-primary" name="updateConfiguration"	value="Update configuration" />
 		</form>
 	</div>
 </body>

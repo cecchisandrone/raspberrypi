@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" 
+	  xmlns:th="http://www.thymeleaf.org">
+<body>
+	<div th:fragment="messages">
+		<div th:each="e : ${#fields.detailedErrors()}" th:class="${e.global}? 'alert alert-danger': 'alert alert-danger'">
+	        <span th:text="${e.global}? '*' : ${e.fieldName}">The field name</span> |
+	        <span th:text="${e.message}">The error message</span>
+	    </div>
+		
+		<div class="alert alert-success" th:if="${infoMessage != null}">
+			<span th:text="${infoMessage}" />
+		</div>
+	</div>
+</body>
+
+</html>

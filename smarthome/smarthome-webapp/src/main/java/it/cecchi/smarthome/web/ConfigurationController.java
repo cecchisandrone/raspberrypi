@@ -35,7 +35,7 @@ public class ConfigurationController {
 	@Autowired
 	private MailSender mailSender;
 
-	@RequestMapping(value = "/updateConfiguration", method = RequestMethod.POST)
+	@RequestMapping(params = "updateConfiguration", value = "/updateConfiguration", method = RequestMethod.POST)
 	public String updateConfiguration(@Valid @ModelAttribute("configuration") Configuration configuration, BindingResult result, Model model) {
 
 		if (!result.hasErrors()) {
@@ -49,7 +49,7 @@ public class ConfigurationController {
 			model.addAttribute("infoMessage", "Configuration updated");
 		}
 
-		return "configuration";
+		return ViewNames.CONFIGURATION;
 	}
 
 	@RequestMapping("/configuration")
@@ -61,21 +61,23 @@ public class ConfigurationController {
 		return new ModelAndView(ViewNames.CONFIGURATION, "configuration", configuration);
 	}
 
-	@RequestMapping(value = "/configuration/mailTest", method = RequestMethod.GET)
-	public ModelAndView testMail(@Valid @ModelAttribute("configuration") Configuration configuration, Model model) {
+	@RequestMapping(params = "mailTest", value = "/updateConfiguration", method = RequestMethod.POST)
+	public ModelAndView mailTest(@Valid @ModelAttribute("configuration") Configuration configuration, BindingResult result, Model model) {
 
-		try {
-			SimpleMailMessage message = new SimpleMailMessage();
-			message.setFrom("raspsonar");
-			message.setSubject("raspsonar test mail");
-			message.setText("If you receive this mail, the mail configuration of raspsonar is correct");
-			message.setTo(configuration.getEmail());
-			mailSender.send(message);
-		} catch (Exception e) {
-			model.addAttribute("errorMessage", "Cannot send mail. Reason: " + e.toString());
+		if (!result.hasErrors()) {
+			try {
+				SimpleMailMessage message = new SimpleMailMessage();
+				message.setFrom("raspsonar");
+				message.setSubject("raspsonar test mail");
+				message.setText("If you receive this mail, the mail configuration of raspsonar is correct");
+				message.setTo(configuration.getEmail());
+				mailSender.send(message);
+			} catch (Exception e) {
+				model.addAttribute("errorMessage", "Cannot send mail. Reason: " + e.toString());
+			}
 		}
 
-		return new ModelAndView(ViewNames.CONFIGURATION, "configuration", configuration);
+		return new ModelAndView(ViewNames.CONFIGURATION, ViewNames.CONFIGURATION, configuration);
 	}
 
 	@RequestMapping(value = "/test", method = RequestMethod.GET)
