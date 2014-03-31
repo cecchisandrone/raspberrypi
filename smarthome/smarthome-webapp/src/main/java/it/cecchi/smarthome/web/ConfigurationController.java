@@ -14,6 +14,7 @@ import java.util.Properties;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Controller;
@@ -29,6 +30,8 @@ import org.springframework.web.servlet.ModelAndView;
 @SessionAttributes
 public class ConfigurationController {
 
+	private @Value("${application.name}") String applicationName;
+	
 	@Autowired
 	private SonarService sonarService;
 
@@ -67,9 +70,9 @@ public class ConfigurationController {
 		if (!result.hasErrors()) {
 			try {
 				SimpleMailMessage message = new SimpleMailMessage();
-				message.setFrom("raspsonar");
-				message.setSubject("raspsonar test mail");
-				message.setText("If you receive this mail, the mail configuration of raspsonar is correct");
+				message.setFrom(applicationName);
+				message.setSubject(applicationName + " test mail");
+				message.setText("If you receive this mail, the mail configuration of " + applicationName + " is correct");
 				message.setTo(configuration.getEmail());
 				mailSender.send(message);
 			} catch (Exception e) {
