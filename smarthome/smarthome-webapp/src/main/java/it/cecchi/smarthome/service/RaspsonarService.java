@@ -15,6 +15,7 @@ import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -75,7 +76,7 @@ public class RaspsonarService {
 		return configurationFile;
 	}
 
-	public Double getWaterLevel() throws RaspsonarServiceException {
+	public Double getDistance() throws RaspsonarServiceException {
 
 		try {
 			Builder request = webTarget.request();
@@ -100,5 +101,16 @@ public class RaspsonarService {
 		} catch (IOException e) {
 			throw new RaspsonarServiceException("Unable to save properties. Reason: " + e.toString());
 		}
+	}
+	
+	@Scheduled(cron="0 0 0/4 * * ?") // Every 4 hours
+	public void checkDistanceTask() {
+		System.out.println("Test");
+		//		try {
+//			getDistance();
+//		} catch (RaspsonarServiceException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 }

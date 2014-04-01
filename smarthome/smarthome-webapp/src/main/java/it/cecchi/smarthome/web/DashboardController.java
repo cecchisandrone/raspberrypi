@@ -23,7 +23,7 @@ public class DashboardController {
 
 		ModelAndView modelAndView = new ModelAndView(ViewNames.DASHBOARD);
 		try {
-			modelAndView.addObject("waterLevel", sonarService.getWaterLevel());
+			modelAndView.addObject("waterLevel", sonarService.getDistance());
 		} catch (RaspsonarServiceException e) {
 			modelAndView.addObject("waterLevel", e.toString());
 		}

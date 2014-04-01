@@ -1,20 +1,27 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org">
 
 <body>
 	<!-- Navigation bar -->
 	<nav class="navbar navbar-default">
 		<div class="navbar-header">
-			<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-				<span class="sr-only">Toggle navigation</span> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span>
+			<button type="button" class="navbar-toggle" data-toggle="collapse"
+				data-target=".navbar-collapse">
+				<span class="sr-only">Toggle navigation</span> <span
+					class="icon-bar"></span> <span class="icon-bar"></span> <span
+					class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="#" th:href="@{/dashboard}"><span class="glyphicon glyphicon-home"></span><span th:text="' ' + ${@appProp['application.name']}" /></a>
+			<a class="navbar-brand" href="#" th:href="@{/dashboard}"><span
+				class="glyphicon glyphicon-home"></span><span
+				th:text="' ' + ${@appProp['application.name']}" /></a>
 		</div>
 
 		<div class="collapse navbar-collapse">
 			<ul class="nav navbar-nav">
-				<li><a th:href="@{/configuration}" href="#">Configuration</a></li>				
-				<li class="dropdown"><a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+				<li><a th:href="@{/configuration}" href="#">Configuration</a></li>
+				<li class="dropdown"><a href="#" class="dropdown-toggle"
+					data-toggle="dropdown">Dropdown <b class="caret"></b></a>
 					<ul class="dropdown-menu">
 						<li><a href="#">Item 1</a></li>
 						<li><a href="#">Item 2</a></li>
@@ -23,22 +30,12 @@
 						<li><a href="#">Item 5</a></li>
 					</ul></li>
 			</ul>
+
+			<ul class="nav navbar-nav navbar-right">
+				<li><span class="label label-primary" th:text="${@appProp['application.name']} + ' ' + ${@appProp['application.version']}"></span></li>
+			</ul>
 		</div>
+
 	</nav>
-
-	<!-- Activates the active class on the selected menu item -->
-	<script type="text/javascript">
-		$(document).ready(function() {
-			$('.nav li').click(function(e) {
-				$('.navbar li.active').removeClass('active');
-				var $this = $(this);
-				if (!$this.hasClass('active')) {
-					$this.addClass('active');
-				}
-				e.preventDefault();
-			});
-		});
-	</script>
-
 </body>
 </html>
