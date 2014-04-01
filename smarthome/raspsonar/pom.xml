@@ -8,8 +8,7 @@
 	</parent>
 	<artifactId>raspsonar</artifactId>
 	<packaging>war</packaging>
-	<properties>
-		<jersey.version>2.7</jersey.version>
+	<properties>		
 		<tomcat.url>localhost:8080</tomcat.url>
 	</properties>	
     <dependencies>
@@ -84,16 +83,5 @@
 				</configuration>
 			</plugin>
 		</plugins>		
-	</build>
-	<dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.glassfish.jersey</groupId>
-                <artifactId>jersey-bom</artifactId>
-                <version>${jersey.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>		
+	</build>		
 </project>

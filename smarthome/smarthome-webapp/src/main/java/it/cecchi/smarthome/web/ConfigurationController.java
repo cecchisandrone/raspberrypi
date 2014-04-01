@@ -2,9 +2,9 @@ package it.cecchi.smarthome.web;
 
 import it.cecchi.smarthome.domain.Configuration;
 import it.cecchi.smarthome.domain.Task;
-import it.cecchi.smarthome.service.SonarService;
-import it.cecchi.smarthome.service.SonarService.PropertyName;
-import it.cecchi.smarthome.service.SonarServiceException;
+import it.cecchi.smarthome.service.RaspsonarService;
+import it.cecchi.smarthome.service.RaspsonarService.PropertyName;
+import it.cecchi.smarthome.service.RaspsonarServiceException;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,10 +30,11 @@ import org.springframework.web.servlet.ModelAndView;
 @SessionAttributes
 public class ConfigurationController {
 
-	private @Value("${application.name}") String applicationName;
-	
+	private @Value("${application.name}")
+	String applicationName;
+
 	@Autowired
-	private SonarService sonarService;
+	private RaspsonarService sonarService;
 
 	@Autowired
 	private MailSender mailSender;
@@ -44,9 +45,10 @@ public class ConfigurationController {
 		if (!result.hasErrors()) {
 			Properties p = sonarService.getProperties();
 			p.put(PropertyName.EMAIL.getPropertyName(), configuration.getEmail());
+			p.put(PropertyName.SERVICE_URL.getPropertyName(), configuration.getServiceUrl());
 			try {
 				sonarService.saveProperties(p);
-			} catch (SonarServiceException e) {
+			} catch (RaspsonarServiceException e) {
 				model.addAttribute("errorMessage", "Error while saving configuration. Reason: " + e.toString());
 			}
 			model.addAttribute("infoMessage", "Configuration updated");
@@ -61,7 +63,13 @@ public class ConfigurationController {
 		Properties p = sonarService.getProperties();
 		Configuration configuration = new Configuration();
 		configuration.setEmail(p.getProperty(PropertyName.EMAIL.getPropertyName()));
-		return new ModelAndView(ViewNames.CONFIGURATION, "configuration", configuration);
+		configuration.setServiceUrl(p.getProperty(PropertyName.SERVICE_URL.getPropertyName()));
+
+		ModelAndView mav = new ModelAndView(ViewNames.CONFIGURATION, "configuration", configuration);
+
+		mav.addObject("configurationFolder", sonarService.getConfigurationFile());
+
+		return mav;
 	}
 
 	@RequestMapping(params = "mailTest", value = "/updateConfiguration", method = RequestMethod.POST)

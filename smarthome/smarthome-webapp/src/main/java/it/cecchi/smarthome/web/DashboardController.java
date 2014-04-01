@@ -1,6 +1,7 @@
 package it.cecchi.smarthome.web;
 
-import it.cecchi.smarthome.service.SonarService;
+import it.cecchi.smarthome.service.RaspsonarService;
+import it.cecchi.smarthome.service.RaspsonarServiceException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -15,14 +16,17 @@ import org.springframework.web.servlet.ModelAndView;
 public class DashboardController {
 
 	@Autowired
-	private SonarService sonarService;
+	private RaspsonarService sonarService;
 
 	@RequestMapping(value = {"/dashboard", "/"}, method = RequestMethod.GET)
 	public ModelAndView home() {
 
 		ModelAndView modelAndView = new ModelAndView(ViewNames.DASHBOARD);
-		modelAndView.addObject("waterLevel", sonarService.getWaterLevel());
-		modelAndView.addObject("configurationFolder", sonarService.getConfigurationFile());
+		try {
+			modelAndView.addObject("waterLevel", sonarService.getWaterLevel());
+		} catch (RaspsonarServiceException e) {
+			modelAndView.addObject("waterLevel", e.toString());
+		}
 
 		return modelAndView;
 	}

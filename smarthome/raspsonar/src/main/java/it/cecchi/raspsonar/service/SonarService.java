@@ -6,7 +6,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 /**
- * Example resource class hosted at the URI path "/myresource"
+ * Example resource class hosted at the URI path "/sonarservice"
  */
 @Path("/sonarservice")
 public class SonarService {
