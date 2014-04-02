@@ -9,7 +9,18 @@
 <body>
 	<!-- /* Content of this page will be decorated by the elements of layout.html */ -->
 	<div layout:fragment="content">
-		<img src="http://cecchisandrone.no-ip.org:802/videostream.cgi"/>
+		<div class="col-md-4">	
+			Living
+			<img class="img-responsive img-thumbnail" alt="Responsive image" src="http://cecchisandrone.no-ip.org/living/videostream.cgi"/>
+		</div>
+		<div class="col-md-4">
+			External
+			<img class="img-responsive img-thumbnail" alt="Responsive image" src="http://cecchisandrone.no-ip.org/external/videostream.cgi"/>
+		</div>
+		<div class="col-md-4">
+			Basement
+			<img class="img-responsive img-thumbnail" alt="Responsive image" src="http://cecchisandrone.no-ip.org/basement/videostream.cgi"/>
+		</div>
 	</div>
 </body>
 </html>

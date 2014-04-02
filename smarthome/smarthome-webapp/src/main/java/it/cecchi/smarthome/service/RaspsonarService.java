@@ -87,7 +87,7 @@ public class RaspsonarService {
 		return configurationFile;
 	}
 
-	public Double getDistance() throws RaspsonarServiceException {
+	public synchronized Double getDistance() throws RaspsonarServiceException {
 
 		double sum = 0;
 		try {
