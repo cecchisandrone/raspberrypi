@@ -15,14 +15,21 @@ import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
 public class RaspsonarService {
 
+	private static final int MEASUREMENT_NUMBER = 5;
+
+	private static final Logger logger = LoggerFactory.getLogger(RaspsonarService.class);
+
 	public enum PropertyName {
-		EMAIL("email"), SERVICE_URL("serviceUrl");
+		EMAIL("email"), SERVICE_URL("serviceUrl"), DISTANCE_THRESHOLD("distanceThreshold");
 
 		private String propertyName;
 
@@ -42,6 +49,9 @@ public class RaspsonarService {
 	private Properties properties;
 
 	private WebTarget webTarget;
+
+	@Autowired
+	private NotificationService notificationService;
 
 	public RaspsonarService() throws FileNotFoundException, IOException {
 
@@ -63,6 +73,7 @@ public class RaspsonarService {
 		Properties def = new Properties();
 		def.put(PropertyName.EMAIL.getPropertyName(), "testemail@test.mail");
 		def.put(PropertyName.SERVICE_URL.getPropertyName(), "http://service_url:8080/service");
+		def.put(PropertyName.DISTANCE_THRESHOLD.getPropertyName(), "10.0");
 		return def;
 	}
 
@@ -78,14 +89,20 @@ public class RaspsonarService {
 
 	public Double getDistance() throws RaspsonarServiceException {
 
+		double sum = 0;
 		try {
 			Builder request = webTarget.request();
-			Response response = request.get();
-			String distanceAsString = response.readEntity(String.class);
-			return new BigDecimal(distanceAsString).setScale(1, RoundingMode.CEILING).doubleValue();
+			for (int i = 0; i < MEASUREMENT_NUMBER; i++) {
+				Response response = request.get();
+				String distanceAsString = response.readEntity(String.class);
+				Double value = new Double(distanceAsString);
+				sum = sum + value;
+			}
+
 		} catch (Exception e) {
 			throw new RaspsonarServiceException("Can't access remote service. Reason: " + e.toString());
 		}
+		return new BigDecimal(sum / MEASUREMENT_NUMBER).setScale(1, RoundingMode.CEILING).doubleValue();
 	}
 
 	public Properties getProperties() {
@@ -102,15 +119,23 @@ public class RaspsonarService {
 			throw new RaspsonarServiceException("Unable to save properties. Reason: " + e.toString());
 		}
 	}
-	
-	@Scheduled(cron="0 0 0/4 * * ?") // Every 4 hours
+
+	// Every 2 hours
+	@Scheduled(cron = "0 0 0/2 * * ?")
 	public void checkDistanceTask() {
-		System.out.println("Test");
-		//		try {
-//			getDistance();
-//		} catch (RaspsonarServiceException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+
+		try {
+			logger.info("Checking distance threshold...");
+			Double distance = getDistance();
+			logger.info("Distance is " + distance);
+			if (distance > new Double((String) properties.get(PropertyName.DISTANCE_THRESHOLD.getPropertyName()))) {
+				logger.info("Alerting user");
+				notificationService.sendMail((String) properties.get(PropertyName.EMAIL.getPropertyName()),
+					"Warning! Distance threshold has been trespassed. Value: " + distance);
+			}
+
+		} catch (RaspsonarServiceException e) {
+			logger.error(e.toString(), e);
+		}
 	}
 }

@@ -34,6 +34,12 @@
 						<input id="serviceUrl" size="40" th:field="*{serviceUrl}" th:errorclass="error" />						
 					</div>
 				</div>
+				<div class="control-group">
+					<label th:for="distanceThreshold" class="control-label">Distance threshold</label>
+					<div class="controls">
+						<input id="distanceThreshold" size="40" th:field="*{distanceThreshold}" th:errorclass="error" />						
+					</div>
+				</div>
 			</fieldset>
 			<br/>
 			<input type="submit" class="btn btn-primary" name="updateConfiguration"	value="Update configuration" />

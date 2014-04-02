@@ -2,6 +2,7 @@ package it.cecchi.smarthome.web;
 
 import it.cecchi.smarthome.domain.Configuration;
 import it.cecchi.smarthome.domain.Task;
+import it.cecchi.smarthome.service.NotificationService;
 import it.cecchi.smarthome.service.RaspsonarService;
 import it.cecchi.smarthome.service.RaspsonarService.PropertyName;
 import it.cecchi.smarthome.service.RaspsonarServiceException;
@@ -14,9 +15,6 @@ import java.util.Properties;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.MailSender;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -30,14 +28,11 @@ import org.springframework.web.servlet.ModelAndView;
 @SessionAttributes
 public class ConfigurationController {
 
-	private @Value("${application.name}")
-	String applicationName;
-
 	@Autowired
 	private RaspsonarService sonarService;
 
 	@Autowired
-	private MailSender mailSender;
+	private NotificationService notificationService;
 
 	@RequestMapping(params = "updateConfiguration", value = "/updateConfiguration", method = RequestMethod.POST)
 	public String updateConfiguration(@Valid @ModelAttribute("configuration") Configuration configuration, BindingResult result, Model model) {
@@ -46,6 +41,7 @@ public class ConfigurationController {
 			Properties p = sonarService.getProperties();
 			p.put(PropertyName.EMAIL.getPropertyName(), configuration.getEmail());
 			p.put(PropertyName.SERVICE_URL.getPropertyName(), configuration.getServiceUrl());
+			p.put(PropertyName.DISTANCE_THRESHOLD.getPropertyName(), configuration.getDistanceThreshold().toString());
 			try {
 				sonarService.saveProperties(p);
 			} catch (RaspsonarServiceException e) {
@@ -64,6 +60,7 @@ public class ConfigurationController {
 		Configuration configuration = new Configuration();
 		configuration.setEmail(p.getProperty(PropertyName.EMAIL.getPropertyName()));
 		configuration.setServiceUrl(p.getProperty(PropertyName.SERVICE_URL.getPropertyName()));
+		configuration.setDistanceThreshold(new Double(p.getProperty(PropertyName.DISTANCE_THRESHOLD.getPropertyName())));
 
 		ModelAndView mav = new ModelAndView(ViewNames.CONFIGURATION, "configuration", configuration);
 
@@ -77,12 +74,7 @@ public class ConfigurationController {
 
 		if (!result.hasErrors()) {
 			try {
-				SimpleMailMessage message = new SimpleMailMessage();
-				message.setFrom(applicationName);
-				message.setSubject(applicationName + " test mail");
-				message.setText("If you receive this mail, the mail configuration of " + applicationName + " is correct");
-				message.setTo(configuration.getEmail());
-				mailSender.send(message);
+				notificationService.sendMail(configuration.getEmail(), "If you receive this mail, the mail configuration is correct");
 			} catch (Exception e) {
 				model.addAttribute("errorMessage", "Cannot send mail. Reason: " + e.toString());
 			}

@@ -73,7 +73,7 @@
 		<dependency>
 			<groupId>org.glassfish.jersey.core</groupId>
 			<artifactId>jersey-client</artifactId>			
-		</dependency>
+		</dependency>		
 	</dependencies>
 	<build>
 		<finalName>smarthome</finalName>
