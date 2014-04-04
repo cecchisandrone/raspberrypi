@@ -24,9 +24,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class RaspsonarService {
 
-	private static final int MEASUREMENT_NUMBER = 5;
+	private static final int MEASUREMENTS = 5;
 
 	private static final Logger logger = LoggerFactory.getLogger(RaspsonarService.class);
+
+	private double averageDistance;
 
 	public enum PropertyName {
 		EMAIL("email"), SERVICE_URL("serviceUrl"), DISTANCE_THRESHOLD("distanceThreshold");
@@ -89,20 +91,21 @@ public class RaspsonarService {
 
 	public synchronized Double getDistance() throws RaspsonarServiceException {
 
-		double sum = 0;
 		try {
-			Builder request = webTarget.request();
-			for (int i = 0; i < MEASUREMENT_NUMBER; i++) {
-				Response response = request.get();
-				String distanceAsString = response.readEntity(String.class);
-				Double value = new Double(distanceAsString);
-				sum = sum + value;
+			WebTarget getDistanceTarget = webTarget.queryParam("measurements", MEASUREMENTS);
+			Builder request = getDistanceTarget.request();
+			Response response = request.get();
+			String distanceAsString = response.readEntity(String.class);
+			Double distance = new Double(distanceAsString);
+			if (averageDistance == 0) {
+				averageDistance = distance;
 			}
+			averageDistance = (distance + averageDistance) / 2;
+			return new BigDecimal(averageDistance).setScale(1, RoundingMode.CEILING).doubleValue();
 
 		} catch (Exception e) {
 			throw new RaspsonarServiceException("Can't access remote service. Reason: " + e.toString());
 		}
-		return new BigDecimal(sum / MEASUREMENT_NUMBER).setScale(1, RoundingMode.CEILING).doubleValue();
 	}
 
 	public Properties getProperties() {

@@ -21,7 +21,7 @@ public class Configuration {
 
 	@NotNull
 	@Min(10)
-	@Max(100)
+	@Max(200)
 	private Double distanceThreshold;
 
 	public String getServiceUrl() {

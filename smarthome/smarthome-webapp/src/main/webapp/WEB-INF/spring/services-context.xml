@@ -11,6 +11,8 @@
 	<task:annotation-driven/>
 
 	<util:properties id="appProp" location="classpath:smarthome.properties" />
+	
+	<context:property-placeholder properties-ref="appProp"/>
 			
 	<!-- SET default mail properties -->
 	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">

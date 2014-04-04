@@ -8,7 +8,15 @@
 		<!-- Grid -->
 		<div class="row">
 			<div class="col-md-6">
-				<p><strong>Actual water level: </strong><span id="waterLevel" th:text="${waterLevel} + ' cm'"></span></p>				
+				<p>
+					<strong>Actual water level: </strong><span id="waterLevel" th:if="${waterLevel != null}" th:text="${waterLevel} + ' cm'"></span>
+					<button type="button" class="btn btn-danger btn-xs" id="waterLevelError" data-toggle="popover" data-placement="bottom" th:if="${waterLevelError != null}" th:attr="data-content=${waterLevelError}">Error while contacting Raspsonar</button>
+					<script>
+					    jQuery(function ($) {
+					        $("#waterLevelError").popover()
+					    });					
+					</script>	
+				</p>			
 			</div>
 			<div class="col-md-6">			
 					

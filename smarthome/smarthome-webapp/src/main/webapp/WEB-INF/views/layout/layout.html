@@ -15,7 +15,9 @@
 </head>
 <body>
 	<!--/* Standard layout can be mixed with Layout Dialect */-->
-	<div th:replace="../fragments/navBar">Navigation bar</div>
+	<div layout:fragment="navigationBar">
+		<div th:replace="../fragments/navBar">Navigation bar</div> 
+	</div>	 
 	<div id="wrap">
 	<div class="container">
 		<div layout:fragment="content">
@@ -30,6 +32,8 @@
 		</div>		
 	</div>
 	</div>
-	<div th:replace="../fragments/footer">© 2014 The Static Templates</div>	
+	<div layout:fragment="footer">
+		<div th:replace="../fragments/footer">© 2014 The Static Templates</div>
+	</div>	
 </body>
 </html>

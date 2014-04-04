@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout/layout">
+<head>
+<title>Login</title>
+</head>
+<body>
+	<div layout:fragment="navigationBar" />
+	<div layout:fragment="content" class="container">
+	<div class="row">
+		<div class="col-md-4">
+		</div>
+		<div class="col-md-4">
+			<div>
+				<h2>Welcome to <span th:text="${@appProp['application.name']}"/></h2>
+	
+				<form action="authentication" th:action="@{/j_spring_security_check}" method="post" class="well">
+					<fieldset>
+						<div th:if="${loginError}" class="alert alert-danger">Wrong user or password</div>
+						<table>
+							<tr>
+								<td width="100px">
+									<label>Login:</label>
+								</td>
+								<td> 
+									<input id="j_username" name="j_username" type="text" required="required" autofocus="autofocus" class="input span3" placeholder="Your login..." />
+								</td>
+							</tr>
+						 	<tr height="5px"/>
+						 	<tr>
+								<td width="100px">
+									<label>Password:</label>
+								</td>  
+								<td>
+									<input id="j_password" name="j_password" type="password" required="required" class="input span3" placeholder="Your password..." />
+								</td>
+							</tr>
+						</table>						
+					</fieldset>
+					<br/> 
+					<button type="submit" class="btn btn-success">Authenticate</button>
+				</form>
+			</div>
+		</div>
+		<div class="col-md-4">
+		</div>
+	</div>
+	</div>
+</body>
+</html>
+

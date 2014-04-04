@@ -68,6 +68,7 @@
 			<set>
 				<!-- <bean class="org.thymeleaf.extras.tiles2.dialect.TilesDialect"/> -->
 				<bean class="nz.net.ultraq.thymeleaf.LayoutDialect" />
+				<bean class="org.thymeleaf.extras.springsecurity3.dialect.SpringSecurityDialect" />				
 			</set>
 		</property>
 	</bean>

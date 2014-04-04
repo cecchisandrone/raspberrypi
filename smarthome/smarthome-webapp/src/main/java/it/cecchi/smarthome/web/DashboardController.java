@@ -3,8 +3,11 @@ package it.cecchi.smarthome.web;
 import it.cecchi.smarthome.service.RaspsonarService;
 import it.cecchi.smarthome.service.RaspsonarServiceException;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -25,9 +28,21 @@ public class DashboardController {
 		try {
 			modelAndView.addObject("waterLevel", sonarService.getDistance());
 		} catch (RaspsonarServiceException e) {
-			modelAndView.addObject("waterLevel", e.toString());
+			modelAndView.addObject("waterLevelError", e.toString());
 		}
-
 		return modelAndView;
+	}
+
+	@RequestMapping("/error")
+	public String error(HttpServletRequest request, Model model) {
+
+		model.addAttribute("errorCode", request.getAttribute("javax.servlet.error.status_code"));
+		Throwable throwable = (Throwable) request.getAttribute("javax.servlet.error.exception");
+		String errorMessage = null;
+		if (throwable != null) {
+			errorMessage = throwable.toString();
+		}
+		model.addAttribute("errorMessage", errorMessage);
+		return ViewNames.ERROR;
 	}
 }
