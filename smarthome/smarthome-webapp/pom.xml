@@ -107,6 +107,7 @@
 				<configuration>
 					<url>http://${tomcat.url}/manager/text</url>
 					<server>TomcatServerRaspberry</server>
+					<path>/smarthome</path>
 				</configuration>
 			</plugin>
 		</plugins>
