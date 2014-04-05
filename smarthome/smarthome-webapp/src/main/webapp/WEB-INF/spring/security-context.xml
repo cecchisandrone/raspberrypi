@@ -9,7 +9,8 @@
 	<sec:http auto-config="true">
 		<sec:intercept-url pattern="/**" access="ROLE_USER" />
 		<sec:form-login login-page="/login" authentication-failure-url="/login-error" />
-		<sec:logout />
+		<sec:logout/>
+		<sec:remember-me key="rememberMeCookie"/>
 	</sec:http>
 
 	<sec:authentication-manager>

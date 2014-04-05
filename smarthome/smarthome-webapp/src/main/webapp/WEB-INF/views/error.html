@@ -12,8 +12,8 @@
 		</div>
 		<div class="col-md-4">
 			<img th:src="@{/assets/img/error.png}" alt="error"/>
-			<h2>Error code: <span th:text="${errorCode}"/></h2>
-       		<p>Message: <span th:text="${errorMessage}"/></p>
+			<h2 class="alert alert-warning">Error code: <span th:text="${errorCode}"/></h2>
+       		<div class="alert alert-warning"><strong>Message: </strong><span th:text="${errorMessage}"/></div>
 		</div>
 		<div class="col-md-4">
 		</div>

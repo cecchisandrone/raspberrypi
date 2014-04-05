@@ -18,7 +18,7 @@
 						<div th:if="${loginError}" class="alert alert-danger">Wrong user or password</div>
 						<table>
 							<tr>
-								<td width="100px">
+								<td width="120px">
 									<label>Login:</label>
 								</td>
 								<td> 
@@ -27,17 +27,26 @@
 							</tr>
 						 	<tr height="5px"/>
 						 	<tr>
-								<td width="100px">
+								<td width="120px">
 									<label>Password:</label>
 								</td>  
 								<td>
 									<input id="j_password" name="j_password" type="password" required="required" class="input span3" placeholder="Your password..." />
 								</td>
 							</tr>
+							<tr height="5px"/>
+							<tr>
+								<td width="120px">
+									<label>Remember me:</label>
+								</td>  
+								<td>
+									<input type="checkbox" class="input span3" id="_spring_security_remember_me" name="_spring_security_remember_me"/>
+								</td>
+							</tr>							
 						</table>						
 					</fieldset>
 					<br/> 
-					<button type="submit" class="btn btn-success">Authenticate</button>
+					<button type="submit" class="center-block btn btn-success">Authenticate</button>
 				</form>
 			</div>
 		</div>
