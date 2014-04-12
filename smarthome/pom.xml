@@ -88,5 +88,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<slf4j.version>1.7.6</slf4j.version>
 		<jersey.version>2.7</jersey.version>
+		<hibernate.version>4.3.4.Final</hibernate.version>
 	</properties>
 </project>
