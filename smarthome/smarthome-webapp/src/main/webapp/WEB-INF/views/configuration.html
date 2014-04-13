@@ -1,7 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:th="http://www.thymeleaf.org"
-	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
 	layout:decorator="layout/layout">
 <head>
 <title>Configuration</title>
@@ -11,38 +9,83 @@
 	<div layout:fragment="content">
 
 
-		<form class="form-horizontal" th:action="@{/updateConfiguration}" th:object="${configuration}"
-			action="#" method="post">
+		<form class="form-horizontal" th:action="@{/updateConfiguration}" th:object="${configuration}" action="#" method="post">
 
-			<div th:include="../fragments/messages"/>
-		    
+			<div th:include="../fragments/messages" />
+
 			<fieldset>
-				<legend>Raspsonar</legend>						
-				
-				<p><strong>Property file: </strong><span id="confFolder" th:text="${configurationFolder}"></span></p>
-				
+				<legend>Raspsonar</legend>
+
 				<div class="control-group">
 					<label th:for="email" class="control-label">Email address</label>
 					<div class="controls">
-						<input id="email" size="40" th:field="*{email}" th:errorclass="error" />
-						<input name="mailTest" type="submit" value="Send test mail" />
+						<input id="email" size="40" th:field="*{email}" th:errorclass="error" /> <input name="mailTest" type="submit" value="Send test mail"
+							class="btn btn-default" />
 					</div>
-				</div>	
+				</div>
 				<div class="control-group">
 					<label th:for="serviceUrl" class="control-label">Service URL</label>
 					<div class="controls">
-						<input id="serviceUrl" size="40" th:field="*{serviceUrl}" th:errorclass="error" />						
+						<input id="serviceUrl" size="40" th:field="*{serviceUrl}" th:errorclass="error" />
 					</div>
 				</div>
 				<div class="control-group">
 					<label th:for="distanceThreshold" class="control-label">Distance threshold</label>
 					<div class="controls">
-						<input id="distanceThreshold" size="40" th:field="*{distanceThreshold}" th:errorclass="error" />						
+						<input id="distanceThreshold" size="40" th:field="*{distanceThreshold}" th:errorclass="error" />
 					</div>
 				</div>
 			</fieldset>
-			<br/>
-			<input type="submit" class="btn btn-primary" name="updateConfiguration"	value="Update configuration" />
+			<br />
+			<fieldset>
+				<legend>Cameras</legend>
+				<!-- Table -->
+				<div class="table-responsive" th:unless="${#lists.isEmpty(configuration.cameraConfigurations)}">
+					<table class="table">
+						<!-- Header -->
+						<thead>
+							<tr>
+								<th>Host</th>
+								<th>Port</th>
+								<th>Alarm</th>
+								<th>Show</th>
+							</tr>
+						</thead>
+
+						<!-- Rows -->
+						<tbody>
+							<tr th:each="cc : ${configuration.cameraConfigurations}">
+								<td th:text="${cc.host}">host.com</td>
+								<td th:text="${cc.port}">8080</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<!-- No cameras -->
+				<p th:if="${#lists.isEmpty(configuration.cameraConfigurations)}">No cameras configured</p>
+
+				<input class="btn btn-default" value="Add camera" data-toggle="modal" data-target="#newCamera" />
+
+				<!-- New camera modal -->
+				<div class="modal fade" id="newCamera" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+								<h4 class="modal-title" id="myModalLabel">Add new camera</h4>
+							</div>
+							<div class="modal-body">...</div>
+							<div class="modal-footer">
+								<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+								<button type="button" class="btn btn-primary">Save changes</button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</fieldset>
+			<br /> <input type="submit" class="btn btn-primary" name="updateConfiguration" value="Update configuration" />
 		</form>
 	</div>
 </body>

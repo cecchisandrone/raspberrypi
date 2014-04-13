@@ -1,4 +1,4 @@
-package it.cecchi.smarthome.service;
+package it.cecchi.smarthome.service.notification;
 
 
 public class NotificationServiceException extends Exception {

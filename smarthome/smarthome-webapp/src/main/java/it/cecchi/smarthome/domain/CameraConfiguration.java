@@ -1,23 +1,42 @@
 package it.cecchi.smarthome.domain;
 
+import java.io.Serializable;
+
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+
+import org.hibernate.validator.constraints.NotEmpty;
+import org.hibernate.validator.constraints.URL;
 
 @Entity
-public class Camera {
+public class CameraConfiguration implements Serializable {
+
+	private static final long serialVersionUID = 1980887710668055069L;
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
-	
+
+	@NotEmpty
+	@Min(1)
+	@Max(65535)
 	private long port;
-	
+
+	@URL
+	@NotEmpty
 	private String host;
-	
+
 	private boolean alarmEnabled;
-	
+
 	private String username;
-	
+
 	private String password;
+
+	private boolean enabled;
 
 	public long getId() {
 		return id;
@@ -65,5 +84,13 @@ public class Camera {
 
 	public void setPassword(String password) {
 		this.password = password;
-	}	
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
+	}
 }

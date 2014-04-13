@@ -1,12 +1,10 @@
 package it.cecchi.smarthome.web;
 
 import it.cecchi.smarthome.domain.Configuration;
-import it.cecchi.smarthome.service.NotificationService;
-import it.cecchi.smarthome.service.RaspsonarService;
-import it.cecchi.smarthome.service.RaspsonarService.PropertyName;
-import it.cecchi.smarthome.service.RaspsonarServiceException;
-
-import java.util.Properties;
+import it.cecchi.smarthome.service.configuration.ConfigurationService;
+import it.cecchi.smarthome.service.configuration.ConfigurationServiceException;
+import it.cecchi.smarthome.service.notification.NotificationService;
+import it.cecchi.smarthome.service.raspsonar.RaspsonarService;
 
 import javax.validation.Valid;
 
@@ -21,7 +19,7 @@ import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
-@SessionAttributes
+@SessionAttributes(value = { "configuration" })
 public class ConfigurationController {
 
 	@Autowired
@@ -30,20 +28,20 @@ public class ConfigurationController {
 	@Autowired
 	private NotificationService notificationService;
 
+	@Autowired
+	private ConfigurationService configurationService;
+
 	@RequestMapping(params = "updateConfiguration", value = "/updateConfiguration", method = RequestMethod.POST)
-	public String updateConfiguration(@Valid @ModelAttribute("configuration") Configuration configuration, BindingResult result, Model model) {
+	public String updateConfiguration(@Valid @ModelAttribute("configuration") Configuration configuration,
+			BindingResult result, Model model) {
 
 		if (!result.hasErrors()) {
-			Properties p = sonarService.getProperties();
-			p.put(PropertyName.EMAIL.getPropertyName(), configuration.getEmail());
-			p.put(PropertyName.SERVICE_URL.getPropertyName(), configuration.getServiceUrl());
-			p.put(PropertyName.DISTANCE_THRESHOLD.getPropertyName(), configuration.getDistanceThreshold().toString());
 			try {
-				sonarService.saveProperties(p);
-			} catch (RaspsonarServiceException e) {
+				configurationService.saveConfiguration(configuration);
+				model.addAttribute("infoMessage", "Configuration updated");
+			} catch (ConfigurationServiceException e) {
 				model.addAttribute("errorMessage", "Error while saving configuration. Reason: " + e.toString());
 			}
-			model.addAttribute("infoMessage", "Configuration updated");
 		}
 
 		return ViewNames.CONFIGURATION;
@@ -52,25 +50,24 @@ public class ConfigurationController {
 	@RequestMapping("/configuration")
 	public ModelAndView showConfiguration() {
 
-		Properties p = sonarService.getProperties();
-		Configuration configuration = new Configuration();
-		configuration.setEmail(p.getProperty(PropertyName.EMAIL.getPropertyName()));
-		configuration.setServiceUrl(p.getProperty(PropertyName.SERVICE_URL.getPropertyName()));
-		configuration.setDistanceThreshold(new Double(p.getProperty(PropertyName.DISTANCE_THRESHOLD.getPropertyName())));
-
-		ModelAndView mav = new ModelAndView(ViewNames.CONFIGURATION, "configuration", configuration);
-
-		mav.addObject("configurationFolder", sonarService.getConfigurationFile());
-
-		return mav;
+		Configuration configuration;
+		try {
+			configuration = configurationService.getConfiguration();
+			return new ModelAndView(ViewNames.CONFIGURATION, "configuration", configuration);
+		} catch (ConfigurationServiceException e) {
+			return new ModelAndView(ViewNames.CONFIGURATION, "errorMessage",
+					"Error while loading configuration. Reason: " + e.toString());
+		}
 	}
 
 	@RequestMapping(params = "mailTest", value = "/updateConfiguration", method = RequestMethod.POST)
-	public ModelAndView mailTest(@Valid @ModelAttribute("configuration") Configuration configuration, BindingResult result, Model model) {
+	public ModelAndView mailTest(@Valid @ModelAttribute("configuration") Configuration configuration,
+			BindingResult result, Model model) {
 
 		if (!result.hasErrors()) {
 			try {
-				notificationService.sendMail(configuration.getEmail(), "If you receive this mail, the mail configuration is correct");
+				notificationService.sendMail(configuration.getEmail(),
+						"If you receive this mail, the mail configuration is correct");
 			} catch (Exception e) {
 				model.addAttribute("errorMessage", "Cannot send mail. Reason: " + e.toString());
 			}

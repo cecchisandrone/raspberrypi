@@ -1,7 +1,7 @@
 package it.cecchi.smarthome.web;
 
-import it.cecchi.smarthome.service.RaspsonarService;
-import it.cecchi.smarthome.service.RaspsonarServiceException;
+import it.cecchi.smarthome.service.raspsonar.RaspsonarService;
+import it.cecchi.smarthome.service.raspsonar.RaspsonarServiceException;
 
 import javax.servlet.http.HttpServletRequest;
 

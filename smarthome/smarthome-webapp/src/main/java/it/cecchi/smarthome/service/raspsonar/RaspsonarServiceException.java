@@ -1,4 +1,4 @@
-package it.cecchi.smarthome.service;
+package it.cecchi.smarthome.service.raspsonar;
 
 
 public class RaspsonarServiceException extends Exception {

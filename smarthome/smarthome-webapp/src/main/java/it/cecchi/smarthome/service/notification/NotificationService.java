@@ -1,4 +1,4 @@
-package it.cecchi.smarthome.service;
+package it.cecchi.smarthome.service.notification;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
