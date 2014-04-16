@@ -10,7 +10,7 @@
                            http://www.springframework.org/schema/tx 
                            http://www.springframework.org/schema/tx/spring-tx.xsd">
 
-	<tx:annotation-driven />
+	<tx:annotation-driven transaction-manager="transactionManager" />
 
 	<jpa:repositories base-package="it.cecchi.smarthome.persistence" />
 
@@ -28,7 +28,6 @@
 	</jdbc:initialize-database>
 
 	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" p:dataSource-ref="dataSource" p:persistenceUnitName="h2">
-
 		<property name="packagesToScan">
 			<list>
 				<value>it.cecchi.smarthome.domain</value>
@@ -39,7 +38,7 @@
 		</property>
 		<property name="jpaProperties">
 			<props>
-				<prop key="hibernate.enable_lazy_load_no_trans">true</prop>
+				<prop key="hibernate.enable_lazy_load_no_trans">true</prop>							
 			</props>
 		</property>
 	</bean>

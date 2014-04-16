@@ -11,6 +11,10 @@
 		<div class="alert alert-success" th:if="${infoMessage != null}">
 			<span th:text="${infoMessage}" />
 		</div>
+		
+		<div class="alert alert-danger" th:if="${errorMessage != null}">
+			<span th:text="${errorMessage}" />
+		</div>
 	</div>
 </body>
 

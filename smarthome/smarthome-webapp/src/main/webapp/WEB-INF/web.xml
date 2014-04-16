@@ -5,17 +5,15 @@
 	version="2.5">
 
 	<display-name>SmartHome ${project.version}</display-name>
-
-	<listener>
-		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-	</listener>
-
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
 		<param-value>
 			/WEB-INF/spring/*-context.xml
 		</param-value>
 	</context-param>
+	<listener>
+		<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+	</listener>
 
 	<!-- Spring MVC -->
 	<servlet>
@@ -44,19 +42,6 @@
 		<filter-name>springSecurityFilterChain</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-
-<!-- 	<filter> -->
-<!-- 		<filter-name>openSessionInViewFilter</filter-name> -->
-<!-- 		<filter-class>org.springframework.orm.hibernate4.support.OpenSessionInViewFilter</filter-class> -->
-<!-- 		<init-param> -->
-<!-- 			<param-name>singleSession</param-name> -->
-<!-- 			<param-value>true</param-value> -->
-<!-- 		</init-param> -->
-<!-- 	</filter> -->
-<!-- 	<filter-mapping> -->
-<!-- 		<filter-name>openSessionInViewFilter</filter-name> -->
-<!-- 		<url-pattern>/*</url-pattern> -->
-<!-- 	</filter-mapping> -->
 
 	<error-page>
 		<exception-type>java.lang.Throwable</exception-type>

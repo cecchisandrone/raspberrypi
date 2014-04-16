@@ -6,8 +6,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 
 import org.hibernate.validator.constraints.NotEmpty;
 import org.hibernate.validator.constraints.URL;
@@ -21,14 +19,12 @@ public class CameraConfiguration implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 
-	@NotEmpty
-	@Min(1)
-	@Max(65535)
-	private long port;
-
 	@URL
 	@NotEmpty
 	private String host;
+
+	@NotEmpty
+	private String name;
 
 	private boolean alarmEnabled;
 
@@ -44,14 +40,6 @@ public class CameraConfiguration implements Serializable {
 
 	public void setId(long id) {
 		this.id = id;
-	}
-
-	public long getPort() {
-		return port;
-	}
-
-	public void setPort(long port) {
-		this.port = port;
 	}
 
 	public String getHost() {
@@ -92,5 +80,14 @@ public class CameraConfiguration implements Serializable {
 
 	public boolean isEnabled() {
 		return enabled;
+	}
+
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getName() {
+		return name;
 	}
 }

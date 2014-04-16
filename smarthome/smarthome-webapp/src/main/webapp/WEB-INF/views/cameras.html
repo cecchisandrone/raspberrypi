@@ -9,22 +9,13 @@
 <body>
 	<!-- /* Content of this page will be decorated by the elements of layout.html */ -->
 	<div layout:fragment="content">
-		<div class="col-md-4">
-			Living <img class="img-responsive img-thumbnail"
-				alt="Responsive image"
-				src="http://cecchisandrone.no-ip.org/living/videostream.cgi" />
+		<div th:each="cc,row : ${configuration.cameraConfigurations}">
+			<div class="col-md-6" th:if="${cc.enabled}">
+				<h2 th:text="${cc.name}"/>
+				<img class="img-responsive img-thumbnail" alt="Responsive image" th:src="${cc.host} + '/videostream.cgi?user=' + ${cc.username} + '&amp;pwd=' + ${cc.password}" />
+			</div>
 		</div>
-		<div class="col-md-4">
-			External <img class="img-responsive img-thumbnail"
-				alt="Responsive image"
-				src="http://cecchisandrone.no-ip.org/external/videostream.cgi" />
-		</div>
-		<div class="col-md-4">
-			Basement <img class="img-responsive img-thumbnail"
-				alt="Responsive image"
-				src="http://cecchisandrone.no-ip.org/basement/videostream.cgi" />
-		</div>
-
+		
  		<!-- On the window unload, reset the img src attr, because the connection stays open -->
 		<script type="text/javascript">
 			$(window).on('unload', function() {

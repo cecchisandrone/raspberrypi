@@ -8,6 +8,11 @@
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
         http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd">
 
+
+	<!-- Scans within the base package of the application for @Components to configure as beans -->
+	<!-- @Controller, @Service, @Configuration, etc. -->
+	<context:component-scan base-package="it.cecchi.smarthome" />
+
 	<task:annotation-driven/>
 
 	<util:properties id="appProp" location="classpath:smarthome.properties" />

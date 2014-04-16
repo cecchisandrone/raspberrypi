@@ -3,10 +3,13 @@ package it.cecchi.smarthome.domain;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -38,7 +41,8 @@ public class Configuration implements Serializable {
 	@Max(200)
 	private Double distanceThreshold;
 
-	@OneToMany
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+	@JoinColumn(name = "CONFIGURATION_ID")
 	private List<CameraConfiguration> cameraConfigurations;
 
 	public long getId() {

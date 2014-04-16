@@ -1,6 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-	layout:decorator="layout/layout">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout/layout">
 <head>
 <title>Configuration</title>
 </head>
@@ -19,8 +18,7 @@
 				<div class="control-group">
 					<label th:for="email" class="control-label">Email address</label>
 					<div class="controls">
-						<input id="email" size="40" th:field="*{email}" th:errorclass="error" /> <input name="mailTest" type="submit" value="Send test mail"
-							class="btn btn-default" />
+						<input id="email" size="40" th:field="*{email}" th:errorclass="error" /> <input name="mailTest" type="submit" value="Send test mail" class="btn btn-default" />						
 					</div>
 				</div>
 				<div class="control-group">
@@ -45,18 +43,26 @@
 						<!-- Header -->
 						<thead>
 							<tr>
-								<th>Host</th>
-								<th>Port</th>
+								<th>Name</th>
+								<th>Host</th>								
 								<th>Alarm</th>
-								<th>Show</th>
+								<th>Enabled</th>
+								<th>Actions</th>								
 							</tr>
 						</thead>
 
 						<!-- Rows -->
 						<tbody>
-							<tr th:each="cc : ${configuration.cameraConfigurations}">
-								<td th:text="${cc.host}">host.com</td>
-								<td th:text="${cc.port}">8080</td>
+							<tr th:each="cc,row : ${configuration.cameraConfigurations}">
+								<td th:text="${cc.name}">Name</td>
+								<td th:text="${cc.host}">host.com</td>																
+								<td>
+									<input type="checkbox" disabled="disabled" th:checked="${cc.alarmEnabled}" />
+								</td>
+								<td>
+									<input type="checkbox" disabled="disabled" th:checked="${cc.enabled}" />
+								</td>		
+								<td><a th:href="@{/configuration/editCamera/} + ${row.index}" class="glyphicon glyphicon-edit"></a> <a th:href="@{/configuration/removeCamera/} + ${row.index}" class="glyphicon glyphicon-remove"></a></td>							
 							</tr>
 						</tbody>
 					</table>
@@ -64,25 +70,8 @@
 
 				<!-- No cameras -->
 				<p th:if="${#lists.isEmpty(configuration.cameraConfigurations)}">No cameras configured</p>
-
-				<input class="btn btn-default" value="Add camera" data-toggle="modal" data-target="#newCamera" />
-
-				<!-- New camera modal -->
-				<div class="modal fade" id="newCamera" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-					<div class="modal-dialog">
-						<div class="modal-content">
-							<div class="modal-header">
-								<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-								<h4 class="modal-title" id="myModalLabel">Add new camera</h4>
-							</div>
-							<div class="modal-body">...</div>
-							<div class="modal-footer">
-								<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-								<button type="button" class="btn btn-primary">Save changes</button>
-							</div>
-						</div>
-					</div>
-				</div>
+				
+				<a class="btn btn-default" th:href="@{/configuration/addCamera}">Add camera</a>
 
 			</fieldset>
 			<br /> <input type="submit" class="btn btn-primary" name="updateConfiguration" value="Update configuration" />

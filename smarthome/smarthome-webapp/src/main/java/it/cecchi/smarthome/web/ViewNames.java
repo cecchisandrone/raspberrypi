@@ -6,6 +6,8 @@ public class ViewNames {
 
 	public static final String CONFIGURATION = "configuration";
 
+	public static final String CAMERA_DETAIL = "cameraDetail";
+
 	public static final String CAMERAS = "cameras";
 
 	public static final String LOGIN = "login";

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorator="layout/layout">
+<head>
+<title>Camera configuration</title>
+</head>
+<body>
+	<!-- /* Content of this page will be decorated by the elements of layout.html */ -->
+	<div layout:fragment="content">	
+		<form class="form-horizontal" th:action="@{/configuration/addCamera/} + ${cameraConfigurationIndex} == null ? '' : ${cameraConfigurationIndex}" th:object="${cameraConfiguration}" action="#" method="post">			
+			<div th:include="../fragments/messages" />			
+			<fieldset>
+				<legend><span th:text="${cameraConfigurationIndex} == null ? 'Add camera' : 'Edit camera'"></span></legend>
+				<div class="form-group">
+					<label for="name">Name</label> 
+					<input type="text" th:field="*{name}" th:errorclass="error" class="form-control" id="name" placeholder="Enter name" required="required"/>
+				</div>
+				<div class="form-group">
+					<label for="host">Host</label> 
+					<input type="url" th:field="*{host}" th:errorclass="error" class="form-control" id="host" placeholder="Enter host" required="required"/>
+				</div>
+				<div class="form-group">
+					<label for="username">Username</label> 
+					<input type="text" th:field="*{username}" th:errorclass="error" class="form-control" id="username" placeholder="Enter username"/>
+				</div>		
+				<div class="form-group">
+					<label for="password">Password</label> 
+					<input type="password" required="required" th:value="*{password}" name="password" th:errorclass="error" class="form-control" id="password" placeholder="Enter password"/>
+				</div>										
+				<div class="checkbox">
+					<label><input type="checkbox" th:field="*{alarmEnabled}"/> Alarm enabled</label>
+				</div>
+				<div class="checkbox">
+					<label><input type="checkbox" th:field="*{enabled}"/> Enabled in view</label>
+				</div>
+			</fieldset>
+			<br /> <input type="submit" class="btn btn-primary" th:unless="${cameraConfigurationIndex} == null ? 'false' : 'true'" value="Save" />
+			<input type="submit" class="btn btn-primary" name="update" th:unless="${cameraConfigurationIndex} == null ? 'true' : 'false'" value="Update" />			
+		</form>
+	</div>
+</body>
+</html>

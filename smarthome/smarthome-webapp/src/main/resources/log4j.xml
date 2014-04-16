@@ -8,8 +8,14 @@
 			<param name="ConversionPattern" value="%d{dd/MMM/yy-HH\:mm\:ss,SSS} [%p] %c{1}\:%L - %m%n" />
 		</layout>
 	</appender>
+<!-- 	<logger name="org.springframework.orm.jpa"> -->
+<!-- 		<level value="debug"/> -->
+<!-- 	</logger> -->
+<!-- 	<logger name="org.springframework.transaction"> -->
+<!-- 		<level value="debug"/> -->
+<!-- 	</logger> -->
 	<root>
 		<priority value="info" />
-		<appender-ref ref="console" />
-	</root>
+		<appender-ref ref="console" />		
+	</root>	
 </log4j:configuration>
