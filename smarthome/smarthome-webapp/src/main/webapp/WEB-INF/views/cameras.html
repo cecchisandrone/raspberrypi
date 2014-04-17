@@ -12,7 +12,7 @@
 		<div th:each="cc,row : ${configuration.cameraConfigurations}">
 			<div class="col-md-6" th:if="${cc.enabled}">
 				<h2 th:text="${cc.name}"/>
-				<img class="img-responsive img-thumbnail" alt="Responsive image" th:src="${cc.host} + '/videostream.cgi?user=' + ${cc.username} + '&amp;pwd=' + ${cc.password}" />
+				<img class="img-responsive img-thumbnail" alt="Responsive image" th:src="${@cameraService.getVideoStreamUrl(cc)}" />				
 			</div>
 		</div>
 		

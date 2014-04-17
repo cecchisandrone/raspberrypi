@@ -30,7 +30,7 @@ public class ConfigurationController {
 	private ConfigurationService configurationService;
 
 	@RequestMapping(params = "updateConfiguration", value = "/updateConfiguration", method = RequestMethod.POST)
-	public String updateConfiguration(@Valid @ModelAttribute("configuration") Configuration configuration, BindingResult result, Model model) {
+	public ModelAndView updateConfiguration(@Valid @ModelAttribute("configuration") Configuration configuration, BindingResult result, Model model) {
 
 		if (!result.hasErrors()) {
 			try {
@@ -41,7 +41,7 @@ public class ConfigurationController {
 			}
 		}
 
-		return ViewNames.CONFIGURATION;
+		return showConfiguration();
 	}
 
 	@RequestMapping("/configuration")
