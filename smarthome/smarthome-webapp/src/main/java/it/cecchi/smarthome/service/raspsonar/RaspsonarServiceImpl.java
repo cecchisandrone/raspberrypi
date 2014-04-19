@@ -49,7 +49,11 @@ public class RaspsonarServiceImpl implements InitializingBean, RaspsonarService 
 		// Instantiate service client
 		Client client = ClientBuilder.newClient();
 		Configuration configuration = configurationService.getConfiguration();
-		webTarget = client.target(configuration.getServiceUrl());
+		if(configuration != null) {			
+			webTarget = client.target(configuration.getServiceUrl());
+		} else {
+			logger.error("Configuration object is null!");
+		}
 	}
 
 	@Override

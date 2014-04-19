@@ -15,13 +15,16 @@ public class SonarSensor {
 	private GpioPinDigitalOutput triggerPin;
 
 	private GpioPinDigitalInput echoPin;
+	
+	private GpioPinDigitalOutput relayPin;
 
 	private static SonarSensor sonarSensor = null;
 
-	private SonarSensor(GpioPinDigitalOutput triggerPin, GpioPinDigitalInput echoPin) {
+	private SonarSensor(GpioPinDigitalOutput triggerPin, GpioPinDigitalInput echoPin, GpioPinDigitalOutput relayPin) {
 
 		this.triggerPin = triggerPin;
 		this.echoPin = echoPin;
+		this.relayPin = relayPin;
 	}
 
 	public static SonarSensor getInstance() {
@@ -34,10 +37,12 @@ public class SonarSensor {
 
 			// Sonar Sensor pins
 			GpioPinDigitalOutput triggerPin = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_04, "Sonar Sensor Trigger", PinState.LOW);
-
 			GpioPinDigitalInput echoPin = gpio.provisionDigitalInputPin(RaspiPin.GPIO_05, "Sonar Sensor Echo", PinPullResistance.PULL_DOWN);
 
-			sonarSensor = new SonarSensor(triggerPin, echoPin);
+			// Relay toggle
+			GpioPinDigitalOutput relayPin = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_08, "Relay Toggle Pin", PinState.LOW);
+			
+			sonarSensor = new SonarSensor(triggerPin, echoPin, relayPin);
 		}
 
 		return sonarSensor;
@@ -79,5 +84,9 @@ public class SonarSensor {
 
 		// Calculate distance
 		return ((stopTime - startTime) * 340.0) / 20000000.0;
+	}
+
+	public void toggleRelay(boolean status) {
+		relayPin.setState(status);		
 	}
 }

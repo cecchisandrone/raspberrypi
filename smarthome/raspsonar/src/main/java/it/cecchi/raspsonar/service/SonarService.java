@@ -24,4 +24,12 @@ public class SonarService {
 		}
 		return sum / measurements;
 	}
+	
+	@GET
+	@Path("/toggleRelay")
+	public void toggleRelay(@QueryParam(value="status") boolean status) {
+		
+		// Boolean logic inverted on pin
+		SonarSensor.getInstance().toggleRelay(!status);
+	}
 }
