@@ -9,14 +9,23 @@
 		<div class="row">
 			<div class="col-md-6">
 				<p>
-					<strong>Actual water level: </strong><span id="waterLevel" th:if="${waterLevel != null}" th:text="${waterLevel} + ' cm'"></span>
 					<button type="button" class="btn btn-danger btn-xs" id="waterLevelError" data-toggle="popover" data-placement="bottom" th:if="${waterLevelError != null}" th:attr="data-content=${waterLevelError}">Error while contacting Raspsonar</button>
+					<div th:include="../fragments/messages" />
+				</p>
+				<p>
+					<strong>Actual water level (average): </strong><span id="waterLevel" th:if="${waterLevel != null}" th:text="${waterLevel} + ' cm'"></span>
+					<a class="btn btn-default btn-xs" th:href="@{/dashboard/resetAverageDistance}">Reset</a>					
 					<script>
 					    jQuery(function ($) {
 					        $("#waterLevelError").popover()
 					    });					
 					</script>	
-				</p>			
+				</p>	
+				<p>
+					<strong>Water pump control</strong>
+					<a class="btn btn-success btn-xs" th:href="@{/dashboard/waterPump/true}">On </a>
+					<a class="btn btn-danger btn-xs" th:href="@{/dashboard/waterPump/false}">Off</a>
+				</p>		
 			</div>
 			<div class="col-md-6">			
 					

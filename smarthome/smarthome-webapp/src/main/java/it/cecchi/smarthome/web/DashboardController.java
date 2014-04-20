@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
@@ -19,18 +20,41 @@ import org.springframework.web.servlet.ModelAndView;
 public class DashboardController {
 
 	@Autowired
-	private RaspsonarService sonarService;
+	private RaspsonarService raspsonarService;
 
-	@RequestMapping(value = {"/dashboard", "/"}, method = RequestMethod.GET)
+	@RequestMapping(value = { "/dashboard", "/" }, method = RequestMethod.GET)
 	public ModelAndView home() {
 
 		ModelAndView modelAndView = new ModelAndView(ViewNames.DASHBOARD);
 		try {
-			modelAndView.addObject("waterLevel", sonarService.getDistance());
+			modelAndView.addObject("waterLevel", raspsonarService.getDistance(false));
 		} catch (RaspsonarServiceException e) {
-			modelAndView.addObject("waterLevelError", e.toString());
+			modelAndView.addObject("errorMessage", e.toString());
 		}
 		return modelAndView;
+	}
+
+	@RequestMapping(value = { "/dashboard/resetAverageDistance" }, method = RequestMethod.GET)
+	public ModelAndView resetAverageDistance() {
+
+		ModelAndView modelAndView = new ModelAndView(ViewNames.DASHBOARD);
+		try {
+			modelAndView.addObject("waterLevel", raspsonarService.getDistance(true));
+		} catch (RaspsonarServiceException e) {
+			modelAndView.addObject("errorMessage", e.toString());
+		}
+		return modelAndView;
+	}
+
+	@RequestMapping(value = { "/dashboard/waterPump/{status}" }, method = RequestMethod.GET)
+	public String resetAverageDistance(@PathVariable boolean status, Model model) {
+
+		try {
+			raspsonarService.toggleRelay(status);
+		} catch (RaspsonarServiceException e) {
+			model.addAttribute("errorMessage", e.toString());
+		}
+		return ViewNames.DASHBOARD;
 	}
 
 	@RequestMapping("/error")

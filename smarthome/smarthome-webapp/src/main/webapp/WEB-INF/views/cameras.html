@@ -9,6 +9,10 @@
 <body>
 	<!-- /* Content of this page will be decorated by the elements of layout.html */ -->
 	<div layout:fragment="content">
+	
+		<!-- No cameras -->
+		<p th:if="${#lists.isEmpty(configuration.cameraConfigurations)}">No cameras configured</p>
+				
 		<div th:each="cc,row : ${configuration.cameraConfigurations}">
 			<div class="col-md-6" th:if="${cc.enabled}">
 				<h2 th:text="${cc.name}"/>
