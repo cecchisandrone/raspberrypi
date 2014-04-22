@@ -10,4 +10,6 @@ public interface RaspsonarService {
 	public void toggleRelay(boolean status) throws RaspsonarServiceException;
 
 	public void checkDistanceTask();
+
+	public void autoPowerOffRelay();
 }

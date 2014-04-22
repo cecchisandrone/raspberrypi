@@ -33,6 +33,8 @@ public class RaspsonarServiceImpl implements InitializingBean, RaspsonarService 
 
 	private WebTarget sonarServiceTarget;
 
+	private boolean relayStatus;
+
 	@Autowired
 	private ConfigurationService configurationService;
 
@@ -93,8 +95,7 @@ public class RaspsonarServiceImpl implements InitializingBean, RaspsonarService 
 			Configuration configuration = configurationService.getConfiguration();
 			if (distance < configuration.getDistanceThreshold()) {
 				logger.info("Alerting user");
-				notificationService.sendMail(configuration.getEmail(),
-						"Warning! Distance threshold has been trespassed. Value: " + distance);
+				notificationService.sendMail(configuration.getEmail(), "Warning! Distance threshold has been trespassed. Value: " + distance);
 			}
 
 		} catch (RaspsonarServiceException e) {
@@ -118,6 +119,31 @@ public class RaspsonarServiceImpl implements InitializingBean, RaspsonarService 
 		Response response = request.get();
 		if (response.getStatus() != HttpURLConnection.HTTP_NO_CONTENT) {
 			throw new RaspsonarServiceException("Can't access remote service. Response code: " + response.getStatus());
+		}
+
+		// Update relay status
+		relayStatus = status;
+	}
+
+	@Override
+	@Scheduled(cron = "0 * * * * ?")
+	public void autoPowerOffRelay() {
+
+		if (relayStatus) {
+			try {
+				Double distance = getDistance(false);
+				Configuration configuration = configurationService.getConfiguration();
+				// Toggle relay off is threshold is trespassed
+				if (distance > configuration.getAutoPowerOffDistanceThreshold()) {
+					logger.info("Toggling relay off...threshold is trespassed");
+					toggleRelay(false);
+					notificationService.sendMail(configuration.getEmail(), "Auto power off distance threshold trespassed. Powering off pump");
+				}
+			} catch (ConfigurationServiceException e) {
+				logger.error(e.toString(), e);
+			} catch (RaspsonarServiceException e) {
+				logger.error(e.toString(), e);
+			}
 		}
 	}
 }

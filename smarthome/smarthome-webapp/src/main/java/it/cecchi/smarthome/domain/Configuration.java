@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -40,6 +41,12 @@ public class Configuration implements Serializable {
 	@Min(10)
 	@Max(200)
 	private Double distanceThreshold;
+
+	@NotNull
+	@Min(10)
+	@Max(200)
+	@Column(name = "AUTO_OFF_THRESHOLD")
+	private Double autoPowerOffDistanceThreshold;
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "CONFIGURATION_ID")
@@ -83,5 +90,13 @@ public class Configuration implements Serializable {
 
 	public List<CameraConfiguration> getCameraConfigurations() {
 		return cameraConfigurations;
+	}
+
+	public void setAutoPowerOffDistanceThreshold(Double autoPowerOffDistanceThreshold) {
+		this.autoPowerOffDistanceThreshold = autoPowerOffDistanceThreshold;
+	}
+
+	public Double getAutoPowerOffDistanceThreshold() {
+		return autoPowerOffDistanceThreshold;
 	}
 }
