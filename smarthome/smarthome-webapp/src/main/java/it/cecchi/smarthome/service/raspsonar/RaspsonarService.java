@@ -12,4 +12,8 @@ public interface RaspsonarService {
 	public void checkDistanceTask();
 
 	public void autoPowerOffRelay();
+
+	public boolean isRelayStatus();
+
+	public String getDistanceChartUrl();
 }

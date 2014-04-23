@@ -18,17 +18,18 @@
 					<script>
 					    jQuery(function ($) {
 					        $("#waterLevelError").popover()
-					    });					
+					    });						    
 					</script>	
 				</p>	
-				<p>
-					<strong>Water pump control</strong>
-					<a class="btn btn-success btn-xs" th:href="@{/dashboard/waterPump/true}">On </a>
-					<a class="btn btn-danger btn-xs" th:href="@{/dashboard/waterPump/false}">Off</a>
-				</p>		
+				<div th:fragment="waterPump"> 
+					<strong>Water pump control - Status: </strong>
+                    <input type="checkbox" th:checked="${relayStatus}" disabled="disabled"/>                            
+                    <a class="btn btn-success btn-xs" th:href="@{/dashboard/waterPump/true}">On </a>
+					<a class="btn btn-danger btn-xs" th:href="@{/dashboard/waterPump/false}">Off</a>					
+				</div>		
 			</div>
 			<div class="col-md-6">			
-					
+				<img class="img-responsive img-thumbnail" alt="Distance chart" style="margin: 10px" th:src="${distanceChartUrl}"/>	
 			</div>
 		</div>
 	</div>       	

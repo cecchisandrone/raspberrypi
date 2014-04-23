@@ -22,19 +22,21 @@ public class DashboardController {
 	@Autowired
 	private RaspsonarService raspsonarService;
 
-	@RequestMapping(value = { "/dashboard", "/" }, method = RequestMethod.GET)
+	@RequestMapping(value = {"/dashboard", "/"}, method = RequestMethod.GET)
 	public ModelAndView home() {
 
 		ModelAndView modelAndView = new ModelAndView(ViewNames.DASHBOARD);
 		try {
 			modelAndView.addObject("waterLevel", raspsonarService.getDistance(false));
+			modelAndView.addObject("relayStatus", raspsonarService.isRelayStatus());
+			modelAndView.addObject("distanceChartUrl", raspsonarService.getDistanceChartUrl());
 		} catch (RaspsonarServiceException e) {
 			modelAndView.addObject("errorMessage", e.toString());
 		}
 		return modelAndView;
 	}
 
-	@RequestMapping(value = { "/dashboard/resetAverageDistance" }, method = RequestMethod.GET)
+	@RequestMapping(value = {"/dashboard/resetAverageDistance"}, method = RequestMethod.GET)
 	public ModelAndView resetAverageDistance() {
 
 		ModelAndView modelAndView = new ModelAndView(ViewNames.DASHBOARD);
@@ -46,15 +48,15 @@ public class DashboardController {
 		return modelAndView;
 	}
 
-	@RequestMapping(value = { "/dashboard/waterPump/{status}" }, method = RequestMethod.GET)
-	public String resetAverageDistance(@PathVariable boolean status, Model model) {
+	@RequestMapping(value = {"/dashboard/waterPump/{status}"}, method = RequestMethod.GET)
+	public ModelAndView toggleRelay(@PathVariable boolean status, Model model) {
 
 		try {
 			raspsonarService.toggleRelay(status);
 		} catch (RaspsonarServiceException e) {
 			model.addAttribute("errorMessage", e.toString());
 		}
-		return ViewNames.DASHBOARD;
+		return home();
 	}
 
 	@RequestMapping("/error")
