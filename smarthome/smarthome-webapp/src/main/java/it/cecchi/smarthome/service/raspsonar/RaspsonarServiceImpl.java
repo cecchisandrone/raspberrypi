@@ -143,6 +143,8 @@ public class RaspsonarServiceImpl implements InitializingBean, RaspsonarService 
 			throw new RaspsonarServiceException("Can't load Raspsonar configuration. Reason: " + e.toString());
 		}
 
+		logger.info("Toggling relay to status: " + status);
+
 		WebTarget toggleRelayTarget = sonarServiceTarget.path("toggleRelay").queryParam("status", status);
 		Builder request = toggleRelayTarget.request();
 		Response response = request.get();
