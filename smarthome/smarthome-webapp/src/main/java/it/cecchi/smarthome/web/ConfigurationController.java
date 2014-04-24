@@ -120,4 +120,22 @@ public class ConfigurationController {
 		configuration.getCameraConfigurations().add(cameraConfigurationIndex, cameraConfiguration);
 		return new ModelAndView(ViewNames.CONFIGURATION, "configuration", configuration);
 	}
+
+	@RequestMapping(value = "/configuration/toggleEnabledAllCameras/{status}", method = RequestMethod.GET)
+	public ModelAndView toggleEnabledAllCameras(@PathVariable boolean status, @ModelAttribute("configuration") Configuration configuration, Model model) {
+
+		for (CameraConfiguration cameraConfiguration : configuration.getCameraConfigurations()) {
+			cameraConfiguration.setEnabled(status);
+		}
+		return new ModelAndView(ViewNames.CONFIGURATION, "configuration", configuration);
+	}
+
+	@RequestMapping(value = "/configuration/toggleAlarmAllCameras/{status}", method = RequestMethod.GET)
+	public ModelAndView toggleAlarmAllCameras(@PathVariable boolean status, @ModelAttribute("configuration") Configuration configuration, Model model) {
+
+		for (CameraConfiguration cameraConfiguration : configuration.getCameraConfigurations()) {
+			cameraConfiguration.setAlarmEnabled(status);
+		}
+		return new ModelAndView(ViewNames.CONFIGURATION, "configuration", configuration);
+	}
 }

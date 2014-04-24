@@ -78,7 +78,20 @@
 				<p th:if="${#lists.isEmpty(configuration.cameraConfigurations)}">No cameras configured</p>
 				
 				<a class="btn btn-default" th:href="@{/configuration/addCamera}">Add camera</a>
-
+				
+				<!-- Toggle button -->
+				<div class="btn-group pull-right">
+				  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+				    Toggle all cameras <span class="caret"></span>
+				  </button>
+				  <ul class="dropdown-menu" role="menu">
+				    <li><a th:href="@{/configuration/toggleEnabledAllCameras/true}">Enable all</a></li>
+				    <li><a th:href="@{/configuration/toggleEnabledAllCameras/false}">Disable all</a></li>
+				    <li class="divider"></li>
+				    <li><a th:href="@{/configuration/toggleAlarmAllCameras/true}">Enable alarm on all</a></li>
+					<li><a th:href="@{/configuration/toggleAlarmAllCameras/false}">Disable alarm on all</a></li>
+				  </ul>
+				</div>
 			</fieldset>
 			<br /> <input type="submit" class="btn btn-primary" name="updateConfiguration" value="Update configuration" />
 		</form>
