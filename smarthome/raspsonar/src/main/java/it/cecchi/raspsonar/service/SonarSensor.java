@@ -15,7 +15,7 @@ public class SonarSensor {
 	private GpioPinDigitalOutput triggerPin;
 
 	private GpioPinDigitalInput echoPin;
-	
+
 	private GpioPinDigitalOutput relayPin;
 
 	private static SonarSensor sonarSensor = null;
@@ -36,12 +36,15 @@ public class SonarSensor {
 			GpioController gpio = GpioFactory.getInstance();
 
 			// Sonar Sensor pins
-			GpioPinDigitalOutput triggerPin = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_04, "Sonar Sensor Trigger", PinState.LOW);
-			GpioPinDigitalInput echoPin = gpio.provisionDigitalInputPin(RaspiPin.GPIO_05, "Sonar Sensor Echo", PinPullResistance.PULL_DOWN);
+			GpioPinDigitalOutput triggerPin = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_04, "Sonar Sensor Trigger",
+					PinState.LOW);
+			GpioPinDigitalInput echoPin = gpio.provisionDigitalInputPin(RaspiPin.GPIO_05, "Sonar Sensor Echo",
+					PinPullResistance.PULL_DOWN);
 
 			// Relay toggle
-			GpioPinDigitalOutput relayPin = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_08, "Relay Toggle Pin", PinState.LOW);
-			
+			GpioPinDigitalOutput relayPin = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_08, "Relay Toggle Pin",
+					PinState.HIGH);
+
 			sonarSensor = new SonarSensor(triggerPin, echoPin, relayPin);
 		}
 
@@ -74,19 +77,17 @@ public class SonarSensor {
 		long startTime = 0, stopTime = 0;
 		do {
 			startTime = System.nanoTime();
-		}
-		while (echoPin.getState() == PinState.LOW);
+		} while (echoPin.getState() == PinState.LOW);
 
 		do {
 			stopTime = System.nanoTime();
-		}
-		while (echoPin.getState() == PinState.HIGH);
+		} while (echoPin.getState() == PinState.HIGH);
 
 		// Calculate distance
 		return ((stopTime - startTime) * 340.0) / 20000000.0;
 	}
 
 	public void toggleRelay(boolean status) {
-		relayPin.setState(status);		
+		relayPin.setState(status);
 	}
 }
