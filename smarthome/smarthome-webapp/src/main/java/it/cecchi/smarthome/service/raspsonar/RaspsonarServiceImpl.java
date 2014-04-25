@@ -124,7 +124,8 @@ public class RaspsonarServiceImpl implements InitializingBean, RaspsonarService 
 			Configuration configuration = configurationService.getConfiguration();
 			if (distance < configuration.getDistanceThreshold()) {
 				logger.info("Alerting user");
-				notificationService.sendMail(configuration.getEmail(), "Warning! Distance threshold has been trespassed. Value: " + distance);
+				notificationService.sendMail(configuration.getEmail(),
+						"Warning! Distance threshold has been trespassed. Value: " + distance);
 			}
 
 		} catch (RaspsonarServiceException e) {
@@ -157,7 +158,7 @@ public class RaspsonarServiceImpl implements InitializingBean, RaspsonarService 
 	}
 
 	@Override
-	@Scheduled(cron = "0 * * * * ?")
+	@Scheduled(cron = "*/30 * * * * ?")
 	public void autoPowerOffRelay() {
 
 		if (relayStatus) {
@@ -168,7 +169,9 @@ public class RaspsonarServiceImpl implements InitializingBean, RaspsonarService 
 				if (distance > configuration.getAutoPowerOffDistanceThreshold()) {
 					logger.info("Toggling relay off...threshold is trespassed");
 					toggleRelay(false);
-					notificationService.sendMail(configuration.getEmail(), "Auto power off distance threshold trespassed. Powering off pump");
+					notificationService.sendMail(configuration.getEmail(), "Auto power off distance threshold ("
+							+ configuration.getAutoPowerOffDistanceThreshold()
+							+ " cm) trespassed. Powering off the pump");
 				}
 			} catch (ConfigurationServiceException e) {
 				logger.error(e.toString(), e);
@@ -199,7 +202,8 @@ public class RaspsonarServiceImpl implements InitializingBean, RaspsonarService 
 		// Defining axis info and styles
 		AxisStyle axisStyle = AxisStyle.newAxisStyle(WHITE, 12, AxisTextAlignment.CENTER);
 
-		AxisLabels yAxis = AxisLabelsFactory.newNumericAxisLabels(Collections.min(distanceMeasurements), Collections.max(distanceMeasurements));
+		AxisLabels yAxis = AxisLabelsFactory.newNumericAxisLabels(Collections.min(distanceMeasurements),
+				Collections.max(distanceMeasurements));
 		AxisLabels xAxis = AxisLabelsFactory.newAxisLabels("Time", 50.0);
 		AxisLabels yAxis2 = AxisLabelsFactory.newAxisLabels("Distance", 50.0);
 
