@@ -49,6 +49,8 @@ public class RaspsonarServiceImpl implements InitializingBean, RaspsonarService 
 
 	private static final Logger logger = LoggerFactory.getLogger(RaspsonarServiceImpl.class);
 
+	private static final double WRONG_MEASUREMENT_THRESHOLD = 15;
+
 	private double averageDistance;
 
 	private WebTarget sonarServiceTarget;
@@ -96,6 +98,17 @@ public class RaspsonarServiceImpl implements InitializingBean, RaspsonarService 
 		if (response.getStatus() == HttpURLConnection.HTTP_OK) {
 			String distanceAsString = response.readEntity(String.class);
 			Double distance = new Double(distanceAsString);
+
+			// Check wrong measurements, maybe due to CPU allocation
+			if (averageDistance != 0 && Math.abs(distance - averageDistance) > WRONG_MEASUREMENT_THRESHOLD) {
+
+				logger.warn("Wrong measurement detected. Previous distance value: " + averageDistance + ". Actual: "
+						+ distance);
+
+				// Do another measurement
+				getDistance(resetAverageDistance);
+			}
+
 			if (averageDistance == 0 || resetAverageDistance) {
 				averageDistance = distance;
 			}
