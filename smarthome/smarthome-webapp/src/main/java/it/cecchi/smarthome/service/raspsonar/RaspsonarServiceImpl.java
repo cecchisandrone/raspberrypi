@@ -1,6 +1,6 @@
 package it.cecchi.smarthome.service.raspsonar;
 
-import static com.googlecode.charts4j.Color.WHITE;
+import static com.googlecode.charts4j.Color.*;
 import it.cecchi.smarthome.domain.Configuration;
 import it.cecchi.smarthome.service.configuration.ConfigurationService;
 import it.cecchi.smarthome.service.configuration.ConfigurationServiceException;
@@ -43,197 +43,204 @@ import com.googlecode.charts4j.Shape;
 @Component
 public class RaspsonarServiceImpl implements InitializingBean, RaspsonarService {
 
-	private static final int MEASUREMENTS = 5;
+  private static final int MEASUREMENTS = 5;
 
-	private static final int DISTANCE_VALUES_TO_HOLD = 100;
+  private static final int DISTANCE_VALUES_TO_HOLD = 100;
 
-	private static final Logger logger = LoggerFactory.getLogger(RaspsonarServiceImpl.class);
+  private static final Logger logger = LoggerFactory.getLogger(RaspsonarServiceImpl.class);
 
-	private static final double WRONG_MEASUREMENT_THRESHOLD = 15;
+  private static final double WRONG_MEASUREMENT_THRESHOLD = 15;
 
-	private double averageDistance;
+  private double averageDistance;
 
-	private WebTarget sonarServiceTarget;
+  private WebTarget sonarServiceTarget;
 
-	private boolean relayStatus;
+  private boolean relayStatus;
 
-	private LinkedList<Double> distanceMeasurements = new LinkedList<Double>();
+  private LinkedList<Double> distanceMeasurements = new LinkedList<Double>();
 
-	@Autowired
-	private ConfigurationService configurationService;
+  @Autowired
+  private ConfigurationService configurationService;
 
-	@Autowired
-	private NotificationService notificationService;
+  @Autowired
+  private NotificationService notificationService;
 
-	@Override
-	public void afterPropertiesSet() throws Exception {
+  @Override
+  public void afterPropertiesSet() throws Exception {
 
-		loadClientConfiguration();
-	}
+    loadClientConfiguration();
+  }
 
-	private void loadClientConfiguration() throws ConfigurationServiceException {
+  private void loadClientConfiguration() throws ConfigurationServiceException {
 
-		// Instantiate service client
-		Client client = ClientBuilder.newClient();
-		Configuration configuration = configurationService.getConfiguration();
-		if (configuration != null) {
-			sonarServiceTarget = client.target(configuration.getServiceUrl());
-		} else {
-			logger.error("Configuration object is null!");
-		}
-	}
+    // Instantiate service client
+    Client client = ClientBuilder.newClient();
+    Configuration configuration = configurationService.getConfiguration();
+    if (configuration != null) {
+      sonarServiceTarget = client.target(configuration.getServiceUrl());
+    }
+    else {
+      logger.error("Configuration object is null!");
+    }
+  }
 
-	@Override
-	public synchronized Double getDistance(boolean resetAverageDistance) throws RaspsonarServiceException {
+  @Override
+  public synchronized Double getDistance(boolean resetAverageDistance) throws RaspsonarServiceException {
 
-		try {
-			loadClientConfiguration();
-		} catch (ConfigurationServiceException e) {
-			throw new RaspsonarServiceException("Can't load Raspsonar configuration. Reason: " + e.toString());
-		}
+    try {
+      loadClientConfiguration();
+    }
+    catch (ConfigurationServiceException e) {
+      throw new RaspsonarServiceException("Can't load Raspsonar configuration. Reason: " + e.toString());
+    }
 
-		WebTarget distanceTarget = sonarServiceTarget.path("distance").queryParam("measurements", MEASUREMENTS);
-		Builder request = distanceTarget.request();
-		Response response = request.get();
-		if (response.getStatus() == HttpURLConnection.HTTP_OK) {
-			String distanceAsString = response.readEntity(String.class);
-			Double distance = new Double(distanceAsString);
+    WebTarget distanceTarget = sonarServiceTarget.path("distance").queryParam("measurements", MEASUREMENTS);
+    Builder request = distanceTarget.request();
+    Response response = request.get();
+    if (response.getStatus() == HttpURLConnection.HTTP_OK) {
+      String distanceAsString = response.readEntity(String.class);
+      Double distance = new Double(distanceAsString);
 
-			// Check wrong measurements, maybe due to CPU allocation
-			if (averageDistance != 0 && Math.abs(distance - averageDistance) > WRONG_MEASUREMENT_THRESHOLD) {
+      // Check wrong measurements, maybe due to CPU allocation
+      if (averageDistance != 0 && (distance - averageDistance) > WRONG_MEASUREMENT_THRESHOLD) {
 
-				logger.warn("Wrong measurement detected. Previous distance value: " + averageDistance + ". Actual: "
-						+ distance);
+        logger.warn("Wrong measurement detected. Previous distance value: " + averageDistance + ". Actual: "
+            + distance);
 
-				// Do another measurement
-				getDistance(resetAverageDistance);
-			}
+        // Do another measurement
+        getDistance(resetAverageDistance);
+      }
 
-			if (averageDistance == 0 || resetAverageDistance) {
-				averageDistance = distance;
-			}
-			averageDistance = (distance + averageDistance) / 2;
+      if (averageDistance == 0 || resetAverageDistance) {
+        averageDistance = distance;
+      }
+      averageDistance = (distance + averageDistance) / 2;
 
-			// Update distance measurements for chart
-			if (distanceMeasurements.size() > DISTANCE_VALUES_TO_HOLD) {
-				distanceMeasurements.removeFirst();
-			}
-			distanceMeasurements.add(averageDistance);
+      // Update distance measurements for chart
+      if (distanceMeasurements.size() > DISTANCE_VALUES_TO_HOLD) {
+        distanceMeasurements.removeFirst();
+      }
+      distanceMeasurements.add(averageDistance);
 
-			return new BigDecimal(averageDistance).setScale(1, RoundingMode.CEILING).doubleValue();
-		}
-		throw new RaspsonarServiceException("Can't access remote service. Response code: " + response.getStatus());
-	}
+      return new BigDecimal(averageDistance).setScale(1, RoundingMode.CEILING).doubleValue();
+    }
+    throw new RaspsonarServiceException("Can't access remote service. Response code: " + response.getStatus());
+  }
 
-	// Every 2 hours
-	@Override
-	@Scheduled(cron = "0 0 0/2 * * ?")
-	public void checkDistanceTask() {
+  // Every 2 hours
+  @Override
+  @Scheduled(cron = "0 0 0/2 * * ?")
+  public void checkDistanceTask() {
 
-		try {
-			logger.info("Checking distance threshold...");
-			Double distance = getDistance(false);
-			logger.info("Distance is " + distance);
-			Configuration configuration = configurationService.getConfiguration();
-			if (distance < configuration.getDistanceThreshold()) {
-				logger.info("Alerting user");
-				notificationService.sendMail(configuration.getEmail(),
-						"Warning! Distance threshold has been trespassed. Value: " + distance);
-			}
+    try {
+      logger.info("Checking distance threshold...");
+      Double distance = getDistance(false);
+      logger.info("Distance is " + distance);
+      Configuration configuration = configurationService.getConfiguration();
+      if (distance < configuration.getDistanceThreshold()) {
+        logger.info("Alerting user");
+        notificationService.sendMail(configuration.getEmail(),
+            "Warning! Distance threshold has been trespassed. Value: " + distance);
+      }
 
-		} catch (RaspsonarServiceException e) {
-			logger.error(e.toString(), e);
-		} catch (ConfigurationServiceException e) {
-			logger.error(e.toString(), e);
-		}
-	}
+    }
+    catch (RaspsonarServiceException e) {
+      logger.error(e.toString(), e);
+    }
+    catch (ConfigurationServiceException e) {
+      logger.error(e.toString(), e);
+    }
+  }
 
-	@Override
-	public void toggleRelay(boolean status) throws RaspsonarServiceException {
+  @Override
+  public void toggleRelay(boolean status) throws RaspsonarServiceException {
 
-		try {
-			loadClientConfiguration();
-		} catch (ConfigurationServiceException e) {
-			throw new RaspsonarServiceException("Can't load Raspsonar configuration. Reason: " + e.toString());
-		}
+    try {
+      loadClientConfiguration();
+    }
+    catch (ConfigurationServiceException e) {
+      throw new RaspsonarServiceException("Can't load Raspsonar configuration. Reason: " + e.toString());
+    }
 
-		logger.info("Toggling relay to status: " + status);
+    logger.info("Toggling relay to status: " + status);
 
-		WebTarget toggleRelayTarget = sonarServiceTarget.path("toggleRelay").queryParam("status", status);
-		Builder request = toggleRelayTarget.request();
-		Response response = request.get();
-		if (response.getStatus() != HttpURLConnection.HTTP_NO_CONTENT) {
-			throw new RaspsonarServiceException("Can't access remote service. Response code: " + response.getStatus());
-		}
+    WebTarget toggleRelayTarget = sonarServiceTarget.path("toggleRelay").queryParam("status", status);
+    Builder request = toggleRelayTarget.request();
+    Response response = request.get();
+    if (response.getStatus() != HttpURLConnection.HTTP_NO_CONTENT) {
+      throw new RaspsonarServiceException("Can't access remote service. Response code: " + response.getStatus());
+    }
 
-		// Update relay status
-		relayStatus = status;
-	}
+    // Update relay status
+    relayStatus = status;
+  }
 
-	@Override
-	@Scheduled(cron = "*/30 * * * * ?")
-	public void autoPowerOffRelay() {
+  @Override
+  @Scheduled(cron = "*/30 * * * * ?")
+  public void autoPowerOffRelay() {
 
-		if (relayStatus) {
-			try {
-				Double distance = getDistance(false);
-				Configuration configuration = configurationService.getConfiguration();
-				// Toggle relay off is threshold is trespassed
-				if (distance > configuration.getAutoPowerOffDistanceThreshold()) {
-					logger.info("Toggling relay off...threshold is trespassed");
-					toggleRelay(false);
-					notificationService.sendMail(configuration.getEmail(), "Auto power off distance threshold ("
-							+ configuration.getAutoPowerOffDistanceThreshold()
-							+ " cm) trespassed. Powering off the pump");
-				}
-			} catch (ConfigurationServiceException e) {
-				logger.error(e.toString(), e);
-			} catch (RaspsonarServiceException e) {
-				logger.error(e.toString(), e);
-			}
-		}
-	}
+    if (relayStatus) {
+      try {
+        Double distance = getDistance(false);
+        Configuration configuration = configurationService.getConfiguration();
+        // Toggle relay off is threshold is trespassed
+        if (distance > configuration.getAutoPowerOffDistanceThreshold()) {
+          logger.info("Toggling relay off...threshold is trespassed");
+          toggleRelay(false);
+          notificationService.sendMail(configuration.getEmail(), "Auto power off distance threshold ("
+              + configuration.getAutoPowerOffDistanceThreshold()
+              + " cm) trespassed. Powering off the pump");
+        }
+      }
+      catch (ConfigurationServiceException e) {
+        logger.error(e.toString(), e);
+      }
+      catch (RaspsonarServiceException e) {
+        logger.error(e.toString(), e);
+      }
+    }
+  }
 
-	@Override
-	public boolean isRelayStatus() {
-		return relayStatus;
-	}
+  @Override
+  public boolean isRelayStatus() {
+    return relayStatus;
+  }
 
-	@Override
-	public String getDistanceChartUrl() {
+  @Override
+  public String getDistanceChartUrl() {
 
-		Line line1 = Plots.newLine(Data.newData(distanceMeasurements), Color.newColor("65b459"), "Distance");
-		line1.setLineStyle(LineStyle.newLineStyle(2, 1, 0));
-		line1.addShapeMarkers(Shape.DIAMOND, Color.WHITE, 3);
+    Line line1 = Plots.newLine(Data.newData(distanceMeasurements), Color.newColor("65b459"), "Distance");
+    line1.setLineStyle(LineStyle.newLineStyle(2, 1, 0));
+    line1.addShapeMarkers(Shape.DIAMOND, Color.WHITE, 3);
 
-		// Defining chart
-		LineChart chart = GCharts.newLineChart(line1);
-		chart.setSize(450, 350);
-		chart.setTitle("Distance measurements (Last " + DISTANCE_VALUES_TO_HOLD + " values)", WHITE, 14);
-		chart.setGrid(25, 25, 3, 2);
+    // Defining chart
+    LineChart chart = GCharts.newLineChart(line1);
+    chart.setSize(450, 350);
+    chart.setTitle("Distance measurements (Last " + DISTANCE_VALUES_TO_HOLD + " values)", WHITE, 14);
+    chart.setGrid(25, 25, 3, 2);
 
-		// Defining axis info and styles
-		AxisStyle axisStyle = AxisStyle.newAxisStyle(WHITE, 12, AxisTextAlignment.CENTER);
+    // Defining axis info and styles
+    AxisStyle axisStyle = AxisStyle.newAxisStyle(WHITE, 12, AxisTextAlignment.CENTER);
 
-		AxisLabels yAxis = AxisLabelsFactory.newNumericAxisLabels(Collections.min(distanceMeasurements),
-				Collections.max(distanceMeasurements));
-		AxisLabels xAxis = AxisLabelsFactory.newAxisLabels("Time", 50.0);
-		AxisLabels yAxis2 = AxisLabelsFactory.newAxisLabels("Distance", 50.0);
+    AxisLabels yAxis = AxisLabelsFactory.newNumericAxisLabels(Collections.min(distanceMeasurements),
+        Collections.max(distanceMeasurements));
+    AxisLabels xAxis = AxisLabelsFactory.newAxisLabels("Time", 50.0);
+    AxisLabels yAxis2 = AxisLabelsFactory.newAxisLabels("Distance", 50.0);
 
-		xAxis.setAxisStyle(axisStyle);
-		yAxis2.setAxisStyle(axisStyle);
-		yAxis.setAxisStyle(axisStyle);
+    xAxis.setAxisStyle(axisStyle);
+    yAxis2.setAxisStyle(axisStyle);
+    yAxis.setAxisStyle(axisStyle);
 
-		// Adding axis info to chart
-		chart.addXAxisLabels(xAxis);
-		chart.addYAxisLabels(yAxis);
-		chart.addYAxisLabels(yAxis2);
+    // Adding axis info to chart
+    chart.addXAxisLabels(xAxis);
+    chart.addYAxisLabels(yAxis);
+    chart.addYAxisLabels(yAxis2);
 
-		// Defining background and chart fills.
-		chart.setBackgroundFill(Fills.newSolidFill(Color.newColor("777777")));
-		LinearGradientFill fill = Fills.newLinearGradientFill(0, Color.newColor("363433"), 100);
-		fill.addColorAndOffset(Color.newColor("2E2B2A"), 0);
-		chart.setAreaFill(fill);
-		return chart.toURLString();
-	}
+    // Defining background and chart fills.
+    chart.setBackgroundFill(Fills.newSolidFill(Color.newColor("777777")));
+    LinearGradientFill fill = Fills.newLinearGradientFill(0, Color.newColor("363433"), 100);
+    fill.addColorAndOffset(Color.newColor("2E2B2A"), 0);
+    chart.setAreaFill(fill);
+    return chart.toURLString();
+  }
 }
