@@ -49,7 +49,7 @@ public class RaspsonarServiceImpl implements InitializingBean, RaspsonarService 
 
 	private static final Logger logger = LoggerFactory.getLogger(RaspsonarServiceImpl.class);
 
-	private static final double WRONG_MEASUREMENT_THRESHOLD = 15;
+	private static final double WRONG_MEASUREMENT_THRESHOLD = 5;
 
 	private double averageDistance;
 
