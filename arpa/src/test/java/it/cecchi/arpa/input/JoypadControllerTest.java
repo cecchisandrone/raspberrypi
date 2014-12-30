@@ -1,5 +1,8 @@
 package it.cecchi.arpa.input;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 
 import org.junit.BeforeClass;
@@ -24,6 +27,12 @@ public class JoypadControllerTest {
 	public void testConnect() throws IOException {
 
 		joypadController.addEventListener(joypadEventLogger);
-		joypadController.connect();
+		assertTrue(joypadController.connect());
+		assertFalse(joypadController.connect());
+	}
+
+	@Test
+	public void testDisconnect() throws IOException {
+		joypadController.disconnect();
 	}
 }

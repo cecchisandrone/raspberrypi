@@ -1,7 +1,9 @@
 package it.cecchi.arpa.input;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -10,7 +12,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JoypadController {
+public class JoypadController implements Runnable, UncaughtExceptionHandler {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(JoypadController.class);
 
@@ -29,6 +31,8 @@ public class JoypadController {
 	private static Map<Analog, Integer> oldAnalogValues = new HashMap<Analog, Integer>();
 
 	private static String device;
+
+	private boolean connected = false;
 
 	private static FileInputStream deviceStream;
 
@@ -57,13 +61,39 @@ public class JoypadController {
 		return joypadInterface;
 	}
 
-	public void connect() throws IOException {
+	public synchronized boolean connect() throws IOException {
+		if (!connected) {
+			connected = !connected;
+			Thread t = new Thread(this);
+			t.setUncaughtExceptionHandler(this);
+			t.start();
+			return true;
+		}
+		return false;
+	}
 
+	public synchronized void disconnect() throws IOException {
+
+		LOGGER.debug("Disconnetting...");
+		if (connected) {
+			connected = !connected;
+		}
+	}
+
+	public void addEventListener(JoypadEventListener eventListener) {
+		listeners.add(eventListener);
+	}
+
+	public void removeEventListener(JoypadEventListener eventListener) {
+		listeners.remove(eventListener);
+	}
+
+	public void run() {
 		try {
 			deviceStream = new FileInputStream(device);
-
+			connected = true;
 			byte[] buf = new byte[8];
-			while (deviceStream.read(buf) >= 0) {
+			while (connected && deviceStream.read(buf) >= 0) {
 
 				int newValue = -1;
 				int oldValue = -1;
@@ -85,17 +115,13 @@ public class JoypadController {
 						changedButton = Button.values()[(int) buf[7]];
 						oldValue = oldButtonValues.get(changedButton);
 
-						Character.forDigit((buf[4] >> 4) & 0xF, 16);
-						Character.forDigit((buf[4] & 0xF), 16);
-
 						// Update old value for button
 						oldButtonValues.put(changedButton, newValue);
 
 					} else if (buf[6] == 0x02) {
 
 						// buf[4] LSB buf[5] MSB
-						String hexString = String.format("%02X", buf[5]) + String.format("%02X", buf[4]);
-						newValue = Integer.valueOf(hexString, 16);
+						newValue = (int) ((buf[5]) << 8) | (0xFF & buf[4]);
 						changedAnalog = Analog.values()[(int) buf[7]];
 						oldValue = oldAnalogValues.get(changedAnalog);
 
@@ -115,20 +141,21 @@ public class JoypadController {
 					}
 				}
 			}
+		} catch (FileNotFoundException e) {
+			throw new JoypadException(e.toString(), e);
+		} catch (IOException e) {
+			throw new JoypadException(e.toString(), e);
 		} finally {
-			deviceStream.close();
+			try {
+				LOGGER.debug("Closing stream...");
+				deviceStream.close();
+			} catch (IOException e) {
+				throw new JoypadException(e.toString(), e);
+			}
 		}
 	}
 
-	public void disconnect() throws IOException {
-
-	}
-
-	public void addEventListener(JoypadEventListener eventListener) {
-		listeners.add(eventListener);
-	}
-
-	public void removeEventListener(JoypadEventListener eventListener) {
-		listeners.remove(eventListener);
+	public void uncaughtException(Thread t, Throwable e) {
+		LOGGER.error("Fatal error in JoypadController. Reason: " + e.toString(), e);
 	}
 }
