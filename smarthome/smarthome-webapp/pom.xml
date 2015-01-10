@@ -4,11 +4,11 @@
   <parent>
     <groupId>it.cecchi</groupId>
     <artifactId>smarthome</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
   </parent>
   <artifactId>smarthome-webapp</artifactId>
   <packaging>war</packaging>
-  <name>SmartHome</name>
+  <name>SmartHome webapp</name>
   <dependencies>
     <dependency>
       <groupId>org.springframework</groupId>
