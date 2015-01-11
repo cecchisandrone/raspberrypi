@@ -2,11 +2,12 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>it.cecchi</groupId>
-	<artifactId>raspsonar</artifactId>
-	<version>1.1</version>
+	<artifactId>raspio</artifactId>
+	<version>1.0</version>
 	<packaging>war</packaging>
 	<properties>		
 		<tomcat.url>localhost:8080</tomcat.url>
+		<slf4j.version>1.7.6</slf4j.version>
 	</properties>	
     <dependencies>
         <dependency>
@@ -32,10 +33,20 @@
 					<artifactId>pi4j-native</artifactId>
 				</exclusion>
 			</exclusions>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>${slf4j.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
 		</dependency>				
 	</dependencies>	
 	<build>
-		<finalName>raspsonar</finalName>
+		<finalName>raspio</finalName>
 		<plugins>			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -52,7 +63,7 @@
 							</descriptorRefs>
 							<archive>
 								<manifest>
-									<mainClass>it.cecchi.raspsonar.util.SonarTester</mainClass>
+									<mainClass>it.cecchi.raspio.util.SonarTester</mainClass>
 								</manifest>
 							</archive>
 						</configuration>
