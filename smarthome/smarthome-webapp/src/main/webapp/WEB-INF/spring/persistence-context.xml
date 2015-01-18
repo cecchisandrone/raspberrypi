@@ -12,7 +12,7 @@
 
 	<tx:annotation-driven transaction-manager="transactionManager" />
 
-	<jpa:repositories base-package="it.cecchi.smarthome.persistence" />
+	<jpa:repositories base-package="com.github.cecchisandrone.smarthome.persistence" />
 
 	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager" p:entityManagerFactory-ref="entityManagerFactory" />
 
@@ -30,7 +30,7 @@
 	<bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" p:dataSource-ref="dataSource" p:persistenceUnitName="h2">
 		<property name="packagesToScan">
 			<list>
-				<value>it.cecchi.smarthome.domain</value>
+				<value>com.github.cecchisandrone.smarthome.domain</value>
 			</list>
 		</property>
 		<property name="jpaVendorAdapter">

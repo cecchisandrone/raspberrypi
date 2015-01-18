@@ -11,7 +11,7 @@
 
 	<!-- Scans within the base package of the application for @Components to configure as beans -->
 	<!-- @Controller, @Service, @Configuration, etc. -->
-	<context:component-scan base-package="it.cecchi.smarthome" />
+	<context:component-scan base-package="com.github.cecchisandrone.smarthome" />
 
 	<task:annotation-driven/>
 

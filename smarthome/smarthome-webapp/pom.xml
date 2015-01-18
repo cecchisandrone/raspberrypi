@@ -2,7 +2,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>it.cecchi</groupId>
+    <groupId>com.github.cecchisandrone</groupId>
     <artifactId>smarthome</artifactId>
     <version>1.1</version>
   </parent>
@@ -152,4 +152,5 @@
       </plugin>
     </plugins>
   </build>
+  <groupId>com.github.cecchisandrone</groupId>
 </project>
