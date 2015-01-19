@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.github.cecchisandrone.raspio.io.AbstractDevice;
+import com.github.cecchisandrone.raspio.io.MotorDevice;
 import com.github.cecchisandrone.raspio.io.RelayDevice;
 import com.github.cecchisandrone.raspio.io.SonarDevice;
 import com.pi4j.io.gpio.Pin;
@@ -18,6 +19,7 @@ public class DeviceFactory {
 		deviceClasses = new HashMap<String, Class>();
 		deviceClasses.put("sonar", SonarDevice.class);
 		deviceClasses.put("relay", RelayDevice.class);
+		deviceClasses.put("motor", MotorDevice.class);
 	}
 
 	public AbstractDevice createDevice(String deviceString, String confString) throws DeviceFactoryException {
@@ -28,17 +30,10 @@ public class DeviceFactory {
 
 		deviceString = deviceString.split("\\.")[0];
 
-		// Prepare pins
-		String[] pinNumbers = confString.split(",");
-		Pin[] pins = new Pin[pinNumbers.length];
-		for (int i = 0; i < pins.length; i++) {
-			pins[i] = getPinByPinNumber(pinNumbers[i]);
-		}
-
 		// Instantiate device
 		Class clazz = deviceClasses.get(deviceString);
 		try {
-			return (AbstractDevice) clazz.getConstructors()[0].newInstance(pins);
+			return (AbstractDevice) clazz.newInstance();
 		} catch (Exception e) {
 			throw new DeviceFactoryException("Unable to create a device of type " + deviceString, e);
 		}

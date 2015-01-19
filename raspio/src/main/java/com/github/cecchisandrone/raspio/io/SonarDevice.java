@@ -66,4 +66,10 @@ public class SonarDevice extends AbstractDevice {
 		triggerPin = gpio.provisionDigitalOutputPin(trigger, "Sonar Sensor Trigger", PinState.LOW);
 		echoPin = gpio.provisionDigitalInputPin(echo, "Sonar Sensor Echo", PinPullResistance.PULL_DOWN);
 	}
+
+	@Override
+	public void internalInit(String configurationString) {
+		// TODO Auto-generated method stub
+
+	}
 }

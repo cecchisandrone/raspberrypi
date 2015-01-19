@@ -22,4 +22,10 @@ public class RelayDevice extends AbstractDevice {
 	public void internalInit() {
 		relayPin = gpio.provisionDigitalOutputPin(relay, "Relay Toggle Pin", PinState.HIGH);
 	}
+
+	@Override
+	public void internalInit(String configurationString) {
+		// TODO Auto-generated method stub
+
+	}
 }

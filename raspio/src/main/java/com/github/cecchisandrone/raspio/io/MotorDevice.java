@@ -107,4 +107,14 @@ public class MotorDevice extends AbstractDevice {
 		p1.high();
 		p2.low();
 	}
+
+	@Override
+	public void internalInit(String configurationString) {
+		// Prepare pins
+		// String[] pinNumbers = confString.split(",");
+		// Pin[] pins = new Pin[pinNumbers.length];
+		// for (int i = 0; i < pins.length; i++) {
+		// pins[i] = getPinByPinNumber(pinNumbers[i]);
+		// }
+	}
 }

@@ -9,8 +9,16 @@ public abstract class AbstractDevice {
 
 	protected boolean initialized = false;
 
+	protected String configurationString;
+
 	public void init() {
 		internalInit();
+		initialized = true;
+	}
+
+	public void initWithConfig(String configurationString) {
+		this.configurationString = configurationString;
+		internalInit(configurationString);
 		initialized = true;
 	}
 
@@ -21,4 +29,6 @@ public abstract class AbstractDevice {
 	}
 
 	public abstract void internalInit();
+
+	public abstract void internalInit(String configurationString);
 }
