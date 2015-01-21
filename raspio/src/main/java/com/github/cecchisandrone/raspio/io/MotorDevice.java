@@ -103,7 +103,7 @@ public class MotorDevice extends AbstractDevice {
 			}
 		}
 
-		SoftPwm.softPwmWrite(e, speed);
+		SoftPwm.softPwmWrite(e, Math.abs(speed));
 		p1.high();
 		p2.low();
 	}

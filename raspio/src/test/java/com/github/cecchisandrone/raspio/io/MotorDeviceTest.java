@@ -22,7 +22,7 @@ public class MotorDeviceTest {
 		}
 		motorDevice.changeSpeed(Motor.LEFT, 0);
 
-		for (int speed = 0; speed < 100; speed = speed + 10) {
+		for (int speed = 0; speed > -100; speed = speed - 10) {
 			motorDevice.changeSpeed(Motor.RIGHT, speed);
 			Thread.sleep(1000);
 		}
