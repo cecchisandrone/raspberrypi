@@ -67,9 +67,23 @@ public class SonarDevice extends AbstractDevice {
 		echoPin = gpio.provisionDigitalInputPin(echo, "Sonar Sensor Echo", PinPullResistance.PULL_DOWN);
 	}
 
+	/**
+	 * Expect a configuration string like this: trigger, echo. Where:
+	 * - trigger: integer representing pin to control trigger 
+	 * - echo: integer representing pin to control echo 
+	 */
 	@Override
-	public void internalInit(String configurationString) {
-		// TODO Auto-generated method stub
+	public void loadConfiguration(String configurationString) {
 
+		String[] pinNumbers = configurationString.split(",");
+		if (pinNumbers.length != 2) {
+			throw new IllegalArgumentException("Bad format of configuration string");
+		}
+
+		Pin triggerPin = getPinByPinNumber(pinNumbers[0]);
+		Pin echoPin = getPinByPinNumber(pinNumbers[1]);
+
+		this.trigger = triggerPin;
+		this.echo = echoPin;
 	}
 }

@@ -23,9 +23,13 @@ public class RelayDevice extends AbstractDevice {
 		relayPin = gpio.provisionDigitalOutputPin(relay, "Relay Toggle Pin", PinState.HIGH);
 	}
 
+	/**
+	 * Expect a configuration string like this: pin. Where:
+	 * - pin: integer representing pin to control the relay
+	 */
 	@Override
-	public void internalInit(String configurationString) {
-		// TODO Auto-generated method stub
+	public void loadConfiguration(String configurationString) {
 
+		this.relay = getPinByPinNumber(configurationString);
 	}
 }

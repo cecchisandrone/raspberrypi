@@ -71,6 +71,13 @@ public class MotorDevice extends AbstractDevice {
 		SoftPwm.softPwmCreate(en2Pin, 0, 100);
 	}
 
+	/**
+	 * Change the selected motor speed. Using negative/positive values for speed you decide the rotation direction 
+	 * for the motor 
+	 * 
+	 * @param motor - the selected motor
+	 * @param speed - the speed value. -100 <= speed <= 100
+	 */
 	public void changeSpeed(Motor motor, int speed) {
 
 		checkInitialized();
@@ -108,13 +115,30 @@ public class MotorDevice extends AbstractDevice {
 		p2.low();
 	}
 
+	/**
+	 * Expect a configuration string like this: in1,in2,in3,in4,en1,en2. Where:
+	 * - in1, in2: integer representing pin to control Motor1 direction 
+	 * - in3, in4: integer representing pin to control Motor2 direction 
+	 * - en1: integer representing pin to enable Motor1 (PWM) - en2: integer representing pin to enable Motor2 (PWM)
+	 */
 	@Override
-	public void internalInit(String configurationString) {
-		// Prepare pins
-		// String[] pinNumbers = confString.split(",");
-		// Pin[] pins = new Pin[pinNumbers.length];
-		// for (int i = 0; i < pins.length; i++) {
-		// pins[i] = getPinByPinNumber(pinNumbers[i]);
-		// }
+	public void loadConfiguration(String configurationString) {
+
+		String[] pinNumbers = configurationString.split(",");
+		if (pinNumbers.length != 6) {
+			throw new IllegalArgumentException("Bad format of configuration string");
+		}
+
+		Pin[] pins = new Pin[4];
+		for (int i = 0; i < 4; i++) {
+			pins[i] = getPinByPinNumber(pinNumbers[i]);
+		}
+
+		this.setIn1Pin(pins[0]);
+		this.setIn2Pin(pins[1]);
+		this.setIn3Pin(pins[2]);
+		this.setIn4Pin(pins[3]);
+		this.setEn1Pin(Integer.parseInt(pinNumbers[4]));
+		this.setEn1Pin(Integer.parseInt(pinNumbers[5]));
 	}
 }
