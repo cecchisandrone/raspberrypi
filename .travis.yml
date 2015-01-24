@@ -1,0 +1,8 @@
+language: java
+env:
+  - BUILD_DIR=parent-pom
+  - BUILD_DIR=raspio
+script: cd $BULD_DIR && mvn install
+jdk:
+  - openjdk7
+  - oraclejdk7
