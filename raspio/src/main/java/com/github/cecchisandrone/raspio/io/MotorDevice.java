@@ -139,6 +139,6 @@ public class MotorDevice extends AbstractDevice {
 		this.setIn3Pin(pins[2]);
 		this.setIn4Pin(pins[3]);
 		this.setEn1Pin(Integer.parseInt(pinNumbers[4]));
-		this.setEn1Pin(Integer.parseInt(pinNumbers[5]));
+		this.setEn2Pin(Integer.parseInt(pinNumbers[5]));
 	}
 }

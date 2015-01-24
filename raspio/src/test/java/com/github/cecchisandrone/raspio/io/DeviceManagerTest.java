@@ -1,17 +1,18 @@
 package com.github.cecchisandrone.raspio.io;
 
-import org.junit.Test;
-
 import com.github.cecchisandrone.raspio.service.DeviceManager;
 import com.github.cecchisandrone.raspio.service.IOServiceException;
 
 public class DeviceManagerTest {
 
-	private DeviceManager deviceManager = new DeviceManager();
-
-	@Test(expected = IOServiceException.class)
-	public void testGetDevice() throws IOServiceException {
-		deviceManager.getDevice(SonarDevice.class, "2");
+	public static void main(String[] args) {
+		DeviceManager deviceManager = new DeviceManager();
+		try {
+			SonarDevice device = (SonarDevice) deviceManager.getDevice(SonarDevice.class, "1");
+			System.out.println(device.getRange());
+		} catch (IOServiceException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
-
 }

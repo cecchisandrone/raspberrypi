@@ -1,7 +1,8 @@
 package com.github.cecchisandrone.raspio.service;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -40,13 +41,18 @@ public class DeviceManager {
 	 * The value after the . represents the ID of the device in the map 
 	 */
 	public DeviceManager() {
-		InputStream is = IOService.class.getResourceAsStream("/devices.properties");
-		if (is == null) {
-			throw new IllegalArgumentException("devices.properties not found in the classpath");
+
+		String file = System.getProperty("devices.properties.file");
+		if (file == null) {
+			throw new IllegalArgumentException("devices.properties.file system property not specified");
+		}
+		File f = new File(file);
+		if (!f.exists()) {
+			throw new IllegalArgumentException("devices.properties doesn't exist");
 		}
 		Properties p = new Properties();
 		try {
-			p.load(is);
+			p.load(new FileInputStream(f));
 		} catch (IOException e) {
 			LOGGER.error("Unable to load devices.properties", e);
 		}
@@ -74,6 +80,10 @@ public class DeviceManager {
 	public AbstractDevice getDevice(Class clazz, String id) throws IOServiceException {
 
 		AbstractDevice device = devicesMap.get(id);
+		if (device == null) {
+			throw new IOServiceException("Device with ID " + id + " not found. Available device IDs are: "
+					+ devicesMap.keySet());
+		}
 		try {
 			return (AbstractDevice) clazz.cast(device);
 		} catch (ClassCastException e) {
