@@ -20,22 +20,16 @@ public class DeviceFactory {
 		deviceClasses.put("motor", MotorDevice.class);
 	}
 
-	public AbstractDevice createDevice(String deviceString, String confString) throws DeviceFactoryException {
-
-		if (!deviceString.contains(".")) {
-			throw new IllegalArgumentException("Invalid device string: " + confString);
-		}
-
-		deviceString = deviceString.split("\\.")[0];
+	public AbstractDevice createDevice(String deviceType, String confString) throws DeviceFactoryException {
 
 		// Instantiate device
-		Class clazz = deviceClasses.get(deviceString);
+		Class clazz = deviceClasses.get(deviceType);
 		try {
 			AbstractDevice device = (AbstractDevice) clazz.newInstance();
 			device.initWithConfig(confString);
 			return device;
 		} catch (Exception e) {
-			throw new DeviceFactoryException("Unable to create a device of type " + deviceString, e);
+			throw new DeviceFactoryException("Unable to create a device of type " + deviceType, e);
 		}
 	}
 }

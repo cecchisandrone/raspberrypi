@@ -32,6 +32,8 @@ public class SonarDevice extends AbstractDevice {
 	 */
 	public double getRange() {
 
+		checkInitialized();
+
 		try {
 			// Sensor settling
 			triggerPin.low();

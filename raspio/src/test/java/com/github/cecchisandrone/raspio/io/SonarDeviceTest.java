@@ -4,11 +4,15 @@ import com.pi4j.io.gpio.RaspiPin;
 
 public class SonarDeviceTest {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 
 		SonarDevice sonar = new SonarDevice();
-		sonar.setEcho(RaspiPin.GPIO_04);
-		sonar.setTrigger(RaspiPin.GPIO_05);
-		System.out.println(sonar.getRange() + " cm");
+		sonar.setTrigger(RaspiPin.GPIO_13);
+		sonar.setEcho(RaspiPin.GPIO_14);
+		sonar.init();
+		for (;;) {
+			System.out.println(sonar.getRange() + " cm");
+			Thread.sleep(500);
+		}
 	}
 }

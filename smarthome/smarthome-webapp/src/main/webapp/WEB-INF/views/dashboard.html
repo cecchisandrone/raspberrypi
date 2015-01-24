@@ -10,7 +10,7 @@
 			<div class="col-md-6">
 				<p>
 					<button type="button" class="btn btn-danger btn-xs" id="waterLevelError" data-toggle="popover" data-placement="bottom" th:if="${waterLevelError != null}" th:attr="data-content=${waterLevelError}">Error while contacting Raspsonar</button>
-					<div th:include="../fragments/messages" />
+					<div th:include="../fragments/messages" ></div>
 				</p>
 				<p>
 					<strong>Actual water level (average): </strong><span id="waterLevel" th:if="${waterLevel != null}" th:text="${waterLevel} + ' cm'"></span>

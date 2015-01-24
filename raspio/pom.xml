@@ -5,21 +5,14 @@
 	<artifactId>raspio</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>war</packaging>
-
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-	</distributionManagement>
+	<parent>
+		<groupId>com.github.cecchisandrone</groupId>
+		<artifactId>parent-pom</artifactId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
 
 	<properties>
-		<tomcat.url>localhost:8080</tomcat.url>
-		<slf4j.version>1.7.6</slf4j.version>
+		<tomcat.url>localhost:8080</tomcat.url>	
 	</properties>
 
 	<dependencies>
@@ -33,15 +26,8 @@
 		<!-- uncomment this to get JSON support <dependency> <groupId>org.glassfish.jersey.media</groupId> <artifactId>jersey-media-moxy</artifactId> </dependency> -->
 		<dependency>
 			<groupId>com.pi4j</groupId>
-			<artifactId>pi4j-core</artifactId>
-			<version>0.0.5</version>
-			<exclusions>
-				<exclusion>
-					<groupId>com.pi4j</groupId>
-					<artifactId>pi4j-native</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+			<artifactId>pi4j-core</artifactId>						
+		</dependency>		
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
@@ -52,35 +38,16 @@
 			<artifactId>slf4j-api</artifactId>
 			<version>${slf4j.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.10</version>
+		</dependency>		
 	</dependencies>
 
 	<build>
 		<finalName>raspio</finalName>
 		<plugins>
-			<plugin>
-				<groupId>org.sonatype.plugins</groupId>
-				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<version>1.6.3</version>
-				<extensions>true</extensions>
-				<configuration>
-					<serverId>ossrh</serverId>
-					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-					<autoReleaseAfterClose>true</autoReleaseAfterClose>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>2.2.1</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar-no-fork</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
@@ -93,21 +60,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-gpg-plugin</artifactId>
-				<version>1.5</version>
-				<executions>
-					<execution>
-						<id>sign-artifacts</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>sign</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
+			</plugin>			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>

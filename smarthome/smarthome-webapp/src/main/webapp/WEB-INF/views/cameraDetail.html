@@ -10,7 +10,7 @@
 	<!-- /* Content of this page will be decorated by the elements of layout.html */ -->
 	<div layout:fragment="content">	
 		<form class="form-horizontal" th:action="@{/configuration/addCamera/} + ${cameraConfigurationIndex} == null ? '' : ${cameraConfigurationIndex}" th:object="${cameraConfiguration}" action="#" method="post">			
-			<div th:include="../fragments/messages" />			
+			<div th:include="../fragments/messages"></div>			
 			<fieldset>
 				<legend><span th:text="${cameraConfigurationIndex} == null ? 'Add camera' : 'Edit camera'"></span></legend>
 				<div class="form-group">
