@@ -2,8 +2,27 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.cecchisandrone</groupId>
 	<artifactId>parent-pom</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	<version>1.0</version>
 	<packaging>pom</packaging>
+	<name>Raspberry PI projects Parent POM</name>
+	<description>The parent POM to inherit from in Raspberry PI Projects</description>
+	<url>http://github.com/cecchisandrone/raspberrypi</url>
+	<licenses>
+		<license>
+			<name>GNU Affero General Public License v3</name>
+			<url>http://www.spdx.org/licenses/AGPL-3.0</url>
+		</license>
+	</licenses>
+	<scm>
+		<url>https://github.com/cecchisandrone/raspberrypi</url>
+		<connection>https://github.com/cecchisandrone/raspberrypi.git</connection>
+	</scm>
+	<developers>
+		<developer>
+			<name>Alessandro Dionisi</name>
+			<email>cecchisandrone@gmail.com</email>
+		</developer>
+	</developers>
 
 	<distributionManagement>
 		<snapshotRepository>
@@ -40,7 +59,7 @@
 			<dependency>
 				<groupId>javax.servlet</groupId>
 				<artifactId>servlet-api</artifactId>
-				<version>2.5</version>				
+				<version>2.5</version>
 			</dependency>
 			<dependency>
 				<groupId>com.pi4j</groupId>
@@ -57,7 +76,7 @@
 	</dependencyManagement>
 
 	<build>
-		<pluginManagement>			
+		<pluginManagement>
 			<plugins>
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
@@ -92,21 +111,31 @@
 						</execution>
 					</executions>
 				</plugin>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-gpg-plugin</artifactId>
-					<version>1.5</version>
-					<executions>
-						<execution>
-							<id>sign-artifacts</id>
-							<phase>verify</phase>
-							<goals>
-								<goal>sign</goal>
-							</goals>
-						</execution>
-					</executions>
-				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
+
+	<profiles>
+		<profile>
+			<id>release</id>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-gpg-plugin</artifactId>
+						<version>1.5</version>
+						<executions>
+							<execution>
+								<id>sign-artifacts</id>
+								<phase>verify</phase>
+								<goals>
+									<goal>sign</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
