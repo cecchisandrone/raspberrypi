@@ -12,52 +12,60 @@
 	</parent>
 
 	<properties>
-		<tomcat.url>192.168.1.25:8080</tomcat.url>	
+		<tomcat.url>192.168.1.25:8080</tomcat.url>
+		<spring.version>4.1.4.RELEASE</spring.version>
 	</properties>
 
 	<dependencies>
 		<dependency>
-			<groupId>org.glassfish.jersey.containers</groupId>
-			<artifactId>jersey-container-servlet-core</artifactId>
-			<version>2.7</version>
-			<!-- use the following artifactId if you don't need servlet 2.x compatibility -->
-			<!-- artifactId>jersey-container-servlet</artifactId -->
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>${spring.version}</version>
 		</dependency>
-		<!-- uncomment this to get JSON support <dependency> <groupId>org.glassfish.jersey.media</groupId> <artifactId>jersey-media-moxy</artifactId> </dependency> -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-webmvc</artifactId>
+			<version>${spring.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>com.pi4j</groupId>
-			<artifactId>pi4j-core</artifactId>						
-		</dependency>		
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-log4j12</artifactId>			
+			<artifactId>pi4j-core</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>			
+			<artifactId>slf4j-log4j12</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>			
-		</dependency>		
+			<artifactId>junit</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.1.4</version>
+		</dependency>
 	</dependencies>
 
 	<build>
 		<finalName>raspio</finalName>
-		<plugins>					
+		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-assembly-plugin</artifactId>        
+				<artifactId>maven-assembly-plugin</artifactId>
 				<executions>
 					<execution>
 						<goals>
 							<goal>attached</goal>
 						</goals>
-            <phase>package</phase>
+						<phase>package</phase>
 						<configuration>
 							<descriptors>
-								<descriptor>src/assembly/jar.xml</descriptor>
-							</descriptors>							
+								<descriptor>src/assembly/lib.xml</descriptor>
+							</descriptors>
 						</configuration>
 					</execution>
 				</executions>

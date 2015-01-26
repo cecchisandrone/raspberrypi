@@ -1,26 +1,23 @@
 package com.github.cecchisandrone.raspio.service;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.github.cecchisandrone.raspio.io.RelayDevice;
 import com.github.cecchisandrone.raspio.io.SonarDevice;
 
-@Path("/io")
+@RestController
+@RequestMapping("/rest")
 public class IOService {
 
 	private DeviceManager deviceManager = new DeviceManager();
 
-	@GET
-	@Produces(MediaType.TEXT_PLAIN)
-	@Path("/sonar/{id}/distance")
-	public double getDistance(@PathParam(value = "id") String id, @QueryParam(value = "measurements") int measurements)
-			throws IOServiceException {
+	@RequestMapping(method = RequestMethod.GET, value = "/sonar/{id}/distance")
+	public double getDistance(@PathVariable(value = "id") String id,
+			@RequestParam(value = "measurements", defaultValue = "1") int measurements) throws IOServiceException {
 
 		SonarDevice sonar = (SonarDevice) deviceManager.getDevice(SonarDevice.class, id);
 
@@ -35,9 +32,8 @@ public class IOService {
 		return sum / measurements;
 	}
 
-	@POST
-	@Path("/relay/{id}/toggleRelay")
-	public void toggleRelay(@PathParam(value = "id") String id, @QueryParam(value = "status") boolean status)
+	@RequestMapping(method = RequestMethod.POST, value = "/relay/{id}/toggleRelay")
+	public void toggleRelay(@PathVariable(value = "id") String id, @RequestParam(value = "status") boolean status)
 			throws IOServiceException {
 
 		RelayDevice relay = (RelayDevice) deviceManager.getDevice(RelayDevice.class, id);
