@@ -1,6 +1,7 @@
-package com.github.cecchisandrone.raspio.io;
+package com.github.cecchisandrone.raspio.gpio;
 
-import com.github.cecchisandrone.raspio.io.MotorDevice.Motor;
+import com.github.cecchisandrone.raspio.gpio.MotorDevice;
+import com.github.cecchisandrone.raspio.gpio.MotorDevice.Motor;
 import com.pi4j.io.gpio.RaspiPin;
 
 public class MotorDeviceTest {

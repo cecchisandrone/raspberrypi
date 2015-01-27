@@ -11,7 +11,7 @@ import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.cecchisandrone.raspio.io.AbstractDevice;
+import com.github.cecchisandrone.raspio.gpio.AbstractDevice;
 
 /**
  * Manages multiple {@link AbstractDevice} instances, using the configuration read from devices.properties file.

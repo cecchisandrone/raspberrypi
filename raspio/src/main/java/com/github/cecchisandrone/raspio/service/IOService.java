@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.github.cecchisandrone.raspio.io.RelayDevice;
-import com.github.cecchisandrone.raspio.io.SonarDevice;
+import com.github.cecchisandrone.raspio.gpio.RelayDevice;
+import com.github.cecchisandrone.raspio.gpio.SonarDevice;
 
 @RestController
 @RequestMapping("/rest")

@@ -1,4 +1,4 @@
-package com.github.cecchisandrone.arpa.input;
+package com.github.cecchisandrone.raspio.input;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -8,8 +8,8 @@ import java.io.IOException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.github.cecchisandrone.arpa.input.JoypadController;
-import com.github.cecchisandrone.arpa.input.JoypadEventLogger;
+import com.github.cecchisandrone.raspio.input.JoypadController;
+import com.github.cecchisandrone.raspio.input.JoypadEventLogger;
 
 public class JoypadControllerTest {
 

@@ -1,9 +1,9 @@
-package com.github.cecchisandrone.arpa.input;
+package com.github.cecchisandrone.raspio.input;
 
 import java.util.List;
 
-import com.github.cecchisandrone.arpa.input.JoypadController.Analog;
-import com.github.cecchisandrone.arpa.input.JoypadController.Button;
+import com.github.cecchisandrone.raspio.input.JoypadController.Analog;
+import com.github.cecchisandrone.raspio.input.JoypadController.Button;
 
 public interface JoypadEventListener {
 

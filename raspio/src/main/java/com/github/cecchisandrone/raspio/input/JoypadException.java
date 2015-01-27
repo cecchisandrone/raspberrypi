@@ -1,4 +1,4 @@
-package com.github.cecchisandrone.arpa.input;
+package com.github.cecchisandrone.raspio.input;
 
 public class JoypadException extends RuntimeException {
 

@@ -1,5 +1,6 @@
-package com.github.cecchisandrone.raspio.io;
+package com.github.cecchisandrone.raspio.gpio;
 
+import com.github.cecchisandrone.raspio.gpio.SonarDevice;
 import com.github.cecchisandrone.raspio.service.DeviceManager;
 import com.github.cecchisandrone.raspio.service.IOServiceException;
 

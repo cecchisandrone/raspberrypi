@@ -3,10 +3,10 @@ package com.github.cecchisandrone.raspio.service;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.github.cecchisandrone.raspio.io.AbstractDevice;
-import com.github.cecchisandrone.raspio.io.MotorDevice;
-import com.github.cecchisandrone.raspio.io.RelayDevice;
-import com.github.cecchisandrone.raspio.io.SonarDevice;
+import com.github.cecchisandrone.raspio.gpio.AbstractDevice;
+import com.github.cecchisandrone.raspio.gpio.MotorDevice;
+import com.github.cecchisandrone.raspio.gpio.RelayDevice;
+import com.github.cecchisandrone.raspio.gpio.SonarDevice;
 
 public class DeviceFactory {
 
