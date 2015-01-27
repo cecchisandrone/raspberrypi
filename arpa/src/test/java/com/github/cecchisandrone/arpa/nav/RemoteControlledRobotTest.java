@@ -1,11 +1,11 @@
 package com.github.cecchisandrone.arpa.nav;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import com.github.cecchisandrone.raspio.gpio.MotorDevice;
 import com.github.cecchisandrone.raspio.gpio.MotorDevice.Motor;
+import com.github.cecchisandrone.raspio.gpio.SonarDevice;
 import com.github.cecchisandrone.raspio.input.JoypadController;
 import com.github.cecchisandrone.raspio.input.JoypadController.Analog;
 import com.github.cecchisandrone.raspio.input.JoypadController.Button;
@@ -15,65 +15,88 @@ import com.pi4j.io.gpio.RaspiPin;
 
 public class RemoteControlledRobotTest implements Runnable, JoypadEventListener {
 
-  private double currentSpeedOnX = 0;
+	private int currentSpeedOnX = 0;
 
-  private double currentSpeedOnY = 0;
+	private int currentSpeedOnY = 0;
 
-  private JoypadController controller;
+	private JoypadController controller;
 
-  private MotorDevice motorDevice = new MotorDevice();
+	private MotorDevice motorDevice = new MotorDevice();
 
-  public static void main(String[] args) {
+	private SonarDevice sonarDevice = new SonarDevice();
 
-    RemoteControlledRobotTest launcher = new RemoteControlledRobotTest();
-    Runtime.getRuntime().addShutdownHook(new Thread(launcher));
-    launcher.launch();
-  }
+	private boolean manualMode = true;
 
-  private void launch() {
+	public static void main(String[] args) {
 
-    motorDevice.setEn1Pin(15);
-    motorDevice.setEn2Pin(16);
-    motorDevice.setIn1Pin(RaspiPin.GPIO_00);
-    motorDevice.setIn2Pin(RaspiPin.GPIO_02);
-    motorDevice.setIn3Pin(RaspiPin.GPIO_12);
-    motorDevice.setIn4Pin(RaspiPin.GPIO_03);
-    motorDevice.init();
+		RemoteControlledRobotTest launcher = new RemoteControlledRobotTest();
+		Runtime.getRuntime().addShutdownHook(new Thread(launcher));
+		launcher.launch();
+	}
 
-    controller = JoypadController.getInstance("/dev/input/js0");
-    controller.addEventListener(this);
-    controller.connect();
-  }
+	private void launch() {
 
-  public void run() {
-    controller.disconnect();
-  }
+		motorDevice.setEn1Pin(15);
+		motorDevice.setEn2Pin(16);
+		motorDevice.setIn1Pin(RaspiPin.GPIO_00);
+		motorDevice.setIn2Pin(RaspiPin.GPIO_02);
+		motorDevice.setIn3Pin(RaspiPin.GPIO_12);
+		motorDevice.setIn4Pin(RaspiPin.GPIO_03);
+		motorDevice.init();
 
-  public void joypadEventTriggered(JoypadEvent e) {
+		sonarDevice.setTrigger(RaspiPin.GPIO_13);
+		sonarDevice.setEcho(RaspiPin.GPIO_14);
+		sonarDevice.init();
 
-    int speed = (int)((100.0 / 32768.0) * e.getNewValue());
+		controller = JoypadController.getInstance("/dev/input/js0");
+		controller.addEventListener(this);
+		controller.connect();
 
-    if (Math.abs(speed) < 20) {
-      speed = 0;
-    }
+		while (true) {
+			if (!manualMode) {
 
-    if (e.getChangedAnalog() == Analog.Y1 && currentSpeedOnX < 30) {
-      currentSpeedOnY = Math.abs(speed);
-      motorDevice.changeSpeed(Motor.LEFT, speed);
-      motorDevice.changeSpeed(Motor.RIGHT, speed);
-    }
-    else if (e.getChangedAnalog() == Analog.X1 && currentSpeedOnY < 30) {
-      currentSpeedOnX = Math.abs(speed);
-      motorDevice.changeSpeed(Motor.LEFT, -speed);
-      motorDevice.changeSpeed(Motor.RIGHT, speed);
-    }
-  }
+				double range = sonarDevice.getRange();
+				System.out.println(range);
+				if (range < 30) {
+					motorDevice.changeSpeed(Motor.LEFT, 40);
+					motorDevice.changeSpeed(Motor.RIGHT, 40);
+				}
+			}
+		}
+	}
 
-  public List<Button> getButtonsToNotify() {
-    return new ArrayList<JoypadController.Button>();
-  }
+	public void run() {
+		controller.disconnect();
+	}
 
-  public List<Analog> getAnalogsToNotify() {
-    return Arrays.asList(Analog.values());
-  }
+	public void joypadEventTriggered(JoypadEvent e) {
+
+		if (e.getChangedButton() != null && e.getChangedButton().equals(Button.START) && e.getNewValue() == 1) {
+			manualMode = !manualMode;
+		}
+
+		int speed = (int) ((100.0 / 32768.0) * e.getNewValue());
+
+		if (Math.abs(speed) < 20) {
+			speed = 0;
+		}
+
+		if (e.getChangedAnalog() != null && e.getChangedAnalog() == Analog.Y1 && currentSpeedOnX < 30) {
+			currentSpeedOnY = Math.abs(speed);
+			motorDevice.changeSpeed(Motor.LEFT, speed);
+			motorDevice.changeSpeed(Motor.RIGHT, speed);
+		} else if (e.getChangedAnalog() == Analog.X1 && currentSpeedOnY < 30) {
+			currentSpeedOnX = Math.abs(speed);
+			motorDevice.changeSpeed(Motor.LEFT, -speed);
+			motorDevice.changeSpeed(Motor.RIGHT, speed);
+		}
+	}
+
+	public List<Button> getButtonsToNotify() {
+		return Arrays.asList(Button.values());
+	}
+
+	public List<Analog> getAnalogsToNotify() {
+		return Arrays.asList(Analog.values());
+	}
 }
