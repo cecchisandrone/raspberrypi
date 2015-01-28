@@ -1,11 +1,16 @@
 package com.github.cecchisandrone.arpa.module;
 
-public abstract class AbstractAgentModule extends Thread {
+public abstract class AbstractAgentModule {
 
-	@Override
-	public void run() {
-		executeWork();
+	private int runPriority;
+
+	public int getRunPriority() {
+		return runPriority;
 	}
 
-	abstract void executeWork();
+	public void setRunPriority(int runPriority) {
+		this.runPriority = runPriority;
+	}
+
+	public abstract void executeWork();
 }
