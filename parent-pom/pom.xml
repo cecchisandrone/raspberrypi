@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.cecchisandrone</groupId>
 	<artifactId>parent-pom</artifactId>
-	<version>1.0</version>
+	<version>1.1</version>
 	<packaging>pom</packaging>
 	<name>Raspberry PI projects Parent POM</name>
 	<description>The parent POM to inherit from in Raspberry PI Projects</description>
@@ -34,6 +34,19 @@
 			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
 	</distributionManagement>
+
+	<repositories>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
 
 	<properties>
 		<slf4j.version>1.7.6</slf4j.version>
