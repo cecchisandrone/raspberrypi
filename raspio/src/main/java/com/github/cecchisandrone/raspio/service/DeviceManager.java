@@ -3,6 +3,7 @@ package com.github.cecchisandrone.raspio.service;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -42,17 +43,22 @@ public class DeviceManager {
 	 */
 	public DeviceManager() {
 
+		InputStream inputStream = getClass().getClassLoader().getResourceAsStream("devices.properties");
 		String file = System.getProperty("devices.properties.file");
-		if (file == null) {
-			throw new IllegalArgumentException("devices.properties.file system property not specified");
-		}
-		File f = new File(file);
-		if (!f.exists()) {
-			throw new IllegalArgumentException("devices.properties doesn't exist");
-		}
 		Properties p = new Properties();
+
 		try {
-			p.load(new FileInputStream(f));
+			if (file != null) { // Override classpath file with custom file
+				File f = new File(file);
+				inputStream = new FileInputStream(f);
+			}
+
+			if (inputStream == null) {
+				throw new IllegalArgumentException(
+						"devices.properties file not found in classpath and devices.properties.file system property not specified. Unable to initialize the device manager");
+			}
+
+			p.load(inputStream);
 		} catch (IOException e) {
 			LOGGER.error("Unable to load devices.properties", e);
 		}
