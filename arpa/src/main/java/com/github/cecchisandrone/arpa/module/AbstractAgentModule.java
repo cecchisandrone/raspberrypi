@@ -1,6 +1,11 @@
 package com.github.cecchisandrone.arpa.module;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class AbstractAgentModule {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAgentModule.class);
 
 	private boolean terminated = false;
 
@@ -32,10 +37,9 @@ public abstract class AbstractAgentModule {
 					executeWork();
 
 					try {
-						Thread.sleep(3000);
+						Thread.sleep(10);
 					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						LOGGER.error(e.toString(), e);
 					}
 
 				}

@@ -1,6 +1,5 @@
 package com.github.cecchisandrone.raspio.gpio;
 
-import com.github.cecchisandrone.raspio.gpio.SonarDevice;
 import com.pi4j.io.gpio.RaspiPin;
 
 public class SonarDeviceTest {

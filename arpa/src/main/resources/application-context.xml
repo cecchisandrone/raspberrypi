@@ -15,6 +15,7 @@
 			<util:list>			
 				<ref bean="navigationModule"/>					
 				<ref bean="autonomousNavigationModule"/>
+				<ref bean="systemModule"/>
 			</util:list>
 		</property>
 	</bean>
@@ -22,15 +23,17 @@
 	<bean id="abstractAgentModule" class="com.github.cecchisandrone.arpa.module.AbstractAgentModule" abstract="true"/>
 	
 	<bean id="navigationModule" class="com.github.cecchisandrone.arpa.module.NavigationModule" parent="abstractAgentModule">
-		<property name="priority" value="10"/>
-		<property name="motorDeviceId" value="1"/>
-		<property name="sonarDeviceId" value="2"/>
+		<property name="priority" value="10"/>		
 	</bean>
 				
 	<bean id="autonomousNavigationModule"  class="com.github.cecchisandrone.arpa.module.AutonomousNavigationModule" parent="abstractAgentModule">
-		<property name="priority" value="1"/>
+		<property name="priority" value="5"/>
 	</bean>
 	
+	<bean id="systemModule" class="com.github.cecchisandrone.arpa.module.SystemModule" parent="abstractAgentModule">
+		<property name="priority" value="1"/>
+	</bean>
+				
 	<bean id="joypadController" class="com.github.cecchisandrone.raspio.input.JoypadController" factory-method="getInstance">
 		<constructor-arg>
 			<value>/dev/input/js0</value>
@@ -38,5 +41,10 @@
 	</bean>
 	
 	<bean id="deviceManager" class="com.github.cecchisandrone.raspio.service.DeviceManager"/>
+	
+	<bean id="robotNavigator" class="com.github.cecchisandrone.arpa.io.RobotNavigator" init-method="init">
+		<property name="motorDeviceId" value="1"/>	
+		<property name="sonarDeviceId" value="2"/>
+	</bean>
 	
 </beans>

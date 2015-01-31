@@ -20,5 +20,12 @@ public class ArpaLauncher {
 		moduleContainer.initializeModules();
 
 		LOGGER.info("ARPA initialization completed...");
+
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			@Override
+			public void run() {
+				LOGGER.info("ARPA shutdown completed...");
+			}
+		});
 	}
 }
