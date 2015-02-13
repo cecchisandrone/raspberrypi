@@ -3,8 +3,10 @@ import threading
 import sys
 import json
 import signal
-from flask import Flask, url_for
+from flask import Flask
 from flask import request
+import time
+import flask
 
 
 class FaceDetector(object):
@@ -21,6 +23,21 @@ class FaceDetector(object):
 
     def rest_service(self):
 
+        @self.rest.after_request
+        def add_cors(resp):
+
+            """ Ensure all responses have the CORS headers. This ensures any failures are also accessible
+                by the client. """
+            resp.headers['Access-Control-Allow-Origin'] = flask.request.headers.get('Origin', '*')
+            resp.headers['Access-Control-Allow-Credentials'] = 'true'
+            resp.headers['Access-Control-Allow-Methods'] = 'POST, OPTIONS, GET'
+            resp.headers['Access-Control-Allow-Headers'] = flask.request.headers.get(
+                'Access-Control-Request-Headers', 'Authorization')
+            # set low for debugging
+            if self.rest.debug:
+                resp.headers['Access-Control-Max-Age'] = '1'
+            return resp
+
         @self.rest.route('/config/frame')
         def frame():
             data = {
@@ -34,6 +51,8 @@ class FaceDetector(object):
 
             # Terminate face recognition loop
             self.stopped = True
+            # Give it the time to terminate
+            time.sleep(2)
 
             # Terminate Flask
             func = request.environ.get('werkzeug.server.shutdown')
@@ -46,12 +65,15 @@ class FaceDetector(object):
 
         @self.rest.route('/faces')
         def list_faces():
-            return json.dumps(self.detected_faces)
+            faces = list()
+            for (x, y, w, h) in self.detected_faces:
+                face = {'x': x, 'y': y, 'w': w, 'h': h}
+                faces.append(face)
+            return json.dumps(faces)
 
         self.rest.run()
 
     def faces_detect_thread(self):
-
         video_capture = cv2.VideoCapture(0)
         self.width = video_capture.get(3)
         self.height = video_capture.get(4)
@@ -72,7 +94,7 @@ class FaceDetector(object):
                 flags=cv2.cv.CV_HAAR_SCALE_IMAGE
             )
 
-            print("Detected " + str(len(self.detected_faces)) + " faces")
+            # print("Detected " + str(len(self.detected_faces)) + " faces")
 
             # Draw a rectangle around the faces
             for (x, y, w, h) in self.detected_faces:
@@ -93,6 +115,7 @@ class FaceDetector(object):
 
     def start(self):
         t = threading.Thread(target=self.faces_detect_thread, args=())
+        t.daemon = True
         t.start()
 
         self.rest_service()
@@ -104,6 +127,7 @@ class FaceDetector(object):
 def signal_term_handler(signal, frame):
     print 'got SIGTERM'
     sys.exit(0)
+
 
 signal.signal(signal.SIGTERM, signal_term_handler)
 
