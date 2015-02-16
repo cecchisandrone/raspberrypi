@@ -63,7 +63,7 @@ public class NavigationModule extends AbstractAgentModule implements JoypadEvent
 
 		if (event.getChangedAnalog() != null && event.getChangedAnalog() == Analog.Y1
 				&& robotNavigator.getCurrentSpeedOnX() < 30) {
-			robotNavigator.moveStraight(-speed);
+			robotNavigator.moveStraight(speed);
 		} else if (event.getChangedAnalog() == Analog.X1 && robotNavigator.getCurrentSpeedOnY() < 30) {
 			robotNavigator.rotate(speed);
 		}

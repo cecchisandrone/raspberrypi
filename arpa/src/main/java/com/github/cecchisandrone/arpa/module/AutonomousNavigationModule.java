@@ -64,7 +64,7 @@ public class AutonomousNavigationModule extends AbstractAgentModule implements J
 			if (range < obstacleThreshold) {
 				navigationStatus = NavigationStatus.ROTATING;
 			}
-			robotNavigator.moveStraight(navigationSpeed);
+			robotNavigator.moveStraight(-navigationSpeed);
 			break;
 		}
 		case STOPPED:
