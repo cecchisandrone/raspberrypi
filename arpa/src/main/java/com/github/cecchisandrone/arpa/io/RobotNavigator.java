@@ -59,12 +59,18 @@ public class RobotNavigator {
 	}
 
 	public synchronized void moveStraight(int speed) {
+		if (Math.abs(speed) > MotorDevice.PWM_RANGE) {
+			speed = (int) (Math.signum(speed) * MotorDevice.PWM_RANGE);
+		}
 		currentSpeedOnY = Math.abs(speed);
 		motorDevice.changeSpeed(Motor.LEFT, -speed);
 		motorDevice.changeSpeed(Motor.RIGHT, -speed);
 	}
 
 	public synchronized void rotate(int speed) {
+		if (Math.abs(speed) > MotorDevice.PWM_RANGE) {
+			speed = (int) (Math.signum(speed) * MotorDevice.PWM_RANGE);
+		}
 		currentSpeedOnX = Math.abs(speed);
 		motorDevice.changeSpeed(Motor.LEFT, -speed);
 		motorDevice.changeSpeed(Motor.RIGHT, speed);

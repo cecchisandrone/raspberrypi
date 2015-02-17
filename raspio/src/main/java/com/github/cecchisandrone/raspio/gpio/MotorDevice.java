@@ -7,6 +7,8 @@ import com.pi4j.wiringpi.SoftPwm;
 
 public class MotorDevice extends AbstractDevice {
 
+	public static final int PWM_RANGE = 100;
+
 	public enum Motor {
 		LEFT, RIGHT
 	}
@@ -67,8 +69,8 @@ public class MotorDevice extends AbstractDevice {
 		in3 = gpio.provisionDigitalOutputPin(in3Pin, "IN3", PinState.LOW);
 		in4 = gpio.provisionDigitalOutputPin(in4Pin, "IN4", PinState.LOW);
 
-		SoftPwm.softPwmCreate(en1Pin, 0, 100);
-		SoftPwm.softPwmCreate(en2Pin, 0, 100);
+		SoftPwm.softPwmCreate(en1Pin, 0, PWM_RANGE);
+		SoftPwm.softPwmCreate(en2Pin, 0, PWM_RANGE);
 	}
 
 	/**
@@ -76,13 +78,13 @@ public class MotorDevice extends AbstractDevice {
 	 * for the motor 
 	 * 
 	 * @param motor - the selected motor
-	 * @param speed - the speed value. -100 <= speed <= 100
+	 * @param speed - the speed value. -PWM_RANGE <= speed <= PWM_RANGE
 	 */
 	public void changeSpeed(Motor motor, int speed) {
 
 		checkInitialized();
 
-		if (speed > 100 || speed < -100) {
+		if (speed > PWM_RANGE || speed < -PWM_RANGE) {
 			throw new IllegalArgumentException(speed + " is an illegal value for speed parameter");
 		}
 
