@@ -1,3 +1,6 @@
+import io
+import numpy as np
+import picamera
 import cv2
 import threading
 import sys
@@ -10,6 +13,10 @@ import flask
 
 
 class FaceDetector(object):
+    
+    CAMERA_WIDTH = 640
+    CAMERA_HEIGHT = 480
+
     def __init__(self, classifier_file):
 
         # Initialize Flask
@@ -18,8 +25,9 @@ class FaceDetector(object):
         self.stopped = False
         self.detected_faces = None
         self.classifier_file = classifier_file
-        self.width = -1
-        self.height = -1
+        self.width = FaceDetector.CAMERA_WIDTH
+        self.height = FaceDetector.CAMERA_HEIGHT
+	self.last_frame = None
 
     def rest_service(self):
 
@@ -71,20 +79,42 @@ class FaceDetector(object):
                 faces.append(face)
             return json.dumps(faces)
 
-        self.rest.run()
+	@self.rest.route('/frame')
+	def last_frame():
+	    return self.last_frame	
+
+	@self.rest.route('/')
+	def root():
+	    print("index requested")	
+	    return self.rest.send_static_file('index.html')
+	
+	self.rest.debug = True
+        self.rest.run(host='0.0.0.0')
 
     def faces_detect_thread(self):
-        video_capture = cv2.VideoCapture(0)
-        self.width = video_capture.get(3)
-        self.height = video_capture.get(4)
-        classifier = cv2.CascadeClassifier(self.classifier_file)
+
+	#saving the picture to an in-program stream rather than a file
+	stream = io.BytesIO()
+
+	classifier = cv2.CascadeClassifier(self.classifier_file)
 
         print('Using resolution: ' + str(self.width) + '*' + str(self.height))
 
         while not self.stopped:
 
             # Capture frame-by-frame
-            ret, frame = video_capture.read()
+	    with picamera.PiCamera() as camera:
+        
+	    	camera.resolution = (self.width, self.height)
+	        #capture into stream
+        	camera.capture(stream, format='jpeg')
+
+	    #convert image into numpy array
+	    data = np.fromstring(stream.getvalue(), dtype=np.uint8)
+	    #turn the array into a cv2 image
+	    frame = cv2.imdecode(data, 1)
+
+
             gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             self.detected_faces = classifier.detectMultiScale(
                 gray,
@@ -101,9 +131,11 @@ class FaceDetector(object):
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
             # Display the resulting frame
-            cv2.imshow('Camera', frame)
+            #cv2.imshow('Camera', frame)
 
-            # cv2.imwrite('file.jpg', frame)
+            cv2.imwrite('file.jpg', frame)
+
+            self.last_frame = frame	
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 self.stop()
