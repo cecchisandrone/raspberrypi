@@ -1,4 +1,5 @@
 import io
+import socket
 import numpy as np
 import picamera
 import cv2
@@ -8,6 +9,7 @@ import json
 import signal
 from flask import Flask
 from flask import request
+from flask import render_template
 import time
 import flask
 
@@ -27,7 +29,7 @@ class FaceDetector(object):
         self.classifier_file = classifier_file
         self.width = FaceDetector.CAMERA_WIDTH
         self.height = FaceDetector.CAMERA_HEIGHT
-	self.last_frame = None
+	self.stream = None
 
     def rest_service(self):
 
@@ -72,29 +74,33 @@ class FaceDetector(object):
             return msg
 
         @self.rest.route('/faces')
-        def list_faces():
+        def list_faces():            
             faces = list()
-            for (x, y, w, h) in self.detected_faces:
-                face = {'x': x, 'y': y, 'w': w, 'h': h}
-                faces.append(face)
+            if self.detected_faces is not None:
+                for (x, y, w, h) in self.detected_faces:
+            	    face = {'x': x.item(), 'y': y.item(), 'w': w.item(), 'h': h.item()}
+                    faces.append(face)
+            print self.detected_faces
+	    print faces       
             return json.dumps(faces)
 
-	@self.rest.route('/frame')
-	def last_frame():
-	    return self.last_frame	
-
-	@self.rest.route('/')
-	def root():
-	    print("index requested")	
-	    return self.rest.send_static_file('index.html')
-	
-	self.rest.debug = True
+    	@self.rest.route('/frame')
+    	def last_frame():
+            resp = flask.make_response(self.stream.getvalue())
+            resp.content_type = "image/jpeg"
+            return resp	    	
+    
+    	@self.rest.route('/')
+    	def root():	    
+    	    return render_template('index.html', serverUrl=serverUrl)
+    	
+    	self.rest.debug = True
         self.rest.run(host='0.0.0.0')
 
     def faces_detect_thread(self):
 
-	#saving the picture to an in-program stream rather than a file
-	stream = io.BytesIO()
+	# saving the picture to an in-program stream rather than a file
+	self.stream = io.BytesIO()
 
 	classifier = cv2.CascadeClassifier(self.classifier_file)
 
@@ -106,12 +112,14 @@ class FaceDetector(object):
 	    with picamera.PiCamera() as camera:
         
 	    	camera.resolution = (self.width, self.height)
-	        #capture into stream
-        	camera.capture(stream, format='jpeg')
+	        # capture into stream
+        	camera.capture(self.stream, format='jpeg')
 
-	    #convert image into numpy array
-	    data = np.fromstring(stream.getvalue(), dtype=np.uint8)
-	    #turn the array into a cv2 image
+		camera.close()
+
+	    # convert image into numpy array
+	    data = np.fromstring(self.stream.getvalue(), dtype=np.uint8)
+	    # turn the array into a cv2 image
 	    frame = cv2.imdecode(data, 1)
 
 
@@ -131,11 +139,8 @@ class FaceDetector(object):
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
 
             # Display the resulting frame
-            #cv2.imshow('Camera', frame)
-
-            cv2.imwrite('file.jpg', frame)
-
-            self.last_frame = frame	
+            # cv2.imshow('Camera', frame)
+            # cv2.imwrite('file.jpg', frame
 
             if cv2.waitKey(1) & 0xFF == ord('q'):
                 self.stop()
@@ -162,7 +167,8 @@ def signal_term_handler(signal, frame):
 
 
 signal.signal(signal.SIGTERM, signal_term_handler)
-
+serverUrl = '192.168.1.15:5000'
+# socket.getfqdn()
 cl_file = sys.argv[1]
 face_detector = FaceDetector(cl_file)
 face_detector.start()
