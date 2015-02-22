@@ -1,25 +1,18 @@
-import io
-import socket
-import numpy as np
-import picamera
 import cv2
 import threading
-import sys
 import json
-import signal
+from optparse import OptionParser
 from flask import Flask
 from flask import request
 from flask import render_template
 import time
 import flask
+import numpy as np
 
 
 class FaceDetector(object):
-    
-    CAMERA_WIDTH = 640
-    CAMERA_HEIGHT = 480
 
-    def __init__(self, classifier_file):
+    def __init__(self, classifier_file, cameraindex, width, height):
 
         # Initialize Flask
         self.rest = Flask(__name__)
@@ -27,9 +20,10 @@ class FaceDetector(object):
         self.stopped = False
         self.detected_faces = None
         self.classifier_file = classifier_file
-        self.width = FaceDetector.CAMERA_WIDTH
-        self.height = FaceDetector.CAMERA_HEIGHT
-	self.stream = None
+        self.width = width
+        self.height = height
+        self.cameraindex = cameraindex
+        self.buffer = None
 
     def rest_service(self):
 
@@ -74,101 +68,94 @@ class FaceDetector(object):
             return msg
 
         @self.rest.route('/faces')
-        def list_faces():            
+        def list_faces():
             faces = list()
             if self.detected_faces is not None:
                 for (x, y, w, h) in self.detected_faces:
-            	    face = {'x': x.item(), 'y': y.item(), 'w': w.item(), 'h': h.item()}
+                    face = {'x': x.item(), 'y': y.item(), 'w': w.item(), 'h': h.item()}
                     faces.append(face)
             print self.detected_faces
-	    print faces       
+            print faces
             return json.dumps(faces)
 
-    	@self.rest.route('/frame')
-    	def last_frame():
-            resp = flask.make_response(self.stream.getvalue())
+        @self.rest.route('/frame')
+        def last_frame():
+            resp = flask.make_response(self.buffer[1])
             resp.content_type = "image/jpeg"
-            return resp	    	
-    
-    	@self.rest.route('/')
-    	def root():	    
-    	    return render_template('index.html', serverUrl=serverUrl)
-    	
-    	self.rest.debug = True
+            return resp
+
+        @self.rest.route('/')
+        def root():
+            return render_template('index.html', serverUrl=serverUrl)
+
+        self.rest.debug = True
         self.rest.run(host='0.0.0.0')
 
     def faces_detect_thread(self):
 
-	# saving the picture to an in-program stream rather than a file
-	self.stream = io.BytesIO()
+        image_scale = 2
+        haar_scale = 1.2
+        min_neighbors = 2
 
-	classifier = cv2.CascadeClassifier(self.classifier_file)
-
-        print('Using resolution: ' + str(self.width) + '*' + str(self.height))
+        video_capture = cv2.VideoCapture(self.cameraindex)
+        video_capture.set(3, self.width)
+        video_capture.set(4, self.height)
+        classifier = cv2.CascadeClassifier(options.cascade)
 
         while not self.stopped:
 
-            # Capture frame-by-frame
-	    with picamera.PiCamera() as camera:
-        
-	    	camera.resolution = (self.width, self.height)
-	        # capture into stream
-        	camera.capture(self.stream, format='jpeg')
+            # Measure time
+            start = time.time()
 
-		camera.close()
+            ret, frame = video_capture.read()
 
-	    # convert image into numpy array
-	    data = np.fromstring(self.stream.getvalue(), dtype=np.uint8)
-	    # turn the array into a cv2 image
-	    frame = cv2.imdecode(data, 1)
+            small_frame = cv2.resize(frame, (self.width / image_scale, self.height / image_scale))
+            gray = cv2.cvtColor(small_frame, cv2.COLOR_RGB2GRAY)
+            cv2.equalizeHist(gray, gray)
 
-
-            gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-            self.detected_faces = classifier.detectMultiScale(
+            detected_faces = classifier.detectMultiScale(
                 gray,
-                scaleFactor=1.1,
-                minNeighbors=5,
-                minSize=(30, 30),
-                flags=cv2.cv.CV_HAAR_SCALE_IMAGE
+                scaleFactor=haar_scale,
+                minNeighbors=min_neighbors
             )
 
-            # print("Detected " + str(len(self.detected_faces)) + " faces")
-
             # Draw a rectangle around the faces
-            for (x, y, w, h) in self.detected_faces:
-                cv2.rectangle(frame, (x, y), (x + w, y + h), (0, 255, 0), 2)
+            for (x, y, w, h) in detected_faces:
+                pt1 = (int(x * image_scale), int(y * image_scale))
+                pt2 = (int((x + w) * image_scale), int((y + h) * image_scale))
+                cv2.rectangle(frame, pt1, pt2, (0, 255, 0), 2)
 
-            # Display the resulting frame
-            # cv2.imshow('Camera', frame)
-            # cv2.imwrite('file.jpg', frame
+            array = np.asarray(frame)
+            # cv2.imwrite('detected.jpg', frame)
 
-            if cv2.waitKey(1) & 0xFF == ord('q'):
-                self.stop()
-
-        # When everything is done, release the capture
-        print("Shutting down OpenCV...")
-        video_capture.release()
-        cv2.destroyAllWindows()
+            self.buffer = cv2.imencode('.jpg', frame)
+            print("Detected " + str(len(detected_faces)) + " faces in " + time.time() - start + "s")
 
     def start(self):
         t = threading.Thread(target=self.faces_detect_thread, args=())
         t.daemon = True
         t.start()
-
         self.rest_service()
 
     def stop(self):
         self.stopped = True
 
+parser = OptionParser(usage="usage: %prog [options]")
+parser.add_option("-c", "--cascade", action="store", dest="cascade", type="str",
+                  help="Haar cascade file, default %default",
+                  default="haarcascade_frontalface_default.xml")
+parser.add_option("-i", "--camera-index", action="store", dest="cameraindex", type="int",
+                  help="Camera index, default %default",
+                  default="0")
+parser.add_option("-x", "--width", action="store", dest="width", type="int",
+                  help="Width (px), default %default",
+                  default="320")
+parser.add_option("-y", "--height", action="store", dest="height", type="int",
+                  help="Height (px), default %default",
+                  default="200")
+(options, args) = parser.parse_args()
 
-def signal_term_handler(signal, frame):
-    print 'got SIGTERM'
-    sys.exit(0)
-
-
-signal.signal(signal.SIGTERM, signal_term_handler)
 serverUrl = '192.168.1.15:5000'
 # socket.getfqdn()
-cl_file = sys.argv[1]
-face_detector = FaceDetector(cl_file)
+face_detector = FaceDetector(options.cascade, options.cameraindex, options.width, options.height)
 face_detector.start()

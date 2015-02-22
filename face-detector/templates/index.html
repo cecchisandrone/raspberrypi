@@ -1,44 +1,47 @@
+<!DOCTYPE html>
 <html>
-    <head>
-        <title>jQuery ajax polling</title>
-    </head>
+<head>
+    <title>ARPA camera vew</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="../static/bootstrap.min.css" rel="stylesheet" media="screen">
+    <script src="../static/jquery.min.js"></script>
+</head>
 <body>
+<div class="container">
+    <h2>ARPA camera view</h2>
 
-<!-- where the response will be displayed -->
-<div id='response'></div>
-<img id="image" src="../static/loader.gif" alt="image"/>
- 
-<script src="../static/jquery.min.js"></script>
-<script>
-$(document).ready(function() {
+    <div id='response'></div>
+    <img id="image" class="img-responsive" src="../static/loader.gif" alt="image"/>
+    <script>
+        $(document).ready(function () {
 
-    // host:port
-    var serverUrl = '{{ serverUrl }}';
+            (function poll() {
+                setTimeout(function () {
 
-    (function poll() {
-        setTimeout(function() {
+                    // host:port
+                    var serverUrl = '{{ serverUrl }}';
 
-            // show that something is loading
-            $('#response').html("<b>Loading response...</b>");
+                    // show that something is loading
+                    $('#response').html("<b>Loading data...</b>");
 
-            $.ajax({
-                type: 'GET',
-                url: 'http://' + serverUrl + '/faces',
-                data: $(this).serialize()
-            })
-            .done(function(data){
-                // show the response
-                $('#response').html(data);
-                $('#image').attr("src","http://" + serverUrl + "/frame");
-                poll();
-            })
-            .fail(function(jqXHR, status, err) {
-                $('#response').html("<p style='color: red'>Error in the request</p>");
-            });
-        }, 1000);
-    })();
-});
-</script>
- 
+                    $.ajax({
+                        type: 'GET',
+                        url: 'http://' + serverUrl + '/faces',
+                        data: $(this).serialize()
+                    })
+                    .done(function(data){
+                        // show the response
+                        $('#response').html(data);
+                        $("#image").removeAttr("src").attr("src", "http://" + serverUrl + "/frame?rnd=" + (new Date()).getTime());
+                        poll();
+                    })
+                    .fail(function(jqXHR, status, err) {
+                        $('#response').html("<p style='color: red'>Error in the request</p>");
+                    });
+                }, 3000);
+            })();
+        });
+    </script>
+</div>
 </body>
 </html>
