@@ -111,6 +111,8 @@ class FaceDetector(object):
         video_capture.set(3, self.width)
         video_capture.set(4, self.height)
         classifier = cv2.CascadeClassifier(options.cascade)
+	
+	print "Using resolution " + str(self.width) + "*" + str(self.height)		
 
         while not self.stopped:
 
@@ -170,7 +172,7 @@ parser.add_option("-y", "--height", action="store", dest="height", type="int",
                   default="200")
 parser.add_option("-p", "--port", action="store", dest="port", type="int",
                   help="Port number, default %default",
-                  default="200")
+                  default="5000")
 (options, args) = parser.parse_args()
 
 lock = threading.Lock()
