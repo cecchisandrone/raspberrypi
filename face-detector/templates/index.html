@@ -10,7 +10,9 @@
 <div class="container">
     <h2>ARPA camera view</h2>
 
-    <div id='response'></div>
+    <div id='response'>
+        <b>Loading data...</b>
+    </div>
     <img id="image" class="img-responsive" src="../static/loader.gif" alt="image"/>
     <script>
         $(document).ready(function () {
@@ -21,9 +23,6 @@
                     // host:port
                     var serverUrl = '{{ serverUrl }}';
 
-                    // show that something is loading
-                    $('#response').html("<b>Loading data...</b>");
-
                     $.ajax({
                         type: 'GET',
                         url: 'http://' + serverUrl + '/faces',
@@ -32,13 +31,13 @@
                     .done(function(data){
                         // show the response
                         $('#response').html(data);
-                        $("#image").removeAttr("src").attr("src", "http://" + serverUrl + "/frame?rnd=" + (new Date()).getTime());
+                        $("#image").attr("src", "http://" + serverUrl + "/frame?rnd=" + (new Date()).getTime());
                         poll();
                     })
                     .fail(function(jqXHR, status, err) {
                         $('#response').html("<p style='color: red'>Error in the request</p>");
                     });
-                }, 1000);
+                }, 100);
             })();
         });
     </script>

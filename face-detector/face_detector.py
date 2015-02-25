@@ -7,13 +7,11 @@ from flask import request
 from flask import render_template
 import time
 import flask
-import numpy as np
 import socket
 
 
 class FaceDetector(object):
-
-    def __init__(self, classifier_file, cameraindex, width, height, port):
+    def __init__(self, classifier_file, cameraindex, width, height, host, port):
 
         # Initialize Flask
         self.rest = Flask(__name__)
@@ -26,7 +24,7 @@ class FaceDetector(object):
         self.cameraindex = cameraindex
         self.buffer = None
         self.port = port
-
+        self.host = host
 
     def rest_service(self):
 
@@ -72,34 +70,28 @@ class FaceDetector(object):
 
         @self.rest.route('/faces')
         def list_faces():
-            try:
-                lock.acquire()
-                faces = list()
-                if self.detected_faces is not None:
-                    for (x, y, w, h) in self.detected_faces:
-                        face = {'x': x.item(), 'y': y.item(), 'w': w.item(), 'h': h.item()}
-                        faces.append(face)
-                print faces
-            finally:
-                lock.release()
+
+            faces = list()
+            if self.detected_faces is not None:
+                for (x, y, w, h) in self.detected_faces:
+                    face = {'x': x.item(), 'y': y.item(), 'w': w.item(), 'h': h.item()}
+                    faces.append(face)
+            print faces
             return json.dumps(faces)
 
         @self.rest.route('/frame')
         def last_frame():
-            try:
-                lock.acquire()
-                resp = flask.make_response(self.buffer[1].tobytes())
-            finally:
-                lock.release()
+
+            resp = flask.make_response(self.buffer[1].tostring())
             resp.content_type = "image/jpeg"
             return resp
 
         @self.rest.route('/')
         def root():
-            return render_template('index.html', serverUrl=socket.getfqdn() + ":" + str(self.port))
+            return render_template('index.html', serverUrl=self.host + ":" + str(self.port))
 
         self.rest.debug = True
-        self.rest.run(host='0.0.0.0', port=self.port)
+        self.rest.run(host='0.0.0.0', port=self.port, use_reloader=False)
 
     def faces_detect_thread(self):
 
@@ -111,8 +103,8 @@ class FaceDetector(object):
         video_capture.set(3, self.width)
         video_capture.set(4, self.height)
         classifier = cv2.CascadeClassifier(options.cascade)
-	
-	print "Using resolution " + str(self.width) + "*" + str(self.height)		
+
+        print "Using resolution " + str(self.width) + "*" + str(self.height)
 
         while not self.stopped:
 
@@ -125,27 +117,22 @@ class FaceDetector(object):
             gray = cv2.cvtColor(small_frame, cv2.COLOR_RGB2GRAY)
             cv2.equalizeHist(gray, gray)
 
-            try:
-                lock.acquire()
-                detected_faces = classifier.detectMultiScale(
-                    gray,
-                    scaleFactor=haar_scale,
-                    minNeighbors=min_neighbors
-                )
+            detected_faces = classifier.detectMultiScale(
+                gray,
+                scaleFactor=haar_scale,
+                minNeighbors=min_neighbors
+            )
 
-                # Draw a rectangle around the faces
-                for (x, y, w, h) in detected_faces:
-                    pt1 = (int(x * image_scale), int(y * image_scale))
-                    pt2 = (int((x + w) * image_scale), int((y + h) * image_scale))
-                    cv2.rectangle(frame, pt1, pt2, (0, 255, 0), 2)
+            # Draw a rectangle around the faces
+            for (x, y, w, h) in detected_faces:
+                pt1 = (int(x * image_scale), int(y * image_scale))
+                pt2 = (int((x + w) * image_scale), int((y + h) * image_scale))
+                cv2.rectangle(frame, pt1, pt2, (0, 255, 0), 2)
 
-                array = np.asarray(frame)
-                # cv2.imwrite('detected.jpg', frame)
+            # cv2.imwrite('detected.jpg', frame)
 
-                self.buffer = cv2.imencode('.jpg', frame)
-            finally:
-                lock.release()
-            time.sleep(1)
+            self.buffer = cv2.imencode('.jpg', frame)
+
             print("Detected " + str(len(detected_faces)) + " faces in " + str(time.time() - start) + "s")
 
     def start(self):
@@ -156,6 +143,7 @@ class FaceDetector(object):
 
     def stop(self):
         self.stopped = True
+
 
 parser = OptionParser(usage="usage: %prog [options]")
 parser.add_option("-c", "--cascade", action="store", dest="cascade", type="str",
@@ -173,8 +161,10 @@ parser.add_option("-y", "--height", action="store", dest="height", type="int",
 parser.add_option("-p", "--port", action="store", dest="port", type="int",
                   help="Port number, default %default",
                   default="5000")
+parser.add_option("-H", "--host", action="store", dest="host", type="str",
+                  help="Host name, default %default",
+                  default="localhost")
 (options, args) = parser.parse_args()
 
-lock = threading.Lock()
-face_detector = FaceDetector(options.cascade, options.cameraindex, options.width, options.height, options.port)
+face_detector = FaceDetector(options.cascade, options.cameraindex, options.width, options.height, options.host, options.port)
 face_detector.start()
