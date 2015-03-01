@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.launchpi.launcher">
+<stringAttribute key="display" value=":0"/>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/raspio/src/test/java/com/github/cecchisandrone/raspio/gpio/SonarDeviceTest.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<booleanAttribute key="org.eclipse.jdt.debug.ui.CONSIDER_INHERITED_MAIN" value="true"/>
+<booleanAttribute key="org.eclipse.jdt.debug.ui.INCLUDE_EXTERNAL_JARS" value="true"/>
+<booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
+<mapAttribute key="org.eclipse.jdt.launching.CONNECT_MAP">
+<mapEntry key="hostname" value="192.168.1.25"/>
+<mapEntry key="port" value="4000"/>
+</mapAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="com.github.cecchisandrone.raspio.gpio.SonarDeviceTest"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="raspio"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_CONNECTOR_ID" value="org.eclipse.jdt.launching.socketAttachConnector"/>
+<booleanAttribute key="rpiRunAsRoot" value="true"/>
+<stringAttribute key="rpiSystem" value="192.168.1.25"/>
+<intAttribute key="rpiSystemDebugPort" value="4000"/>
+<stringAttribute key="rpiSystemProfile" value="cecchi-notebook"/>
+</launchConfiguration>

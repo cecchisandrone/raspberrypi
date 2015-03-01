@@ -1,5 +1,6 @@
 package com.github.cecchisandrone.arpa.module;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -52,7 +53,11 @@ public class SystemModule extends AbstractAgentModule implements JoypadEventList
 	public void joypadEventTriggered(JoypadEvent event) {
 
 		if (event.getChangedButton().equals(Button.GUIDE)) {
-			System.exit(0);
+			try {
+				Runtime.getRuntime().exec("./home/pi/scripts/face_detector_launcher.sh");
+			} catch (IOException e) {
+				LOGGER.error("Unable to start face detection. Reason: " + e.toString(), e);
+			}
 		}
 	}
 }

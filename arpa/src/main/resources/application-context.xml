@@ -16,6 +16,7 @@
 				<ref bean="navigationModule"/>					
 				<ref bean="autonomousNavigationModule"/>
 				<ref bean="systemModule"/>
+				<ref bean="cameraModule"/>
 			</util:list>
 		</property>
 	</bean>
@@ -32,6 +33,12 @@
 	
 	<bean id="systemModule" class="com.github.cecchisandrone.arpa.module.SystemModule" parent="abstractAgentModule">
 		<property name="priority" value="1"/>
+	</bean>
+	
+	<bean id="cameraModule" class="com.github.cecchisandrone.arpa.module.CameraModule" parent="abstractAgentModule">
+		<property name="priority" value="5"/>
+		<property name="servoMotorPanDeviceId" value="3"/>
+		<property name="servoMotorTiltDeviceId" value="4"/>
 	</bean>
 				
 	<bean id="joypadController" class="com.github.cecchisandrone.raspio.input.JoypadController" factory-method="getInstance">
