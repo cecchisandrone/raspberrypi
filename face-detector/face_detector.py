@@ -90,7 +90,8 @@ class FaceDetector(object):
         def root():
             return render_template('index.html', serverUrl=self.host + ":" + str(self.port))
 
-        self.rest.debug = True
+        self.rest.debug = False
+	self.rest.logger.disabled = True
         self.rest.run(host='0.0.0.0', port=self.port, use_reloader=False)
 
     def faces_detect_thread(self):
@@ -133,7 +134,7 @@ class FaceDetector(object):
 
             self.buffer = cv2.imencode('.jpg', frame)
 
-            print("Detected " + str(len(detected_faces)) + " faces in " + str(time.time() - start) + "s")
+            # print("Detected " + str(len(detected_faces)) + " faces in " + str(time.time() - start) + "s")
 
     def start(self):
         t = threading.Thread(target=self.faces_detect_thread, args=())
