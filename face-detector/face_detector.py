@@ -7,7 +7,7 @@ from flask import request
 from flask import render_template
 import time
 import flask
-import socket
+import logging
 
 
 class FaceDetector(object):
@@ -76,7 +76,6 @@ class FaceDetector(object):
                 for (x, y, w, h) in self.detected_faces:
                     face = {'x': x.item(), 'y': y.item(), 'w': w.item(), 'h': h.item()}
                     faces.append(face)
-            print faces
             return json.dumps(faces)
 
         @self.rest.route('/frame')
@@ -90,8 +89,9 @@ class FaceDetector(object):
         def root():
             return render_template('index.html', serverUrl=self.host + ":" + str(self.port))
 
+        log = logging.getLogger('werkzeug')
+        log.setLevel(logging.ERROR)
         self.rest.debug = False
-	self.rest.logger.disabled = True
         self.rest.run(host='0.0.0.0', port=self.port, use_reloader=False)
 
     def faces_detect_thread(self):
@@ -118,23 +118,27 @@ class FaceDetector(object):
             gray = cv2.cvtColor(small_frame, cv2.COLOR_RGB2GRAY)
             cv2.equalizeHist(gray, gray)
 
-            detected_faces = classifier.detectMultiScale(
+            self.detected_faces = classifier.detectMultiScale(
                 gray,
                 scaleFactor=haar_scale,
                 minNeighbors=min_neighbors
             )
 
             # Draw a rectangle around the faces
-            for (x, y, w, h) in detected_faces:
+            for (x, y, w, h) in self.detected_faces:
                 pt1 = (int(x * image_scale), int(y * image_scale))
                 pt2 = (int((x + w) * image_scale), int((y + h) * image_scale))
                 cv2.rectangle(frame, pt1, pt2, (0, 255, 0), 2)
+
+            fps = str(round(1 / (time.time() - start), 2)) + " FPS"
+
+            cv2.putText(frame, fps, (10, 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255))
 
             # cv2.imwrite('detected.jpg', frame)
 
             self.buffer = cv2.imencode('.jpg', frame)
 
-            # print("Detected " + str(len(detected_faces)) + " faces in " + str(time.time() - start) + "s")
+            # print("Detected " + str(len(self.detected_faces)) + " faces in " + str(time.time() - start) + "s")
 
     def start(self):
         t = threading.Thread(target=self.faces_detect_thread, args=())

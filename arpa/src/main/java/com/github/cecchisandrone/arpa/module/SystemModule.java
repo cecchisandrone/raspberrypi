@@ -52,9 +52,9 @@ public class SystemModule extends AbstractAgentModule implements JoypadEventList
 	@Override
 	public void joypadEventTriggered(JoypadEvent event) {
 
-		if (event.getChangedButton().equals(Button.GUIDE)) {
+		if (event.getChangedButton().equals(Button.GUIDE) && event.getNewValue() == 1) {
 			try {
-				Runtime.getRuntime().exec("./home/pi/scripts/face_detector_launcher.sh");
+				Runtime.getRuntime().exec("sh", new String[] { "/home/pi/scripts/face_detector_launcher.sh" });
 			} catch (IOException e) {
 				LOGGER.error("Unable to start face detection. Reason: " + e.toString(), e);
 			}

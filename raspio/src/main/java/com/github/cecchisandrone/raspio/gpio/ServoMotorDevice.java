@@ -58,13 +58,17 @@ public class ServoMotorDevice extends AbstractDevice {
 	 * Change the motor position 
 	 * 
 	 * @param position - the position value. 0 <= position <= 100
+	 * 
+	 * @return the position set on the motor
 	 */
-	public void changePosition(int position) {
+	public int changePosition(int position) {
 
 		checkInitialized();
 
-		if (position > POSITION_RANGE || position < 0) {
-			throw new IllegalArgumentException(position + " is an illegal value for position parameter");
+		if (position > POSITION_RANGE) {
+			position = POSITION_RANGE;
+		} else if (position < 0) {
+			position = 0;
 		}
 
 		String str = String.format(command, controlPin, position);
@@ -74,6 +78,7 @@ public class ServoMotorDevice extends AbstractDevice {
 		} catch (IOException e) {
 			LOGGER.error("Unable to send command " + str + " to " + SERVOBLASTER_FILE + ". Reason: " + e.toString(), e);
 		}
+		return position;
 	}
 
 	public void close() {

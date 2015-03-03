@@ -39,6 +39,7 @@
 		<property name="priority" value="5"/>
 		<property name="servoMotorPanDeviceId" value="3"/>
 		<property name="servoMotorTiltDeviceId" value="4"/>
+		<property name="serverUrl" value="http://192.168.1.15:5000"/>
 	</bean>
 				
 	<bean id="joypadController" class="com.github.cecchisandrone.raspio.input.JoypadController" factory-method="getInstance">
