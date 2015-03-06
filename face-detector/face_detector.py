@@ -8,11 +8,14 @@ from flask import render_template
 import time
 import flask
 import logging
-
+import os.path
+ 
 
 class FaceDetector(object):
     def __init__(self, classifier_file, cameraindex, width, height, host, port):
 
+	if not os.path.isfile(classifier_file):
+	    raise IOError("Classifier file not found")	
         # Initialize Flask
         self.rest = Flask(__name__)
         # Initialize OpenCV
@@ -25,6 +28,7 @@ class FaceDetector(object):
         self.buffer = None
         self.port = port
         self.host = host
+
 
     def rest_service(self):
 
@@ -104,7 +108,7 @@ class FaceDetector(object):
         video_capture.set(3, self.width)
         video_capture.set(4, self.height)
         classifier = cv2.CascadeClassifier(options.cascade)
-
+	
         print "Using resolution " + str(self.width) + "*" + str(self.height)
 
         while not self.stopped:
@@ -153,7 +157,7 @@ class FaceDetector(object):
 parser = OptionParser(usage="usage: %prog [options]")
 parser.add_option("-c", "--cascade", action="store", dest="cascade", type="str",
                   help="Haar cascade file, default %default",
-                  default="haarcascade_frontalface_default.xml")
+                  default=os.path.dirname(os.path.realpath(__file__)) + "/haarcascade_frontalface_default.xml")
 parser.add_option("-i", "--camera-index", action="store", dest="cameraindex", type="int",
                   help="Camera index, default %default",
                   default="0")
