@@ -9,13 +9,23 @@ import time
 import flask
 import logging
 import os.path
- 
+import picamera
+import picamera.array
+import numpy as np
+
+
+def setServo(servoChannel, position):
+    servoStr = "P1-%u=%u%%\n" % (servoChannel, position)
+
+    with open("/dev/servoblaster", "wb") as f:
+        f.write(servoStr)
+
 
 class FaceDetector(object):
     def __init__(self, classifier_file, cameraindex, width, height, host, port):
 
-	if not os.path.isfile(classifier_file):
-	    raise IOError("Classifier file not found")	
+        if not os.path.isfile(classifier_file):
+            raise IOError("Classifier file not found")
         # Initialize Flask
         self.rest = Flask(__name__)
         # Initialize OpenCV
@@ -28,7 +38,8 @@ class FaceDetector(object):
         self.buffer = None
         self.port = port
         self.host = host
-
+        self.currentPan = 25
+        self.currentTilt = 90
 
     def rest_service(self):
 
@@ -102,53 +113,76 @@ class FaceDetector(object):
 
         image_scale = 2
         haar_scale = 1.2
-        min_neighbors = 2
+        min_neighbors = 3
 
-        video_capture = cv2.VideoCapture(self.cameraindex)
-        video_capture.set(3, self.width)
-        video_capture.set(4, self.height)
         classifier = cv2.CascadeClassifier(options.cascade)
-	
+
         print "Using resolution " + str(self.width) + "*" + str(self.height)
 
-        while not self.stopped:
+        with picamera.PiCamera() as camera:
+            camera.resolution = (self.width, self.height)
 
-            # Measure time
-            start = time.time()
+            while not self.stopped:
 
-            ret, frame = video_capture.read()
+                # Measure time
+                start = time.time()
 
-            small_frame = cv2.resize(frame, (self.width / image_scale, self.height / image_scale))
-            gray = cv2.cvtColor(small_frame, cv2.COLOR_RGB2GRAY)
-            cv2.equalizeHist(gray, gray)
+                with picamera.array.PiRGBArray(camera) as stream:
 
-            self.detected_faces = classifier.detectMultiScale(
-                gray,
-                scaleFactor=haar_scale,
-                minNeighbors=min_neighbors
-            )
+                    # Create the in-memory stream
+                    camera.capture(stream, 'bgr', use_video_port=True)
+                    frame = stream.array
 
-            # Draw a rectangle around the faces
-            for (x, y, w, h) in self.detected_faces:
-                pt1 = (int(x * image_scale), int(y * image_scale))
-                pt2 = (int((x + w) * image_scale), int((y + h) * image_scale))
-                cv2.rectangle(frame, pt1, pt2, (0, 255, 0), 2)
+                small_frame = cv2.resize(frame, (self.width / image_scale, self.height / image_scale))
+                gray = cv2.cvtColor(small_frame, cv2.COLOR_RGB2GRAY)
+                cv2.equalizeHist(gray, gray)
 
-            fps = str(round(1 / (time.time() - start), 2)) + " FPS"
+                self.detected_faces = classifier.detectMultiScale(gray, scaleFactor=haar_scale,
+                                                                  minNeighbors=min_neighbors,
+                                                                  minSize=(20, 20), flags=cv2.cv.CV_HAAR_SCALE_IMAGE)
 
-            cv2.putText(frame, fps, (10, 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255,255,255))
+                self.detected_faces = map(lambda x: x * image_scale, self.detected_faces)
 
-            # cv2.imwrite('detected.jpg', frame)
+                # Draw a rectangle around the faces
 
-            self.buffer = cv2.imencode('.jpg', frame)
+                for (x, y, w, h) in self.detected_faces:
+                    pt1 = (x, y)
+                    pt2 = (x + w, y + h)
+                    cv2.rectangle(frame, pt1, pt2, (0, 255, 0), 2)
 
-            # print("Detected " + str(len(self.detected_faces)) + " faces in " + str(time.time() - start) + "s")
+                    halfx = self.width / 2
+                    halfy = self.height / 2
+
+                    if (x + w / 2) > halfx + 15:
+                        self.currentPan += 4
+                    elif (x + w / 2) < halfx - 15:
+                        self.currentPan -= 4
+
+                    if (y + h / 2) > halfy + 15:
+                        self.currentTilt += 3
+                    elif (y + h / 2) < halfy - 15:
+                        self.currentTilt -= 3
+
+                    setServo(16, self.currentPan)
+                    setServo(18, self.currentTilt)
+
+                    # Take the 1st face
+                    break
+
+                fps = str(round(1 / (time.time() - start), 2)) + " FPS"
+
+                cv2.putText(frame, fps, (10, 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255))
+
+                self.buffer = cv2.imencode('.jpg', frame)
+
+                print("Detected " + str(len(self.detected_faces)) + " faces in " + str(time.time() - start) + "s")
 
     def start(self):
         t = threading.Thread(target=self.faces_detect_thread, args=())
         t.daemon = True
         t.start()
         self.rest_service()
+
 
     def stop(self):
         self.stopped = True
@@ -175,5 +209,8 @@ parser.add_option("-H", "--host", action="store", dest="host", type="str",
                   default="localhost")
 (options, args) = parser.parse_args()
 
-face_detector = FaceDetector(options.cascade, options.cameraindex, options.width, options.height, options.host, options.port)
+setServo(16, 25)
+
+face_detector = FaceDetector(options.cascade, options.cameraindex, options.width, options.height, options.host,
+                             options.port)
 face_detector.start()
