@@ -11,35 +11,36 @@ import logging
 import os.path
 import picamera
 import picamera.array
-import numpy as np
-
-
-def setServo(servoChannel, position):
-    servoStr = "P1-%u=%u%%\n" % (servoChannel, position)
-
-    with open("/dev/servoblaster", "wb") as f:
-        f.write(servoStr)
+import servo_control
 
 
 class FaceDetector(object):
-    def __init__(self, classifier_file, cameraindex, width, height, host, port):
 
-        if not os.path.isfile(classifier_file):
+    DEFAULT_PAN = 50
+    DEFAULT_TILT = 90
+    NO_PANTILT_INTERVAL = 15
+    PAN_STEP = 3
+    TILT_STEP = 4
+
+    def __init__(self, options):
+
+        if not os.path.isfile(options.classifier_file):
             raise IOError("Classifier file not found")
         # Initialize Flask
         self.rest = Flask(__name__)
         # Initialize OpenCV
         self.stopped = False
         self.detected_faces = None
-        self.classifier_file = classifier_file
-        self.width = width
-        self.height = height
-        self.cameraindex = cameraindex
+        self.classifier_file = options.classifier_file
+        self.width = options.width
+        self.height = options.height
         self.buffer = None
-        self.port = port
-        self.host = host
-        self.currentPan = 25
-        self.currentTilt = 90
+        self.port = options.port
+        self.host = options.host
+        self.currentPan = FaceDetector.DEFAULT_PAN
+        self.currentTilt = FaceDetector.DEFAULT_TILT
+        self.panMotorPin = options.panMotorPin
+        self.tiltMotorPin = options.tiltMotorPin
 
     def rest_service(self):
 
@@ -115,7 +116,7 @@ class FaceDetector(object):
         haar_scale = 1.2
         min_neighbors = 3
 
-        classifier = cv2.CascadeClassifier(options.cascade)
+        classifier = cv2.CascadeClassifier(self.classifier_file)
 
         print "Using resolution " + str(self.width) + "*" + str(self.height)
 
@@ -133,6 +134,7 @@ class FaceDetector(object):
                     camera.capture(stream, 'bgr', use_video_port=True)
                     frame = stream.array
 
+                # Resize for better speed
                 small_frame = cv2.resize(frame, (self.width / image_scale, self.height / image_scale))
                 gray = cv2.cvtColor(small_frame, cv2.COLOR_RGB2GRAY)
                 cv2.equalizeHist(gray, gray)
@@ -141,37 +143,39 @@ class FaceDetector(object):
                                                                   minNeighbors=min_neighbors,
                                                                   minSize=(20, 20), flags=cv2.cv.CV_HAAR_SCALE_IMAGE)
 
+                # Rescale to original size
                 self.detected_faces = map(lambda x: x * image_scale, self.detected_faces)
-
-                # Draw a rectangle around the faces
 
                 for (x, y, w, h) in self.detected_faces:
                     pt1 = (x, y)
                     pt2 = (x + w, y + h)
+
+                    # Draw a rectangle around the faces
                     cv2.rectangle(frame, pt1, pt2, (0, 255, 0), 2)
 
-                    halfx = self.width / 2
-                    halfy = self.height / 2
+                    if(self.servoTrackingEnabled):
+                        halfx = self.width / 2
+                        halfy = self.height / 2
 
-                    if (x + w / 2) > halfx + 15:
-                        self.currentPan += 4
-                    elif (x + w / 2) < halfx - 15:
-                        self.currentPan -= 4
+                        if (x + w / 2) > halfx + FaceDetector.NO_PANTILT_INTERVAL:
+                            self.currentPan += FaceDetector.PAN_STEP
+                        elif (x + w / 2) < halfx - FaceDetector.NO_PANTILT_INTERVAL:
+                            self.currentPan -= FaceDetector.PAN_STEP
 
-                    if (y + h / 2) > halfy + 15:
-                        self.currentTilt += 3
-                    elif (y + h / 2) < halfy - 15:
-                        self.currentTilt -= 3
+                        if (y + h / 2) > halfy + FaceDetector.NO_PANTILT_INTERVAL:
+                            self.currentTilt += FaceDetector.TILT_STEP
+                        elif (y + h / 2) < halfy - FaceDetector.NO_PANTILT_INTERVAL:
+                            self.currentTilt -= FaceDetector.TILT_STEP
 
-                    setServo(16, self.currentPan)
-                    setServo(18, self.currentTilt)
+                        servo_control.setServo(self.panMotorPin, self.currentPan)
+                        servo_control.setServo(self.tiltMotorPin, self.currentTilt)
 
-                    # Take the 1st face
-                    break
+                        # Take the 1st face
+                        break
 
                 fps = str(round(1 / (time.time() - start), 2)) + " FPS"
 
-                cv2.putText(frame, fps, (10, 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255))
+                cv2.putText(frame, fps, (15, 15), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255))
 
                 self.buffer = cv2.imencode('.jpg', frame)
 
@@ -189,12 +193,9 @@ class FaceDetector(object):
 
 
 parser = OptionParser(usage="usage: %prog [options]")
-parser.add_option("-c", "--cascade", action="store", dest="cascade", type="str",
+parser.add_option("-c", "--classifierFile", action="store", dest="classifier_file", type="str",
                   help="Haar cascade file, default %default",
                   default=os.path.dirname(os.path.realpath(__file__)) + "/haarcascade_frontalface_default.xml")
-parser.add_option("-i", "--camera-index", action="store", dest="cameraindex", type="int",
-                  help="Camera index, default %default",
-                  default="0")
 parser.add_option("-x", "--width", action="store", dest="width", type="int",
                   help="Width (px), default %default",
                   default="320")
@@ -207,10 +208,13 @@ parser.add_option("-p", "--port", action="store", dest="port", type="int",
 parser.add_option("-H", "--host", action="store", dest="host", type="str",
                   help="Host name, default %default",
                   default="localhost")
+parser.add_option("-P", "--panMotorPin", action="store", dest="panMotorPin", type="int",
+                  help="Pan motor pin number, default %default",
+                  default="16")
+parser.add_option("-T", "--tiltMotorPin", action="store", dest="tiltMotorPin", type="int",
+                  help="Tilt motor pin number, default %default",
+                  default="18")
 (options, args) = parser.parse_args()
 
-setServo(16, 25)
-
-face_detector = FaceDetector(options.cascade, options.cameraindex, options.width, options.height, options.host,
-                             options.port)
+face_detector = FaceDetector(options)
 face_detector.start()
