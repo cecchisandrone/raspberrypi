@@ -10,6 +10,8 @@ public class RelayDevice extends AbstractDevice {
 
 	private GpioPinDigitalOutput relayPin;
 
+	private PinState defaultState;
+
 	public void setRelay(Pin relay) {
 		this.relay = relay;
 	}
@@ -20,16 +22,24 @@ public class RelayDevice extends AbstractDevice {
 
 	@Override
 	public void internalInit() {
-		relayPin = gpio.provisionDigitalOutputPin(relay, "Relay Toggle Pin", PinState.HIGH);
+		relayPin = gpio.provisionDigitalOutputPin(relay, "Relay Toggle Pin", defaultState);
 	}
 
 	/**
-	 * Expect a configuration string like this: pin. Where:
+	 * Expect a configuration string like this: pin, defaultState. Where:
 	 * - pin: integer representing pin to control the relay
+	 * - defaultState: LOW or HIGH, representing the starting state
 	 */
 	@Override
 	public void loadConfiguration(String configurationString) {
 
-		this.relay = getPinByPinNumber(configurationString);
+		String[] pinNumbers = configurationString.split(",");
+		if (pinNumbers.length != 2) {
+			throw new IllegalArgumentException("Bad format of configuration string");
+		}
+		String pin = pinNumbers[0];
+		defaultState = PinState.valueOf(pinNumbers[1]);
+
+		this.relay = getPinByPinNumber(pin);
 	}
 }
