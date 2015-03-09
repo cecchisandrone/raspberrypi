@@ -4,13 +4,13 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.cecchisandrone.arpa.module.json.FrameConfig;
 import com.github.cecchisandrone.raspio.gpio.ServoMotorDevice;
 import com.github.cecchisandrone.raspio.input.JoypadController;
 import com.github.cecchisandrone.raspio.input.JoypadController.Analog;
@@ -43,7 +43,7 @@ public class CameraModule extends AbstractAgentModule implements JoypadEventList
 
 	private int currentPanPosition = 50;
 
-	private int currentTiltPosition = 70;
+	private int currentTiltPosition = 100;
 
 	private int currentPanIncrease = 0;
 
@@ -51,7 +51,13 @@ public class CameraModule extends AbstractAgentModule implements JoypadEventList
 
 	private ObjectMapper objectMapper = new ObjectMapper();
 
-	private String serverUrl;
+	private String host;
+
+	private int port;
+
+	private FrameConfig frameConfig;
+
+	private Process faceDetectorProcess;
 
 	@Autowired
 	private DeviceManager deviceManager;
@@ -64,8 +70,12 @@ public class CameraModule extends AbstractAgentModule implements JoypadEventList
 		this.servoMotorTiltDeviceId = servoMotorTiltDeviceId;
 	}
 
-	public void setServerUrl(String serverUrl) {
-		this.serverUrl = serverUrl;
+	public void setHost(String host) {
+		this.host = host;
+	}
+
+	public void setPort(int port) {
+		this.port = port;
 	}
 
 	@Override
@@ -98,15 +108,6 @@ public class CameraModule extends AbstractAgentModule implements JoypadEventList
 	@Override
 	public void executeWork() {
 
-		try {
-			Map<String, Object> faces = objectMapper.readValue(new URL(serverUrl + FACES_URL_SUFFIX), Map.class);
-			Map<String, Object> config = objectMapper.readValue(new URL(serverUrl + CONFIG_URL_SUFFIX), Map.class);
-			System.out.println(faces);
-			System.out.println(config);
-		} catch (IOException e) {
-			LOGGER.error(e.toString(), e);
-		}
-
 		// Camera move
 		if (currentPanIncrease != 0 && currentPanPosition + currentPanIncrease > 0
 				&& currentPanPosition + currentPanIncrease < ServoMotorDevice.POSITION_RANGE) {
@@ -115,6 +116,10 @@ public class CameraModule extends AbstractAgentModule implements JoypadEventList
 				&& currentTiltPosition + currentTiltIncrease < ServoMotorDevice.POSITION_RANGE) {
 			tiltMotor.changePosition(currentTiltPosition += currentTiltIncrease);
 		}
+	}
+
+	private String getServerUrl() {
+		return "http://" + host + ":" + port;
 	}
 
 	public List<Button> getButtonsToNotify() {
@@ -127,6 +132,28 @@ public class CameraModule extends AbstractAgentModule implements JoypadEventList
 
 	@Override
 	public void joypadEventTriggered(JoypadEvent event) {
+
+		if (event.getChangedButton() != null && event.getChangedButton().equals(Button.GUIDE)
+				&& event.getNewValue() == 1) {
+
+			if (faceDetectorProcess == null) {
+
+				try {
+					faceDetectorProcess = Runtime.getRuntime().exec(
+							"sudo python /home/pi/raspberrypi/face-detector/face_detector.py -H " + host);
+					// Wait to be started
+					Thread.sleep(10000);
+					frameConfig = objectMapper
+							.readValue(new URL(getServerUrl() + CONFIG_URL_SUFFIX), FrameConfig.class);
+				} catch (IOException | InterruptedException ex) {
+					LOGGER.error("Unable to start face detection. Reason: " + ex.toString(), ex);
+				}
+			} else {
+				frameConfig = null;
+				faceDetectorProcess.destroy();
+				faceDetectorProcess = null;
+			}
+		}
 
 		if (event.getChangedAnalog() != null) {
 

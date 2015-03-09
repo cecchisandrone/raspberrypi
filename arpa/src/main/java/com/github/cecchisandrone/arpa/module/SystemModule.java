@@ -1,8 +1,6 @@
 package com.github.cecchisandrone.arpa.module;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -42,7 +40,7 @@ public class SystemModule extends AbstractAgentModule implements JoypadEventList
 	}
 
 	public List<Button> getButtonsToNotify() {
-		return Arrays.asList(Button.GUIDE);
+		return new ArrayList<JoypadController.Button>();
 	}
 
 	public List<Analog> getAnalogsToNotify() {
@@ -52,12 +50,5 @@ public class SystemModule extends AbstractAgentModule implements JoypadEventList
 	@Override
 	public void joypadEventTriggered(JoypadEvent event) {
 
-		if (event.getChangedButton().equals(Button.GUIDE) && event.getNewValue() == 1) {
-			try {
-				Runtime.getRuntime().exec("sh", new String[] { "/home/pi/scripts/face_detector_launcher.sh" });
-			} catch (IOException e) {
-				LOGGER.error("Unable to start face detection. Reason: " + e.toString(), e);
-			}
-		}
 	}
 }
