@@ -153,25 +153,24 @@ class FaceDetector(object):
                     # Draw a rectangle around the faces
                     cv2.rectangle(frame, pt1, pt2, (0, 255, 0), 2)
 
-                    if(self.servoTrackingEnabled):
-                        halfx = self.width / 2
-                        halfy = self.height / 2
+                    halfx = self.width / 2
+                    halfy = self.height / 2
 
-                        if (x + w / 2) > halfx + FaceDetector.NO_PANTILT_INTERVAL:
-                            self.currentPan += FaceDetector.PAN_STEP
-                        elif (x + w / 2) < halfx - FaceDetector.NO_PANTILT_INTERVAL:
-                            self.currentPan -= FaceDetector.PAN_STEP
+                    if (x + w / 2) > halfx + FaceDetector.NO_PANTILT_INTERVAL:
+                        self.currentPan += FaceDetector.PAN_STEP
+                    elif (x + w / 2) < halfx - FaceDetector.NO_PANTILT_INTERVAL:
+                        self.currentPan -= FaceDetector.PAN_STEP
 
-                        if (y + h / 2) > halfy + FaceDetector.NO_PANTILT_INTERVAL:
-                            self.currentTilt += FaceDetector.TILT_STEP
-                        elif (y + h / 2) < halfy - FaceDetector.NO_PANTILT_INTERVAL:
-                            self.currentTilt -= FaceDetector.TILT_STEP
+                    if (y + h / 2) > halfy + FaceDetector.NO_PANTILT_INTERVAL:
+                        self.currentTilt += FaceDetector.TILT_STEP
+                    elif (y + h / 2) < halfy - FaceDetector.NO_PANTILT_INTERVAL:
+                        self.currentTilt -= FaceDetector.TILT_STEP
 
-                        servo_control.setServo(self.panMotorPin, self.currentPan)
-                        servo_control.setServo(self.tiltMotorPin, self.currentTilt)
+                    servo_control.setServo(self.panMotorPin, self.currentPan)
+                    servo_control.setServo(self.tiltMotorPin, self.currentTilt)
 
-                        # Take the 1st face
-                        break
+                    # Take the 1st face
+                    break
 
                 fps = str(round(1 / (time.time() - start), 2)) + " FPS"
 
