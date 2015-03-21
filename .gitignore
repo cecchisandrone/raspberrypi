@@ -4,3 +4,4 @@
 **/.project
 **/.pydevproject
 **/rebel.xml
+/target
