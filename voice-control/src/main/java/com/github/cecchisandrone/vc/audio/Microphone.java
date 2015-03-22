@@ -1,13 +1,10 @@
 package com.github.cecchisandrone.vc.audio;
 
-import java.io.InputStream;
-
-import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.Mixer.Info;
 import javax.sound.sampled.TargetDataLine;
 
 import org.slf4j.Logger;
@@ -17,16 +14,16 @@ public class Microphone {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Microphone.class);
 
-	// format of audio file
-	private static final AudioFileFormat.Type fileType = AudioFileFormat.Type.WAVE;
+	private int deviceIndex;
 
 	// the line from which audio data is captured
 	private TargetDataLine line;
 
 	private AudioFormat audioFormat;
 
-	public Microphone(AudioFormat audioFormat) {
+	public Microphone(AudioFormat audioFormat, int deviceIndex) {
 		this.audioFormat = audioFormat;
+		this.deviceIndex = deviceIndex;
 	}
 
 	/**
@@ -36,14 +33,8 @@ public class Microphone {
 	 */
 	public boolean open() {
 		try {
-			DataLine.Info info = new DataLine.Info(TargetDataLine.class, audioFormat);
-
-			// Checks if system supports the data line
-			if (!AudioSystem.isLineSupported(info)) {
-				LOGGER.error("Line is not supported");
-				System.exit(0);
-			}
-			line = (TargetDataLine) AudioSystem.getLine(info);
+			Info info = AudioSystem.getMixerInfo()[deviceIndex];
+			line = (TargetDataLine) AudioSystem.getTargetDataLine(audioFormat, info);
 			line.open(audioFormat);
 
 		} catch (LineUnavailableException ex) {
@@ -56,7 +47,7 @@ public class Microphone {
 	/**
 	 * Captures the sound and return the stream
 	 */
-	public InputStream start() {
+	public MicrophoneInputStream start() {
 
 		if (line != null) {
 
@@ -64,7 +55,7 @@ public class Microphone {
 
 			LOGGER.info("Start recording...");
 
-			return new AudioInputStream(line);
+			return new MicrophoneInputStream(new AudioInputStream(line));
 
 			// AudioSystem.write(ais, fileType, outputStream);
 

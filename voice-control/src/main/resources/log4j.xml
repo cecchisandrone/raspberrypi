@@ -7,9 +7,15 @@
 		<layout class="org.apache.log4j.PatternLayout">
 			<param name="ConversionPattern" value="%d{dd/MMM/yy-HH\:mm\:ss,SSS} [%p] %c{1}\:%L - %m%n" />
 		</layout>
-	</appender>
+	</appender>	
+	<logger name="org.apache.http">		
+		<level value="info" />
+	</logger>
+	<logger name="org.apache.http.wire">
+		<level value="error" />
+	</logger>
 	<root>
 		<priority value="info" />
-		<appender-ref ref="console" />		
-	</root>	
+		<appender-ref ref="console" />
+	</root>
 </log4j:configuration>
