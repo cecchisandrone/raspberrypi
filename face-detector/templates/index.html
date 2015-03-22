@@ -9,19 +9,49 @@
 <body>
 <div class="container">
     <h2>ARPA camera view</h2>
-
-    <div id='response'>
-        <b>Loading data...</b>
+    <div>Detected faces:
+        <p id='response'>
+            <b>Loading data...</b>
+        </p>
     </div>
+    <input id="toggleFaceDetection" type="checkbox">Face detection</input>
     <img id="image" class="img-responsive" src="../static/loader.gif" alt="image"/>
     <script>
+
         $(document).ready(function () {
+
+            // host:port
+            var serverUrl = '{{ serverUrl }}';
+
+            $.ajax({
+                type: 'GET',
+                url: 'http://' + serverUrl + '/face_detection'
+            })
+            .done(function(data){
+                $('#toggleFaceDetection').prop('checked', data);
+            })
+            .fail(function(jqXHR, status, err) {
+                $('#response').html("<p style='color: red'>Error in the request</p>");
+            });
+
+            $('#toggleFaceDetection').change(function() {
+                $('#response').val($(this).is(':checked'));
+                var value = $(this).is(':checked');
+                $.ajax({
+                    type: 'POST',
+                    url: 'http://' + serverUrl + '/face_detection',
+                    data: value
+                })
+                .done(function(data){
+                    
+                })
+                .fail(function(jqXHR, status, err) {
+                    $('#response').html("<p style='color: red'>Error in the request</p>");
+                });
+            });
 
             (function poll() {
                 setTimeout(function () {
-
-                    // host:port
-                    var serverUrl = '{{ serverUrl }}';
 
                     $.ajax({
                         type: 'GET',

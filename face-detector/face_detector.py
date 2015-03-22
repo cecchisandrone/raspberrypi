@@ -29,7 +29,7 @@ class FaceDetector(object):
         # Initialize Flask
         self.rest = Flask(__name__)
         # Initialize OpenCV
-        self.stopped = False
+        self.faceDetectionEnabled = True
         self.detected_faces = None
         self.classifier_file = options.classifier_file
         self.width = options.width
@@ -67,13 +67,17 @@ class FaceDetector(object):
             }
             return json.dumps(data)
 
+        @self.rest.route('/face_detection', methods=['POST'])
+        def toggle_face_detection():
+            self.faceDetectionEnabled = not self.faceDetectionEnabled
+            return json.dumps(self.faceDetectionEnabled)
+
+        @self.rest.route('/face_detection')
+        def get_face_detection():
+            return json.dumps(self.faceDetectionEnabled)
+
         @self.rest.route('/shutdown', methods=['POST'])
         def shutdown():
-
-            # Terminate face recognition loop
-            self.stopped = True
-            # Give it the time to terminate
-            time.sleep(2)
 
             # Terminate Flask
             func = request.environ.get('werkzeug.server.shutdown')
@@ -123,7 +127,7 @@ class FaceDetector(object):
         with picamera.PiCamera() as camera:
             camera.resolution = (self.width, self.height)
 
-            while not self.stopped:
+            while True:
 
                 # Measure time
                 start = time.time()
@@ -134,43 +138,45 @@ class FaceDetector(object):
                     camera.capture(stream, 'bgr', use_video_port=True)
                     frame = stream.array
 
-                # Resize for better speed
-                small_frame = cv2.resize(frame, (self.width / image_scale, self.height / image_scale))
-                gray = cv2.cvtColor(small_frame, cv2.COLOR_RGB2GRAY)
-                cv2.equalizeHist(gray, gray)
+                if self.faceDetectionEnabled:
 
-                self.detected_faces = classifier.detectMultiScale(gray, scaleFactor=haar_scale,
-                                                                  minNeighbors=min_neighbors,
-                                                                  minSize=(20, 20), flags=cv2.cv.CV_HAAR_SCALE_IMAGE)
+                    # Resize for better speed
+                    small_frame = cv2.resize(frame, (self.width / image_scale, self.height / image_scale))
+                    gray = cv2.cvtColor(small_frame, cv2.COLOR_RGB2GRAY)
+                    cv2.equalizeHist(gray, gray)
 
-                # Rescale to original size
-                self.detected_faces = map(lambda x: x * image_scale, self.detected_faces)
+                    self.detected_faces = classifier.detectMultiScale(gray, scaleFactor=haar_scale,
+                                                                      minNeighbors=min_neighbors,
+                                                                      minSize=(20, 20), flags=cv2.cv.CV_HAAR_SCALE_IMAGE)
 
-                for (x, y, w, h) in self.detected_faces:
-                    pt1 = (x, y)
-                    pt2 = (x + w, y + h)
+                    # Rescale to original size
+                    self.detected_faces = map(lambda x: x * image_scale, self.detected_faces)
 
-                    # Draw a rectangle around the faces
-                    cv2.rectangle(frame, pt1, pt2, (0, 255, 0), 2)
+                    for (x, y, w, h) in self.detected_faces:
+                        pt1 = (x, y)
+                        pt2 = (x + w, y + h)
 
-                    halfx = self.width / 2
-                    halfy = self.height / 2
+                        # Draw a rectangle around the faces
+                        cv2.rectangle(frame, pt1, pt2, (0, 255, 0), 2)
 
-                    if (x + w / 2) > halfx + FaceDetector.NO_PANTILT_INTERVAL:
-                        self.currentPan += FaceDetector.PAN_STEP
-                    elif (x + w / 2) < halfx - FaceDetector.NO_PANTILT_INTERVAL:
-                        self.currentPan -= FaceDetector.PAN_STEP
+                        halfx = self.width / 2
+                        halfy = self.height / 2
 
-                    if (y + h / 2) > halfy + FaceDetector.NO_PANTILT_INTERVAL:
-                        self.currentTilt += FaceDetector.TILT_STEP
-                    elif (y + h / 2) < halfy - FaceDetector.NO_PANTILT_INTERVAL:
-                        self.currentTilt -= FaceDetector.TILT_STEP
+                        if (x + w / 2) > halfx + FaceDetector.NO_PANTILT_INTERVAL:
+                            self.currentPan += FaceDetector.PAN_STEP
+                        elif (x + w / 2) < halfx - FaceDetector.NO_PANTILT_INTERVAL:
+                            self.currentPan -= FaceDetector.PAN_STEP
 
-                    servo_control.setServo(self.panMotorPin, self.currentPan)
-                    servo_control.setServo(self.tiltMotorPin, self.currentTilt)
+                        if (y + h / 2) > halfy + FaceDetector.NO_PANTILT_INTERVAL:
+                            self.currentTilt += FaceDetector.TILT_STEP
+                        elif (y + h / 2) < halfy - FaceDetector.NO_PANTILT_INTERVAL:
+                            self.currentTilt -= FaceDetector.TILT_STEP
 
-                    # Take the 1st face
-                    break
+                        servo_control.setServo(self.panMotorPin, self.currentPan)
+                        servo_control.setServo(self.tiltMotorPin, self.currentTilt)
+
+                        # Take the 1st face
+                        break
 
                 fps = str(round(1 / (time.time() - start), 2)) + " FPS"
 
@@ -185,10 +191,6 @@ class FaceDetector(object):
         t.daemon = True
         t.start()
         self.rest_service()
-
-
-    def stop(self):
-        self.stopped = True
 
 
 parser = OptionParser(usage="usage: %prog [options]")
