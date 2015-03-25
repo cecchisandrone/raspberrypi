@@ -1,6 +1,8 @@
 package com.github.cecchisandrone.vc.audio;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 
 import javax.sound.sampled.AudioFormat;
@@ -14,24 +16,39 @@ public class MicrophoneTest {
 	// record duration, in milliseconds
 	static final long RECORD_TIME = 5000;
 
-	private static AudioFormat audioFormat = new AudioFormat(32000, 8, 1, true, false);
+	private static AudioFormat audioFormat = new AudioFormat(32000, 8, 1, true,
+			false);
 
 	/**
 	 * Entry to run the program
-	 * @throws URISyntaxException 
-	 * @throws IOException 
+	 * 
+	 * @throws URISyntaxException
+	 * @throws IOException
 	 */
-	public static void main(String[] args) throws URISyntaxException, IOException {
+	public static void main(String[] args) throws URISyntaxException,
+			IOException {
 
 		int i = 0;
 		for (Mixer.Info info : AudioSystem.getMixerInfo()) {
 			System.out.println("[" + i++ + "] " + info);
 		}
 
-		final Microphone recorder = new Microphone(audioFormat, 4);
+		String indexString;
+		if (args == null || args.length == 0) {
+			System.out.print("Please enter the line number: ");
+			BufferedReader br = new BufferedReader(new InputStreamReader(
+					System.in));
+			indexString = br.readLine();
+		} else {
+			indexString = args[0];
+		}
+
+		final Microphone recorder = new Microphone(audioFormat,
+				Integer.parseInt(indexString));
 		recorder.open();
 
-		WitClient witClient = new WitClient("https://api.wit.ai/speech", audioFormat);
+		WitClient witClient = new WitClient("https://api.wit.ai/speech",
+				audioFormat);
 
 		// creates a new thread that waits for a specified
 		// of time before stopping
