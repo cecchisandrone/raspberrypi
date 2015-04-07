@@ -1,11 +1,17 @@
 package com.github.cecchisandrone.vc.audio;
 
+import java.io.IOException;
+import java.util.Date;
+
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.LineListener;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.Mixer.Info;
 import javax.sound.sampled.TargetDataLine;
+
+import junit.framework.Assert;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +27,10 @@ public class Microphone {
 
 	private AudioFormat audioFormat;
 
+	public AudioFormat getAudioFormat() {
+		return audioFormat;
+	}
+
 	public Microphone(AudioFormat audioFormat, int deviceIndex) {
 		this.audioFormat = audioFormat;
 		this.deviceIndex = deviceIndex;
@@ -31,37 +41,29 @@ public class Microphone {
 	 * 
 	 * @return
 	 */
-	public boolean open() {
+	public void open(LineListener listener) {
 		try {
 			Info info = AudioSystem.getMixerInfo()[deviceIndex];
 			line = (TargetDataLine) AudioSystem.getTargetDataLine(audioFormat, info);
-			line.open(audioFormat);
+			line.addLineListener(listener);
+			line.open(audioFormat);			
 
 		} catch (LineUnavailableException ex) {
 			LOGGER.error(ex.toString(), ex);
-			return false;
-		}
-		return true;
+		}		
 	}
 
 	/**
 	 * Captures the sound and return the stream
+	 * @throws IOException 
 	 */
 	public MicrophoneInputStream start() {
 
-		if (line != null) {
+		Assert.assertNotNull(line);
 
-			line.start(); // start capturing
-
-			LOGGER.info("Start recording...");
-
-			return new MicrophoneInputStream(new AudioInputStream(line));
-
-			// AudioSystem.write(ais, fileType, outputStream);
-
-		} else {
-			throw new IllegalStateException("Line has not created. Cannot start recording");
-		}
+		AudioInputStream audioInputStream = new AudioInputStream(line);
+		line.start(); // start capturing
+		return new MicrophoneInputStream(audioInputStream);	
 	}
 
 	/**
@@ -69,7 +71,7 @@ public class Microphone {
 	 */
 	public void stop() {
 		line.stop();
-		LOGGER.info("Stop recording...");
+		LOGGER.info("Stop recording..." + new Date());
 	}
 
 	/**
