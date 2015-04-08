@@ -42,12 +42,11 @@ public class MicrophoneTest {
 
 		recorder = new Microphone(audioFormat, Integer.parseInt(indexString));
 		WitClient witClient = new WitClient("https://api.wit.ai/speech", recorder);
-		String json = witClient.sendAudio("src/test/resources/audio.wav");
+		witClient.setMaxRecordLength(10000);
+		String json = witClient.sendChunkedAudio();
+		System.out.println(json);		
+		json = witClient.sendAudio("src/test/resources/hello.wav");
 		System.out.println(json);
-		for (int j = 0; j < 3; j++) {
-			json = witClient.sendChunkedAudio();
-			System.out.println(json);
-		}		
 		witClient.close();
 		recorder.close();
 	}

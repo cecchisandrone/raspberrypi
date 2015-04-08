@@ -24,18 +24,24 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.util.EntityUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.github.cecchisandrone.vc.audio.Microphone;
 import com.github.cecchisandrone.vc.audio.MicrophoneInputStream;
 
 public class WitClient implements LineListener {
 
-	// record duration, in milliseconds
-	static final long RECORD_TIME = 5000;
+	private static final Logger LOGGER = LoggerFactory.getLogger(WitClient.class);
+	
+	// Maximum record duration, in milliseconds
+	private long maxRecordLength = 5000;
 
 	private String baseUri;
 
 	private Microphone microphone;
+	
+	private Thread stopperThread;
 
 	private CloseableHttpClient httpclient = HttpClients.createDefault();
 
@@ -49,6 +55,16 @@ public class WitClient implements LineListener {
 		builder.addParameter("v", "20150318");
 		baseUri = builder.toString();
 		this.microphone = microphone;
+	}
+	
+	/**
+	 * Sets the maximum record length in ms. After this length the recording will be stopped.
+	 * Default is 5000 ms
+	 * 
+	 * @param maxRecordLength
+	 */
+	public void setMaxRecordLength(long maxRecordLength) {
+		this.maxRecordLength = maxRecordLength;
 	}
 
 	public String sendChunkedAudio() {
@@ -80,6 +96,8 @@ public class WitClient implements LineListener {
 
 			startTimestamp = new Date().getTime();
 			CloseableHttpResponse response = httpclient.execute(httpPost);
+			stopperThread.interrupt();
+			
 			System.out.println(response.getStatusLine());
 			HttpEntity entity = response.getEntity();
 			InputStream content = entity.getContent();
@@ -92,9 +110,9 @@ public class WitClient implements LineListener {
 			return json;
 
 		} catch (ClientProtocolException e) {
-			e.printStackTrace();
+			LOGGER.error(e.toString(), e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.error(e.toString(), e);
 		}
 		return null;
 	}
@@ -118,6 +136,8 @@ public class WitClient implements LineListener {
 
 			CloseableHttpResponse response = httpclient.execute(httpPost);
 
+			stopperThread.interrupt();
+			
 			System.out.println(response.getStatusLine());
 			HttpEntity entity = response.getEntity();
 			InputStream content = entity.getContent();
@@ -130,9 +150,9 @@ public class WitClient implements LineListener {
 			return json;
 
 		} catch (ClientProtocolException e) {
-			e.printStackTrace();
+			LOGGER.error(e.toString(), e);
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.error(e.toString(), e);
 		}
 		return null;
 	}
@@ -141,7 +161,7 @@ public class WitClient implements LineListener {
 		try {
 			httpclient.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOGGER.error(e.toString(), e);
 		}
 	}
 
@@ -150,21 +170,19 @@ public class WitClient implements LineListener {
 
 		if (event.getType().equals(LineEvent.Type.START)) {
 
-			System.out
-					.println("################## TALK!!! Start event after: "
+			LOGGER.info("################## TALK!!! Start event after: "
 							+ (new Date().getTime() - startTimestamp) + " ###########################");
-			// creates a new thread that waits for a specified
-			// of time before stopping
-			new Thread(new Runnable() {
+			stopperThread = new Thread(new Runnable() {
 				public void run() {
 					try {
-						Thread.sleep(RECORD_TIME);
+						Thread.sleep(maxRecordLength);
 					} catch (InterruptedException ex) {
-						ex.printStackTrace();
+						// Admitted
 					}
 					microphone.stop();
 				}
-			}).start();
+			});
+			stopperThread.start();
 		}
 	}
 }
