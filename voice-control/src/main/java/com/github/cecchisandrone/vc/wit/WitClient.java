@@ -27,6 +27,7 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.cecchisandrone.vc.audio.Microphone;
 import com.github.cecchisandrone.vc.audio.MicrophoneInputStream;
 
@@ -45,6 +46,8 @@ public class WitClient implements LineListener {
 
 	private CloseableHttpClient httpclient = HttpClients.createDefault();
 
+	private ObjectMapper objectMapper = new ObjectMapper();
+	
 	private Header authorizationHeader = new BasicHeader("Authorization",
 			"Bearer GNOUVVQQWWBQCXHJ263FVIRSFWFIGVCE");
 
@@ -67,7 +70,7 @@ public class WitClient implements LineListener {
 		this.maxRecordLength = maxRecordLength;
 	}
 
-	public String sendChunkedAudio() {
+	public WitResponse sendChunkedAudio() {
 
 		HttpPost httpPost;
 		try {
@@ -107,7 +110,7 @@ public class WitClient implements LineListener {
 			String json = writer.toString();
 			EntityUtils.consume(entity);
 			System.out.println("Time taken: " + (new Date().getTime() - time));
-			return json;
+			return objectMapper.readValue(content, WitResponse.class);
 
 		} catch (ClientProtocolException e) {
 			LOGGER.error(e.toString(), e);
@@ -117,7 +120,7 @@ public class WitClient implements LineListener {
 		return null;
 	}
 
-	public String sendAudio(String filename) {
+	public WitResponse sendAudio(String filename) {
 		HttpPost httpPost;
 		try {
 			long time = new Date().getTime();
@@ -135,20 +138,14 @@ public class WitClient implements LineListener {
 					+ httpPost.getRequestLine());
 
 			CloseableHttpResponse response = httpclient.execute(httpPost);
-
-			stopperThread.interrupt();
 			
 			System.out.println(response.getStatusLine());
 			HttpEntity entity = response.getEntity();
-			InputStream content = entity.getContent();
-
-			StringWriter writer = new StringWriter();
-			IOUtils.copy(content, writer, "UTF-8");
-			String json = writer.toString();
-			EntityUtils.consume(entity);
+			InputStream content = entity.getContent();			
 			System.out.println("Time taken: " + (new Date().getTime() - time));
-			return json;
-
+			WitResponse value = objectMapper.readValue(content, WitResponse.class);
+			EntityUtils.consume(entity);
+			return value;
 		} catch (ClientProtocolException e) {
 			LOGGER.error(e.toString(), e);
 		} catch (IOException e) {
