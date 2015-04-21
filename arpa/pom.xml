@@ -40,5 +40,10 @@
 	        <artifactId>spring-core</artifactId>
 	        <version>${spring.version}</version>	        
 	    </dependency>		
+	    <dependency>
+		    <groupId>com.github.cecchisandrone</groupId>
+			<artifactId>voice-control</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+	    </dependency>
 	</dependencies>
 </project>

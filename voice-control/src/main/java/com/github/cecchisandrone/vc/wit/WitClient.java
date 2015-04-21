@@ -4,14 +4,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.util.Date;
 
 import javax.sound.sampled.AudioFormat.Encoding;
 import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.LineListener;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
@@ -34,22 +32,21 @@ import com.github.cecchisandrone.vc.audio.MicrophoneInputStream;
 public class WitClient implements LineListener {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(WitClient.class);
-	
+
 	// Maximum record duration, in milliseconds
 	private long maxRecordLength = 5000;
 
 	private String baseUri;
 
 	private Microphone microphone;
-	
+
 	private Thread stopperThread;
 
 	private CloseableHttpClient httpclient = HttpClients.createDefault();
 
 	private ObjectMapper objectMapper = new ObjectMapper();
-	
-	private Header authorizationHeader = new BasicHeader("Authorization",
-			"Bearer GNOUVVQQWWBQCXHJ263FVIRSFWFIGVCE");
+
+	private Header authorizationHeader = new BasicHeader("Authorization", "Bearer GNOUVVQQWWBQCXHJ263FVIRSFWFIGVCE");
 
 	private long startTimestamp;
 
@@ -59,7 +56,7 @@ public class WitClient implements LineListener {
 		baseUri = builder.toString();
 		this.microphone = microphone;
 	}
-	
+
 	/**
 	 * Sets the maximum record length in ms. After this length the recording will be stopped.
 	 * Default is 5000 ms
@@ -74,18 +71,15 @@ public class WitClient implements LineListener {
 
 		HttpPost httpPost;
 		try {
-			
+
 			long time = new Date().getTime();
-			
+
 			String encoding = microphone.getAudioFormat().getEncoding() == Encoding.PCM_SIGNED ? "signed-integer"
 					: "unsigned-integer";
-			String bits = Integer.toString(microphone.getAudioFormat()
-					.getSampleSizeInBits());
-			String rate = Long.toString((long) microphone.getAudioFormat()
-					.getSampleRate());
-			String endian = microphone.getAudioFormat().isBigEndian() ? "big"
-					: "little";
-			
+			String bits = Integer.toString(microphone.getAudioFormat().getSampleSizeInBits());
+			String rate = Long.toString((long) microphone.getAudioFormat().getSampleRate());
+			String endian = microphone.getAudioFormat().isBigEndian() ? "big" : "little";
+
 			microphone.open(this);
 			MicrophoneInputStream inputStream = microphone.start();
 			httpPost = new HttpPost(baseUri);
@@ -93,24 +87,20 @@ public class WitClient implements LineListener {
 			reqEntity.setChunked(true);
 			httpPost.setEntity(reqEntity);
 			httpPost.addHeader(authorizationHeader);
-			httpPost.addHeader("Content-Type", "audio/raw;encoding=" + encoding
-					+ ";bits=" + bits + ";rate=" + rate + ";endian=" + endian
-					+ ";");
+			httpPost.addHeader("Content-Type", "audio/raw;encoding=" + encoding + ";bits=" + bits + ";rate=" + rate
+					+ ";endian=" + endian + ";");
 
 			startTimestamp = new Date().getTime();
 			CloseableHttpResponse response = httpclient.execute(httpPost);
 			stopperThread.interrupt();
-			
+
 			System.out.println(response.getStatusLine());
 			HttpEntity entity = response.getEntity();
 			InputStream content = entity.getContent();
-
-			StringWriter writer = new StringWriter();
-			IOUtils.copy(content, writer, "UTF-8");
-			String json = writer.toString();
-			EntityUtils.consume(entity);
 			System.out.println("Time taken: " + (new Date().getTime() - time));
-			return objectMapper.readValue(content, WitResponse.class);
+			WitResponse value = objectMapper.readValue(content, WitResponse.class);
+			EntityUtils.consume(entity);
+			return value;
 
 		} catch (ClientProtocolException e) {
 			LOGGER.error(e.toString(), e);
@@ -120,28 +110,25 @@ public class WitClient implements LineListener {
 		return null;
 	}
 
-	public WitResponse sendAudio(String filename) {
+	public WitResponse sendAudio(File file) {
 		HttpPost httpPost;
 		try {
 			long time = new Date().getTime();
-			File f = new File(filename);
 			httpPost = new HttpPost(baseUri);
-			InputStreamEntity reqEntity = new InputStreamEntity(
-					new FileInputStream(f), f.length(),
+			InputStreamEntity reqEntity = new InputStreamEntity(new FileInputStream(file), file.length(),
 					ContentType.create("audio/wav"));
 
 			reqEntity.setChunked(true);
 			httpPost.setEntity(reqEntity);
 			httpPost.addHeader(authorizationHeader);
 			httpPost.addHeader("Content-Type", "audio/wav");
-			System.out.println("Executing request: "
-					+ httpPost.getRequestLine());
+			System.out.println("Executing request: " + httpPost.getRequestLine());
 
 			CloseableHttpResponse response = httpclient.execute(httpPost);
-			
+
 			System.out.println(response.getStatusLine());
 			HttpEntity entity = response.getEntity();
-			InputStream content = entity.getContent();			
+			InputStream content = entity.getContent();
 			System.out.println("Time taken: " + (new Date().getTime() - time));
 			WitResponse value = objectMapper.readValue(content, WitResponse.class);
 			EntityUtils.consume(entity);
@@ -167,8 +154,8 @@ public class WitClient implements LineListener {
 
 		if (event.getType().equals(LineEvent.Type.START)) {
 
-			LOGGER.info("################## TALK!!! Start event after: "
-							+ (new Date().getTime() - startTimestamp) + " ###########################");
+			LOGGER.info("################## TALK!!! Start event after: " + (new Date().getTime() - startTimestamp)
+					+ " ###########################");
 			stopperThread = new Thread(new Runnable() {
 				public void run() {
 					try {

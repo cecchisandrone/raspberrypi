@@ -17,6 +17,7 @@
 				<ref bean="autonomousNavigationModule"/>
 				<ref bean="systemModule"/>
 				<ref bean="cameraModule"/>
+				<ref bean="voiceControlModule"/>
 			</util:list>
 		</property>
 	</bean>
@@ -34,6 +35,9 @@
 	<bean id="systemModule" class="com.github.cecchisandrone.arpa.module.SystemModule" parent="abstractAgentModule">
 		<property name="priority" value="1"/>
 		<property name="ledDeviceId" value="5"/>
+	</bean>
+	
+	<bean id="voiceControlModule" class="com.github.cecchisandrone.arpa.module.VoiceControlModule">
 	</bean>
 	
 	<bean id="cameraModule" class="com.github.cecchisandrone.arpa.module.CameraModule" parent="abstractAgentModule">
