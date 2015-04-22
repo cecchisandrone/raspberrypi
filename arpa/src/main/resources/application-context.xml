@@ -38,6 +38,7 @@
 	</bean>
 	
 	<bean id="voiceControlModule" class="com.github.cecchisandrone.arpa.module.VoiceControlModule">
+		<property name="priority" value="5"/>
 	</bean>
 	
 	<bean id="cameraModule" class="com.github.cecchisandrone.arpa.module.CameraModule" parent="abstractAgentModule">
@@ -59,6 +60,30 @@
 	<bean id="robotNavigator" class="com.github.cecchisandrone.arpa.io.RobotNavigator" init-method="init">
 		<property name="motorDeviceId" value="1"/>	
 		<property name="sonarDeviceId" value="2"/>
+	</bean>
+	
+	<bean id="microphone" class="com.github.cecchisandrone.vc.audio.Microphone">
+		<constructor-arg>
+			<bean class="javax.sound.sampled.AudioFormat">
+				<constructor-arg value="32000"/>
+				<constructor-arg value="8"/>
+				<constructor-arg value="1"/>
+				<constructor-arg value="true"/>
+				<constructor-arg value="false"/>								
+			</bean>		
+		</constructor-arg>
+		<constructor-arg value="1"/>
+	</bean>
+	
+	<bean id="witClient" class="com.github.cecchisandrone.vc.wit.WitClient">
+		<constructor-arg value="https://api.wit.ai/speech"/>
+		<constructor-arg ref="microphone"/>
+		<property name="maxRecordLength" value="5000"/>
+	</bean>
+	
+	<bean id="picoTtsWrapper" class="com.github.cecchisandrone.vc.audio.PicoTextToSpeechWrapper">
+		<constructor-arg value="IT_IT"/>
+		<constructor-arg value="/tmp/speech.wav"/>
 	</bean>
 	
 </beans>

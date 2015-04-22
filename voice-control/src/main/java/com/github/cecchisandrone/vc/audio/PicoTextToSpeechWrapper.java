@@ -32,6 +32,14 @@ public class PicoTextToSpeechWrapper {
 		this.file = file;
 	}
 
+	public void setLanguage(Language language) {
+		this.language = language;
+	}
+
+	public void setFile(String file) {
+		this.file = file;
+	}
+
 	public void playMessage(String message) {
 
 		try {
