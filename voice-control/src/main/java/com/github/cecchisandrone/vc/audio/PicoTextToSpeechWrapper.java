@@ -1,6 +1,7 @@
 package com.github.cecchisandrone.vc.audio;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,10 @@ public class PicoTextToSpeechWrapper {
 		public String getLanguage() {
 			return language;
 		}
+
+		public Locale getLocale() {
+			return new Locale(language);
+		}
 	}
 
 	private Language language;
@@ -38,6 +43,14 @@ public class PicoTextToSpeechWrapper {
 
 	public void setFile(String file) {
 		this.file = file;
+	}
+
+	public Language getLanguage() {
+		return language;
+	}
+
+	public String getFile() {
+		return file;
 	}
 
 	public void playMessage(String message) {
