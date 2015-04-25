@@ -5,6 +5,7 @@ env:
   - BUILD_DIR=raspio
   - BUILD_DIR=arpa
   - BUILD_DIR=smarthome
+  - BUILD_DIR=voice-control
   global:
   - secure: bxsnf+evVaTeDw+jXgB4ozY1zfpy0GvG2V7Z0G9fwNyfVVX0WP3etCV3mEA/R7Hk7IE3Y7tN9RV96s2tOuXQh6TnhYOzt1+5gKAQmbR+cWpBMlzALM1FVzKIMNbUU1GstVgI2N7kowIaixwnpvKqSAJWBA9trzlaPL5IVGtYo3w=
   - secure: bzoMRCO+kjUNEv+wv4SIeEoin82ysFPctBVAS+0bk97zezK/wJ5OD/94YrsQk45+1K8HpZn4l360V+f0jZfbw+N28C24DFp65opv9+RP+eIRXnvdBK/Oj3zoS8tpM3f5BCihI3sfFney+7IQ/MjLfjkjS+MGsVxt+q3LxHB527A=
