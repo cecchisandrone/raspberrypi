@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 
+import com.github.cecchisandrone.arpa.command.Command;
+import com.github.cecchisandrone.arpa.command.CommandFactory;
 import com.github.cecchisandrone.arpa.util.Resources;
 import com.github.cecchisandrone.raspio.input.JoypadController;
 import com.github.cecchisandrone.raspio.input.JoypadController.Analog;
@@ -18,6 +20,7 @@ import com.github.cecchisandrone.raspio.input.JoypadEvent;
 import com.github.cecchisandrone.raspio.input.JoypadEventListener;
 import com.github.cecchisandrone.vc.audio.PicoTextToSpeechWrapper;
 import com.github.cecchisandrone.vc.audio.Player;
+import com.github.cecchisandrone.vc.wit.Outcome;
 import com.github.cecchisandrone.vc.wit.WitClient;
 import com.github.cecchisandrone.vc.wit.WitResponse;
 
@@ -41,12 +44,20 @@ public class VoiceControlModule extends AbstractAgentModule implements JoypadEve
 	@Autowired
 	private PicoTextToSpeechWrapper picoTextToSpeechWrapper;
 
+	@Autowired
+	private CommandFactory commandFactory;
+
 	@Override
 	protected void executeWork() {
 
 		if (witResponse != null) {
 			if (witResponse.getOutcomes().length != 0) {
 				player.play(Resources.getFile(Resources.VOICE_CONTROL_OK));
+				for (Outcome outcome : witResponse.getOutcomes()) {
+					Command command = commandFactory.getCommand(outcome.getIntent());
+					command.execute(outcome);
+				}
+
 			} else {
 				player.play(Resources.getFile(Resources.VOICE_CONTROL_NO));
 			}

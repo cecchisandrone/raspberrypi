@@ -1,7 +1,6 @@
 package com.github.cecchisandrone.vc.audio;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -67,13 +66,13 @@ public class WitClientTest {
 
 	@Test
 	public void testSendAudioReturnsIntentWithEntity() throws URISyntaxException {
-		WitResponse witResponse = witClient.sendAudio(new File(WitClientTest.class.getResource("/get_name.wav")
-				.toURI()));
+		WitResponse witResponse = witClient
+				.sendAudio(new File(WitClientTest.class.getResource("/get_name.wav").toURI()));
 		Assert.assertThat(witResponse.getText(), is("come si chiama mia moglie"));
 		Assert.assertThat(witResponse.getOutcomes().length, is(1));
 		Outcome o = witResponse.getOutcomes()[0];
 		Assert.assertThat(o.getIntent(), is("get_name"));
 		Assert.assertThat(o.getText(), is("come si chiama mia moglie"));
-		Assert.assertThat(o.getEntities().get("contact"), notNullValue());
+		Assert.assertThat(o.getEntities().getContacts().get(0).getValue(), is("mia moglie"));
 	}
 }

@@ -7,93 +7,115 @@
         http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
         http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
         http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd">
-		
+
 	<context:annotation-config />
-	
+
 	<bean id="moduleContainer" class="com.github.cecchisandrone.arpa.module.ModuleContainer">
 		<property name="modules">
-			<util:list>			
-				<ref bean="navigationModule"/>					
-				<ref bean="autonomousNavigationModule"/>
-				<ref bean="systemModule"/>
-				<ref bean="cameraModule"/>
-				<ref bean="voiceControlModule"/>
+			<util:list>
+				<ref bean="navigationModule" />
+				<ref bean="autonomousNavigationModule" />
+				<ref bean="systemModule" />
+				<ref bean="cameraModule" />
+				<ref bean="voiceControlModule" />
 			</util:list>
 		</property>
 	</bean>
 
-	<bean id="abstractAgentModule" class="com.github.cecchisandrone.arpa.module.AbstractAgentModule" abstract="true"/>
-	
+	<bean id="abstractAgentModule" class="com.github.cecchisandrone.arpa.module.AbstractAgentModule" abstract="true" />
+
 	<bean id="navigationModule" class="com.github.cecchisandrone.arpa.module.NavigationModule" parent="abstractAgentModule">
-		<property name="priority" value="10"/>		
+		<property name="priority" value="10" />
 	</bean>
-				
-	<bean id="autonomousNavigationModule"  class="com.github.cecchisandrone.arpa.module.AutonomousNavigationModule" parent="abstractAgentModule">
-		<property name="priority" value="5"/>
+
+	<bean id="autonomousNavigationModule" class="com.github.cecchisandrone.arpa.module.AutonomousNavigationModule" parent="abstractAgentModule">
+		<property name="priority" value="5" />
 	</bean>
-	
+
 	<bean id="systemModule" class="com.github.cecchisandrone.arpa.module.SystemModule" parent="abstractAgentModule">
-		<property name="priority" value="1"/>
-		<property name="ledDeviceId" value="5"/>
+		<property name="priority" value="1" />
+		<property name="ledDeviceId" value="5" />
 	</bean>
-	
+
 	<bean id="voiceControlModule" class="com.github.cecchisandrone.arpa.module.VoiceControlModule">
-		<property name="priority" value="5"/>
+		<property name="priority" value="5" />
 	</bean>
-	
+
 	<bean id="cameraModule" class="com.github.cecchisandrone.arpa.module.CameraModule" parent="abstractAgentModule">
-		<property name="priority" value="5"/>
-		<property name="servoMotorPanDeviceId" value="3"/>
-		<property name="servoMotorTiltDeviceId" value="4"/>
-		<property name="host" value="192.168.1.15"/>
-		<property name="port" value="5000"/>
+		<property name="priority" value="5" />
+		<property name="servoMotorPanDeviceId" value="3" />
+		<property name="servoMotorTiltDeviceId" value="4" />
+		<property name="host" value="192.168.1.15" />
+		<property name="port" value="5000" />
 	</bean>
-				
+
 	<bean id="joypadController" class="com.github.cecchisandrone.raspio.input.JoypadController" factory-method="getInstance">
 		<constructor-arg>
 			<value>/dev/input/js0</value>
 		</constructor-arg>
 	</bean>
-	
-	<bean id="deviceManager" class="com.github.cecchisandrone.raspio.service.DeviceManager"/>
-	
+
+	<bean id="deviceManager" class="com.github.cecchisandrone.raspio.service.DeviceManager" />
+
 	<bean id="robotNavigator" class="com.github.cecchisandrone.arpa.io.RobotNavigator" init-method="init">
-		<property name="motorDeviceId" value="1"/>	
-		<property name="sonarDeviceId" value="2"/>
+		<property name="motorDeviceId" value="1" />
+		<property name="sonarDeviceId" value="2" />
 	</bean>
-	
+
 	<bean id="microphone" class="com.github.cecchisandrone.vc.audio.Microphone">
 		<constructor-arg>
 			<bean class="javax.sound.sampled.AudioFormat">
-				<constructor-arg value="32000"/>
-				<constructor-arg value="8"/>
-				<constructor-arg value="1"/>
-				<constructor-arg value="true"/>
-				<constructor-arg value="false"/>								
-			</bean>		
+				<constructor-arg value="32000" />
+				<constructor-arg value="8" />
+				<constructor-arg value="1" />
+				<constructor-arg value="true" />
+				<constructor-arg value="false" />
+			</bean>
 		</constructor-arg>
-		<constructor-arg value="1"/>
+		<constructor-arg value="1" />
 	</bean>
-	
+
 	<bean id="witClient" class="com.github.cecchisandrone.vc.wit.WitClient">
-		<constructor-arg value="https://api.wit.ai/speech"/>
-		<constructor-arg ref="microphone"/>
-		<property name="maxRecordLength" value="5000"/>
+		<constructor-arg value="https://api.wit.ai/speech" />
+		<constructor-arg ref="microphone" />
+		<property name="maxRecordLength" value="5000" />
 	</bean>
-	
+
 	<bean id="picoTtsWrapper" class="com.github.cecchisandrone.vc.audio.PicoTextToSpeechWrapper">
-		<constructor-arg value="IT_IT"/>
-		<constructor-arg value="/tmp/speech.wav"/>
+		<constructor-arg value="IT_IT" />
+		<constructor-arg value="/tmp/speech.wav" />
+	</bean>
+
+	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+		<property name="useCodeAsDefaultMessage" value="true" />
+		<property name="basenames">
+			<list>
+				<value>classpath:messages</value>
+			</list>
+		</property>
+		<property name="defaultEncoding" value="UTF-8" />
 	</bean>
 	
-	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
-    <property name="useCodeAsDefaultMessage" value="true" />
-    <property name="basenames">
-         <list>
-            <value>classpath:messages</value>
-         </list>
-    </property>
-    <property name="defaultEncoding" value="UTF-8"/>
-</bean>
+	<bean id="commandFactory" class="org.springframework.beans.factory.config.ServiceLocatorFactoryBean">
+		<property name="serviceLocatorInterface" value="com.github.cecchisandrone.arpa.command.CommandFactory"></property>
+		<property name="serviceMappings">
+			<util:properties location="classpath:commands.properties"/>
+		</property>			
+	</bean>
+	
+	<bean id="abstractResponderCommand" class="com.github.cecchisandrone.arpa.command.ResponderCommand" scope="prototype" abstract="true">
+		<property name="messageSource" ref="messageSource"/>
+		<property name="picoTextToSpeechWrapper" ref="picoTtsWrapper"/>
+	</bean>
+	
+	<bean id="responderCommand" class="com.github.cecchisandrone.arpa.command.ResponderCommand" scope="prototype" parent="abstractResponderCommand">
+		<property name="contacts">
+			<map>
+				<entry key="io" value="Alessandro"/>
+				<entry key="mia moglie" value="Michela"/>
+				<entry key="mia figlia" value="Ilaria"/>
+			</map>
+		</property>		
+	</bean>	
 	
 </beans>
