@@ -26,10 +26,10 @@ public abstract class AbstractResponderCommand implements Command {
 	@Override
 	public void execute(Outcome outcome) {
 
-		String message = messageSource.getMessage(COMMAND_PREFIX + outcome.getIntent(), resolveArguments(),
+		String message = messageSource.getMessage(COMMAND_PREFIX + outcome.getIntent(), resolveArguments(outcome),
 				LocaleContextHolder.getLocale());
 		picoTextToSpeechWrapper.playMessage(message);
 	}
 
-	public abstract String[] resolveArguments();
+	public abstract String[] resolveArguments(Outcome outcome);
 }
