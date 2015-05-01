@@ -10,7 +10,6 @@ import javax.sound.sampled.AudioFormat.Encoding;
 import javax.sound.sampled.LineEvent;
 import javax.sound.sampled.LineListener;
 
-import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -46,15 +45,20 @@ public class WitClient implements LineListener {
 
 	private ObjectMapper objectMapper = new ObjectMapper();
 
-	private Header authorizationHeader = new BasicHeader("Authorization", "Bearer GNOUVVQQWWBQCXHJ263FVIRSFWFIGVCE");
+	private String serverToken;
 
 	private long startTimestamp;
 
-	public WitClient(String url, Microphone microphone) throws Exception {
+	public WitClient(String url, String serverToken, Microphone microphone) throws Exception {
 		URIBuilder builder = new URIBuilder(url);
 		builder.addParameter("v", "20150318");
 		baseUri = builder.toString();
 		this.microphone = microphone;
+		this.serverToken = serverToken;
+	}
+
+	public void setServerToken(String serverToken) {
+		this.serverToken = serverToken;
 	}
 
 	/**
@@ -86,7 +90,7 @@ public class WitClient implements LineListener {
 			InputStreamEntity reqEntity = new InputStreamEntity(inputStream, -1);
 			reqEntity.setChunked(true);
 			httpPost.setEntity(reqEntity);
-			httpPost.addHeader(authorizationHeader);
+			httpPost.addHeader(new BasicHeader("Authorization", "Bearer " + serverToken));
 			httpPost.addHeader("Content-Type", "audio/raw;encoding=" + encoding + ";bits=" + bits + ";rate=" + rate
 					+ ";endian=" + endian + ";");
 
@@ -97,6 +101,7 @@ public class WitClient implements LineListener {
 			System.out.println(response.getStatusLine());
 			HttpEntity entity = response.getEntity();
 			InputStream content = entity.getContent();
+			// System.out.println(IOUtils.toString(content));
 			System.out.println("Time taken: " + (new Date().getTime() - time));
 			WitResponse value = objectMapper.readValue(content, WitResponse.class);
 			EntityUtils.consume(entity);
@@ -120,7 +125,7 @@ public class WitClient implements LineListener {
 
 			reqEntity.setChunked(true);
 			httpPost.setEntity(reqEntity);
-			httpPost.addHeader(authorizationHeader);
+			httpPost.addHeader(new BasicHeader("Authorization", "Bearer " + serverToken));
 			httpPost.addHeader("Content-Type", "audio/wav");
 			System.out.println("Executing request: " + httpPost.getRequestLine());
 

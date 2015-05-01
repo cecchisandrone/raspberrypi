@@ -7,18 +7,17 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.MessageSource;
-import org.springframework.context.i18n.LocaleContextHolder;
 
 import com.github.cecchisandrone.arpa.command.Command;
 import com.github.cecchisandrone.arpa.command.CommandFactory;
+import com.github.cecchisandrone.arpa.command.CommandNotFoundException;
+import com.github.cecchisandrone.arpa.util.LocalizedPicoTextToSpeechWrapper;
 import com.github.cecchisandrone.arpa.util.Resources;
 import com.github.cecchisandrone.raspio.input.JoypadController;
 import com.github.cecchisandrone.raspio.input.JoypadController.Analog;
 import com.github.cecchisandrone.raspio.input.JoypadController.Button;
 import com.github.cecchisandrone.raspio.input.JoypadEvent;
 import com.github.cecchisandrone.raspio.input.JoypadEventListener;
-import com.github.cecchisandrone.vc.audio.PicoTextToSpeechWrapper;
 import com.github.cecchisandrone.vc.audio.Player;
 import com.github.cecchisandrone.vc.wit.Outcome;
 import com.github.cecchisandrone.vc.wit.WitClient;
@@ -39,25 +38,37 @@ public class VoiceControlModule extends AbstractAgentModule implements JoypadEve
 	private WitClient witClient;
 
 	@Autowired
-	private MessageSource messageSource;
-
-	@Autowired
-	private PicoTextToSpeechWrapper picoTextToSpeechWrapper;
+	private LocalizedPicoTextToSpeechWrapper localizedPicoTextToSpeechWrapper;
 
 	@Autowired
 	private CommandFactory commandFactory;
+
+	private float confidenceThreshold;
+
+	public void setConfidenceThreshold(float confidenceThreshold) {
+		this.confidenceThreshold = confidenceThreshold;
+	}
 
 	@Override
 	protected void executeWork() {
 
 		if (witResponse != null) {
+
 			if (witResponse.getOutcomes().length != 0) {
 				player.play(Resources.getFile(Resources.VOICE_CONTROL_OK));
 				for (Outcome outcome : witResponse.getOutcomes()) {
-					Command command = commandFactory.getCommand(outcome.getIntent());
-					command.execute(outcome);
+					if (outcome.getConfidence() > confidenceThreshold) {
+						try {
+							Command command = commandFactory.getCommand(outcome.getIntent());
+							command.execute(outcome);
+						} catch (CommandNotFoundException e) {
+							LOGGER.error(e.toString(), e);
+							localizedPicoTextToSpeechWrapper.playMessage("system.command_not_found");
+						}
+					} else {
+						localizedPicoTextToSpeechWrapper.playMessage("system.command_not_found");
+					}
 				}
-
 			} else {
 				player.play(Resources.getFile(Resources.VOICE_CONTROL_NO));
 			}
@@ -82,9 +93,6 @@ public class VoiceControlModule extends AbstractAgentModule implements JoypadEve
 
 		// Send a dummy request to initialize SSL
 		witClient.sendAudio(Resources.getFile(Resources.DUMMY_SOUND));
-
-		// Init locale
-		LocaleContextHolder.setLocale(picoTextToSpeechWrapper.getLanguage().getLocale());
 	}
 
 	public List<Button> getButtonsToNotify() {

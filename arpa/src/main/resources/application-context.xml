@@ -39,6 +39,7 @@
 
 	<bean id="voiceControlModule" class="com.github.cecchisandrone.arpa.module.VoiceControlModule">
 		<property name="priority" value="5" />
+		<property name="confidenceThreshold" value="0.5"/>
 	</bean>
 
 	<bean id="cameraModule" class="com.github.cecchisandrone.arpa.module.CameraModule" parent="abstractAgentModule">
@@ -77,13 +78,15 @@
 
 	<bean id="witClient" class="com.github.cecchisandrone.vc.wit.WitClient">
 		<constructor-arg value="https://api.wit.ai/speech" />
-		<constructor-arg ref="microphone" />
-		<property name="maxRecordLength" value="5000" />
+		<constructor-arg value="GNOUVVQQWWBQCXHJ263FVIRSFWFIGVCE"/>
+		<constructor-arg ref="microphone" />		
+		<property name="maxRecordLength" value="6000" />
 	</bean>
-
-	<bean id="picoTtsWrapper" class="com.github.cecchisandrone.vc.audio.PicoTextToSpeechWrapper">
+	
+	<bean id="localizedPicoTtsWrapper" class="com.github.cecchisandrone.arpa.util.LocalizedPicoTextToSpeechWrapper">
 		<constructor-arg value="IT_IT" />
 		<constructor-arg value="/tmp/speech.wav" />
+		<property name="messageSource" ref="messageSource"/>
 	</bean>
 
 	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
@@ -101,21 +104,25 @@
 		<property name="serviceMappings">
 			<util:properties location="classpath:commands.properties"/>
 		</property>			
+		<property name="serviceLocatorExceptionClass" value="com.github.cecchisandrone.arpa.command.CommandNotFoundException"/>
 	</bean>
 	
-	<bean id="abstractResponderCommand" class="com.github.cecchisandrone.arpa.command.responder.AbstractResponderCommand" scope="prototype" abstract="true">
-		<property name="messageSource" ref="messageSource"/>
-		<property name="picoTextToSpeechWrapper" ref="picoTtsWrapper"/>
+	<bean id="responderCommand" class="com.github.cecchisandrone.arpa.command.responder.ResponderCommand" scope="prototype">
+		<property name="localizedPicoTextToSpeechWrapper" ref="localizedPicoTtsWrapper"/>
 	</bean>
 	
-	<bean id="getNameResponderCommand" class="com.github.cecchisandrone.arpa.command.responder.GetNameResponderCommand" scope="prototype" parent="abstractResponderCommand">
+	<bean id="getNameResponderCommand" class="com.github.cecchisandrone.arpa.command.responder.GetNameResponderCommand" scope="prototype" parent="responderCommand">
 		<property name="contacts">
 			<map>
 				<entry key="io" value="Alessandro"/>
 				<entry key="mia moglie" value="Michela"/>
 				<entry key="mia figlia" value="Ilaria"/>
 			</map>
-		</property>		
-	</bean>	
+		</property>
+	</bean>
+			
+	<bean id="changeLocaleCommand" class="com.github.cecchisandrone.arpa.command.ChangeLocaleCommand" scope="prototype">
+		<property name="localizedPicoTextToSpeechWrapper" ref="localizedPicoTtsWrapper"/>
+	</bean>		
 	
 </beans>

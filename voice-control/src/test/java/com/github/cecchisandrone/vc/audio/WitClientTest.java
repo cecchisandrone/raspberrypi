@@ -32,7 +32,7 @@ public class WitClientTest {
 	@Before
 	public void setup() throws Exception {
 		recorder = new Microphone(audioFormat, deviceIndex);
-		witClient = new WitClient("https://api.wit.ai/speech", recorder);
+		witClient = new WitClient("https://api.wit.ai/speech", "GNOUVVQQWWBQCXHJ263FVIRSFWFIGVCE", recorder);
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -52,7 +52,7 @@ public class WitClientTest {
 		}
 
 		recorder = new Microphone(audioFormat, Integer.parseInt(indexString));
-		WitClient witClient = new WitClient("https://api.wit.ai/speech", recorder);
+		WitClient witClient = new WitClient("https://api.wit.ai/speech", "GNOUVVQQWWBQCXHJ263FVIRSFWFIGVCE", recorder);
 		witClient.setMaxRecordLength(5000);
 		WitResponse witResponse = witClient.sendChunkedAudio();
 		System.out.println(witResponse.getText());
