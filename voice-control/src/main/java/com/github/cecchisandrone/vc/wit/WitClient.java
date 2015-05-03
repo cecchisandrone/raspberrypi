@@ -105,6 +105,7 @@ public class WitClient implements LineListener {
 			System.out.println("Time taken: " + (new Date().getTime() - time));
 			WitResponse value = objectMapper.readValue(content, WitResponse.class);
 			EntityUtils.consume(entity);
+			httpPost.releaseConnection();
 			return value;
 
 		} catch (ClientProtocolException e) {
@@ -137,6 +138,7 @@ public class WitClient implements LineListener {
 			System.out.println("Time taken: " + (new Date().getTime() - time));
 			WitResponse value = objectMapper.readValue(content, WitResponse.class);
 			EntityUtils.consume(entity);
+			httpPost.releaseConnection();
 			return value;
 		} catch (ClientProtocolException e) {
 			LOGGER.error(e.toString(), e);

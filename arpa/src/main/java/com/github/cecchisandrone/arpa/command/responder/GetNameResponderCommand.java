@@ -6,7 +6,7 @@ import java.util.Map;
 import com.github.cecchisandrone.vc.wit.Contact;
 import com.github.cecchisandrone.vc.wit.Outcome;
 
-public class GetNameResponderCommand extends ResponderCommand {
+public class GetNameResponderCommand extends BasicCommand {
 
 	private Map<String, String> contacts;
 

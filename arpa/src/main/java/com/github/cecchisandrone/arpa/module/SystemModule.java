@@ -74,9 +74,13 @@ public class SystemModule extends AbstractAgentModule implements JoypadEventList
 	@Override
 	public void joypadEventTriggered(JoypadEvent event) {
 		if (event.getChangedButton() != null && event.getChangedButton().equals(Button.RB) && event.getNewValue() == 1) {
-
-			ledStatus = !ledStatus;
-			ledDevice.toggleRelay(ledStatus);
+			switchLights();
 		}
+	}
+
+	public Boolean switchLights() {
+		ledStatus = !ledStatus;
+		ledDevice.toggleRelay(ledStatus);
+		return ledStatus;
 	}
 }

@@ -26,6 +26,7 @@ public class LocalizedPicoTextToSpeechWrapper extends PicoTextToSpeechWrapper {
 
 	public void playMessage(String messageKey, String[] args) {
 
+		System.out.println(LocaleContextHolder.getLocale());
 		String message = messageSource.getMessage(messageKey, args, LocaleContextHolder.getLocale());
 		super.playMessage(message);
 	}

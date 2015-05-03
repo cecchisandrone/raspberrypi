@@ -21,7 +21,6 @@ public class ArpaLauncher {
 		// Init locale
 		LocalizedPicoTextToSpeechWrapper tts = applicationContext.getBean(LocalizedPicoTextToSpeechWrapper.class);
 		LocaleContextHolder.setLocale(tts.getLanguage().getLocale(), true);
-
 		ModuleContainer moduleContainer = applicationContext.getBean(ModuleContainer.class);
 		moduleContainer.initializeModules();
 

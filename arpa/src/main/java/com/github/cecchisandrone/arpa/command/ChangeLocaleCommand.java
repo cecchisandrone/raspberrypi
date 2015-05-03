@@ -5,17 +5,11 @@ import java.util.Locale;
 
 import org.springframework.context.i18n.LocaleContextHolder;
 
-import com.github.cecchisandrone.arpa.util.LocalizedPicoTextToSpeechWrapper;
+import com.github.cecchisandrone.arpa.command.responder.BasicCommand;
 import com.github.cecchisandrone.vc.wit.Language;
 import com.github.cecchisandrone.vc.wit.Outcome;
 
-public class ChangeLocaleCommand implements Command {
-
-	private LocalizedPicoTextToSpeechWrapper localizedPicoTextToSpeechWrapper;
-
-	public void setLocalizedPicoTextToSpeechWrapper(LocalizedPicoTextToSpeechWrapper localizedPicoTextToSpeechWrapper) {
-		this.localizedPicoTextToSpeechWrapper = localizedPicoTextToSpeechWrapper;
-	}
+public class ChangeLocaleCommand extends BasicCommand {
 
 	@Override
 	public void execute(Outcome outcome) {

@@ -4,11 +4,11 @@ import com.github.cecchisandrone.arpa.command.Command;
 import com.github.cecchisandrone.arpa.util.LocalizedPicoTextToSpeechWrapper;
 import com.github.cecchisandrone.vc.wit.Outcome;
 
-public class ResponderCommand implements Command {
+public class BasicCommand implements Command {
 
 	private static final String COMMAND_PREFIX = "commands.";
 
-	private LocalizedPicoTextToSpeechWrapper localizedPicoTextToSpeechWrapper;
+	protected LocalizedPicoTextToSpeechWrapper localizedPicoTextToSpeechWrapper;
 
 	public void setLocalizedPicoTextToSpeechWrapper(LocalizedPicoTextToSpeechWrapper localizedPicoTextToSpeechWrapper) {
 		this.localizedPicoTextToSpeechWrapper = localizedPicoTextToSpeechWrapper;
@@ -20,7 +20,7 @@ public class ResponderCommand implements Command {
 		localizedPicoTextToSpeechWrapper.playMessage(COMMAND_PREFIX + outcome.getIntent(), resolveArguments(outcome));
 	}
 
-	public String[] resolveArguments(Outcome outcome) {
+	protected String[] resolveArguments(Outcome outcome) {
 		return new String[] {};
 	}
 }

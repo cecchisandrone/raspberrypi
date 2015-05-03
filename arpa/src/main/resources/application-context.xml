@@ -107,11 +107,11 @@
 		<property name="serviceLocatorExceptionClass" value="com.github.cecchisandrone.arpa.command.CommandNotFoundException"/>
 	</bean>
 	
-	<bean id="responderCommand" class="com.github.cecchisandrone.arpa.command.responder.ResponderCommand" scope="prototype">
+	<bean id="basicCommand" class="com.github.cecchisandrone.arpa.command.responder.BasicCommand" scope="prototype">
 		<property name="localizedPicoTextToSpeechWrapper" ref="localizedPicoTtsWrapper"/>
 	</bean>
 	
-	<bean id="getNameResponderCommand" class="com.github.cecchisandrone.arpa.command.responder.GetNameResponderCommand" scope="prototype" parent="responderCommand">
+	<bean id="getNameResponderCommand" class="com.github.cecchisandrone.arpa.command.responder.GetNameResponderCommand" scope="prototype" parent="basicCommand">
 		<property name="contacts">
 			<map>
 				<entry key="io" value="Alessandro"/>
@@ -121,8 +121,10 @@
 		</property>
 	</bean>
 			
-	<bean id="changeLocaleCommand" class="com.github.cecchisandrone.arpa.command.ChangeLocaleCommand" scope="prototype">
-		<property name="localizedPicoTextToSpeechWrapper" ref="localizedPicoTtsWrapper"/>
-	</bean>		
+	<bean id="changeLocaleCommand" class="com.github.cecchisandrone.arpa.command.ChangeLocaleCommand" parent="basicCommand" scope="prototype"/>		
+	
+	<bean id="switchLightsCommand" class="com.github.cecchisandrone.arpa.command.SwitchLightsCommand" parent="basicCommand" scope="prototype">
+		<property name="systemModule" ref="systemModule"/>
+	</bean>
 	
 </beans>

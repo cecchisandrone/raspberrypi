@@ -24,7 +24,8 @@ public class PicoTextToSpeechWrapper {
 		}
 
 		public Locale getLocale() {
-			return new Locale(language);
+			String[] split = language.split("-");
+			return new Locale(split[0], split[1]);
 		}
 	}
 
