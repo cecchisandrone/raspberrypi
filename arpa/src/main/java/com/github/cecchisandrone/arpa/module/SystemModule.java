@@ -3,11 +3,17 @@ package com.github.cecchisandrone.arpa.module;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 
+import com.github.cecchisandrone.arpa.util.CustomMessageSource;
+import com.github.cecchisandrone.arpa.util.LocalizedPicoTextToSpeechWrapper;
 import com.github.cecchisandrone.raspio.gpio.RelayDevice;
 import com.github.cecchisandrone.raspio.input.JoypadController;
 import com.github.cecchisandrone.raspio.input.JoypadController.Analog;
@@ -33,8 +39,26 @@ public class SystemModule extends AbstractAgentModule implements JoypadEventList
 
 	private boolean ledStatus = false;
 
+	private String sentencePrefix;
+
+	private CustomMessageSource messageSource;
+
+	private LocalizedPicoTextToSpeechWrapper localizedPicoTextToSpeechWrapper;
+
+	public void setMessageSource(CustomMessageSource messageSource) {
+		this.messageSource = messageSource;
+	}
+
 	public void setLedDeviceId(String ledDeviceId) {
 		this.ledDeviceId = ledDeviceId;
+	}
+
+	public void setSentencePrefix(String sentencePrefix) {
+		this.sentencePrefix = sentencePrefix;
+	}
+
+	public void setLocalizedPicoTextToSpeechWrapper(LocalizedPicoTextToSpeechWrapper localizedPicoTextToSpeechWrapper) {
+		this.localizedPicoTextToSpeechWrapper = localizedPicoTextToSpeechWrapper;
 	}
 
 	@Override
@@ -64,7 +88,7 @@ public class SystemModule extends AbstractAgentModule implements JoypadEventList
 	}
 
 	public List<Button> getButtonsToNotify() {
-		return Arrays.asList(Button.RB);
+		return Arrays.asList(Button.RB, Button.TR);
 	}
 
 	public List<Analog> getAnalogsToNotify() {
@@ -76,6 +100,23 @@ public class SystemModule extends AbstractAgentModule implements JoypadEventList
 		if (event.getChangedButton() != null && event.getChangedButton().equals(Button.RB) && event.getNewValue() == 1) {
 			switchLights();
 		}
+
+		if (event.getChangedButton() != null && event.getChangedButton().equals(Button.TR) && event.getNewValue() == 1) {
+			sayRandomSentence();
+		}
+	}
+
+	private void sayRandomSentence() {
+
+		Map<String, String> propertiesWithPrefix = messageSource.getPropertiesWithPrefix(
+				LocaleContextHolder.getLocale(), sentencePrefix);
+		if (propertiesWithPrefix != null) {
+			int size = propertiesWithPrefix.size();
+			int random = new Random().nextInt(size);
+			Set<String> set = propertiesWithPrefix.keySet();
+			localizedPicoTextToSpeechWrapper.playMessage(new ArrayList<String>(set).get(random));
+		}
+
 	}
 
 	public Boolean switchLights() {

@@ -35,6 +35,9 @@
 	<bean id="systemModule" class="com.github.cecchisandrone.arpa.module.SystemModule" parent="abstractAgentModule">
 		<property name="priority" value="1" />
 		<property name="ledDeviceId" value="5" />
+		<property name="sentencePrefix" value="hello"/>
+		<property name="messageSource" ref="messageSource"/>
+		<property name="localizedPicoTextToSpeechWrapper" ref="localizedPicoTtsWrapper"/>
 	</bean>
 
 	<bean id="voiceControlModule" class="com.github.cecchisandrone.arpa.module.VoiceControlModule">
@@ -89,7 +92,7 @@
 		<property name="messageSource" ref="messageSource"/>
 	</bean>
 
-	<bean id="messageSource" class="org.springframework.context.support.ResourceBundleMessageSource">
+	<bean id="messageSource" class="com.github.cecchisandrone.arpa.util.CustomMessageSource">
 		<property name="useCodeAsDefaultMessage" value="true" />
 		<property name="basenames">
 			<list>
