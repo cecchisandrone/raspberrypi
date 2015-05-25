@@ -29,7 +29,7 @@
 	</bean>
 
 	<bean id="autonomousNavigationModule" class="com.github.cecchisandrone.arpa.module.AutonomousNavigationModule" parent="abstractAgentModule">
-		<property name="priority" value="5" />
+		<property name="priority" value="9" />
 	</bean>
 
 	<bean id="systemModule" class="com.github.cecchisandrone.arpa.module.SystemModule" parent="abstractAgentModule">
@@ -64,6 +64,15 @@
 	<bean id="robotNavigator" class="com.github.cecchisandrone.arpa.io.RobotNavigator" init-method="init">
 		<property name="motorDeviceId" value="1" />
 		<property name="sonarDeviceId" value="2" />
+		<property name="magnetometer" ref="magnetometer"/>
+	</bean>
+	
+	<bean id="magnetometer" class="com.github.cecchisandrone.raspio.i2c.HMC5883L">
+		<constructor-arg value="1"/>
+		<constructor-arg value="0x1E"/>
+		<property name="flipY" value="true"/>
+		<property name="offsetX" value="28.52"/>
+		<property name="offsetY" value="-57.04"/>
 	</bean>
 
 	<bean id="microphone" class="com.github.cecchisandrone.vc.audio.Microphone">

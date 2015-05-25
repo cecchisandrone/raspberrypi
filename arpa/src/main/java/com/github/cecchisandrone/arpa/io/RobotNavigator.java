@@ -1,13 +1,17 @@
 package com.github.cecchisandrone.arpa.io;
 
+import java.io.IOException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.github.cecchisandrone.arpa.module.NavigationModule;
+import com.github.cecchisandrone.arpa.util.Utils;
 import com.github.cecchisandrone.raspio.gpio.MotorDevice;
 import com.github.cecchisandrone.raspio.gpio.MotorDevice.Motor;
 import com.github.cecchisandrone.raspio.gpio.SonarDevice;
+import com.github.cecchisandrone.raspio.i2c.HMC5883L;
 import com.github.cecchisandrone.raspio.service.DeviceManager;
 import com.github.cecchisandrone.raspio.service.IOServiceException;
 
@@ -17,7 +21,7 @@ public class RobotNavigator {
 
 	private int currentSpeedOnY = 0;
 
-	private static final int ROTATION_SPEED = 70;
+	private static final int ROTATION_SPEED = 80;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(NavigationModule.class);
 
@@ -32,12 +36,18 @@ public class RobotNavigator {
 
 	private SonarDevice sonarDevice;
 
+	private HMC5883L magnetometer;
+
 	public void setMotorDeviceId(String motorDeviceId) {
 		this.motorDeviceId = motorDeviceId;
 	}
 
 	public void setSonarDeviceId(String sonarDeviceId) {
 		this.sonarDeviceId = sonarDeviceId;
+	}
+
+	public void setMagnetometer(HMC5883L magnetometer) {
+		this.magnetometer = magnetometer;
 	}
 
 	public int getCurrentSpeedOnX() {
@@ -105,12 +115,28 @@ public class RobotNavigator {
 
 	public synchronized void rotate(double angle) {
 
-		long time = (long) (-13.52 * (angle * angle) + 382 * Math.abs(angle) + 233.333);
+		angle = Math.PI / 2;
+		double angleDeg = Utils.rad2deg(angle);
+		double bearing, initialBearing;
+		initialBearing = bearing = getBearing();
+		do {
+			rotate((int) Math.signum(angle) * ROTATION_SPEED, 100);
+			bearing = getBearing();
+			System.out.println(bearing);
 
-		rotate((int) Math.signum(angle) * ROTATION_SPEED, time);
+		} while (Math.abs(initialBearing - bearing) < angleDeg);
 	}
 
 	public double getRange() {
 		return sonarDevice.getRange();
+	}
+
+	public Double getBearing() {
+		try {
+			return magnetometer.getBearing();
+		} catch (IOException e) {
+			LOGGER.error(e.toString(), e);
+			throw new RuntimeException(e);
+		}
 	}
 }

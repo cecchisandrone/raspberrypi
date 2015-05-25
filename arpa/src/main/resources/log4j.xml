@@ -18,9 +18,12 @@
 			value="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1}:%L - %m%n" />
 	   </layout>
 	</appender>
+	<logger name="com.github.cecchisandrone.raspio.i2c.HMC5883L">
+		<level value="warn"/> 
+	</logger>
 	<root>
 		<priority value="info" />
 		<appender-ref ref="console" />
-		<appender-ref ref="file" />				
+		<appender-ref ref="file" />		
 	</root>	
 </log4j:configuration>

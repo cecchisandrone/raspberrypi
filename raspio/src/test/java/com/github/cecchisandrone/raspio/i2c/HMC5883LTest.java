@@ -12,7 +12,7 @@ public class HMC5883LTest {
 		// device.calibrate();
 
 		for (int i = 0; i < 200; i++) {
-			System.out.println(device.getBearing());
+			device.getBearing();
 			Thread.sleep(200);
 		}
 
