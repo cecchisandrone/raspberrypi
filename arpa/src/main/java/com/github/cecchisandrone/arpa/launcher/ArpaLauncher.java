@@ -2,7 +2,6 @@ package com.github.cecchisandrone.arpa.launcher;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.github.cecchisandrone.arpa.module.ModuleContainer;
@@ -20,7 +19,6 @@ public class ArpaLauncher {
 
 		// Init locale
 		LocalizedPicoTextToSpeechWrapper tts = applicationContext.getBean(LocalizedPicoTextToSpeechWrapper.class);
-		LocaleContextHolder.setLocale(tts.getLanguage().getLocale(), true);
 		ModuleContainer moduleContainer = applicationContext.getBean(ModuleContainer.class);
 		moduleContainer.initializeModules();
 

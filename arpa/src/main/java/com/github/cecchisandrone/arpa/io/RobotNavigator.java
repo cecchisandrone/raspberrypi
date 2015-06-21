@@ -21,7 +21,7 @@ public class RobotNavigator {
 
 	private int currentSpeedOnY = 0;
 
-	private static final int ROTATION_SPEED = 80;
+	private static final int ROTATION_SPEED = 100;
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(NavigationModule.class);
 

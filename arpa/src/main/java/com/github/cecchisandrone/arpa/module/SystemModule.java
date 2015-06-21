@@ -10,7 +10,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.i18n.LocaleContextHolder;
 
 import com.github.cecchisandrone.arpa.util.CustomMessageSource;
 import com.github.cecchisandrone.arpa.util.LocalizedPicoTextToSpeechWrapper;
@@ -109,14 +108,13 @@ public class SystemModule extends AbstractAgentModule implements JoypadEventList
 	private void sayRandomSentence() {
 
 		Map<String, String> propertiesWithPrefix = messageSource.getPropertiesWithPrefix(
-				LocaleContextHolder.getLocale(), sentencePrefix);
+				localizedPicoTextToSpeechWrapper.getLanguage().getLocale(), sentencePrefix);
 		if (propertiesWithPrefix != null) {
 			int size = propertiesWithPrefix.size();
 			int random = new Random().nextInt(size);
 			Set<String> set = propertiesWithPrefix.keySet();
 			localizedPicoTextToSpeechWrapper.playMessage(new ArrayList<String>(set).get(random));
 		}
-
 	}
 
 	public Boolean switchLights() {
