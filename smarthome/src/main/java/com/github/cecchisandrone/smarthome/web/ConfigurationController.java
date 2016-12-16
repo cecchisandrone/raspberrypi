@@ -18,10 +18,14 @@ import com.github.cecchisandrone.smarthome.domain.Configuration;
 import com.github.cecchisandrone.smarthome.service.configuration.ConfigurationService;
 import com.github.cecchisandrone.smarthome.service.configuration.ConfigurationServiceException;
 import com.github.cecchisandrone.smarthome.service.notification.NotificationService;
+import com.github.cecchisandrone.smarthome.service.zm.ZoneMinderService;
 
 @Controller
-@SessionAttributes(value = {"configuration"})
+@SessionAttributes(value = { "configuration" })
 public class ConfigurationController {
+
+	@Autowired
+	private ZoneMinderService zoneMinderService;
 
 	@Autowired
 	private NotificationService notificationService;
@@ -30,7 +34,8 @@ public class ConfigurationController {
 	private ConfigurationService configurationService;
 
 	@RequestMapping(params = "updateConfiguration", value = "/updateConfiguration", method = RequestMethod.POST)
-	public ModelAndView updateConfiguration(@Valid @ModelAttribute("configuration") Configuration configuration, BindingResult result, Model model) {
+	public ModelAndView updateConfiguration(@Valid @ModelAttribute("configuration") Configuration configuration,
+			BindingResult result, Model model) {
 
 		if (!result.hasErrors()) {
 			try {
@@ -41,7 +46,7 @@ public class ConfigurationController {
 			}
 		}
 
-		return showConfiguration();
+		return new ModelAndView(ViewNames.CONFIGURATION, ViewNames.CONFIGURATION, configuration);
 	}
 
 	@RequestMapping("/configuration")
@@ -52,18 +57,21 @@ public class ConfigurationController {
 			configuration = configurationService.getConfiguration();
 			return new ModelAndView(ViewNames.CONFIGURATION, "configuration", configuration);
 		} catch (ConfigurationServiceException e) {
-			return new ModelAndView(ViewNames.CONFIGURATION, "errorMessage", "Error while loading configuration. Reason: " + e.toString());
+			return new ModelAndView(ViewNames.CONFIGURATION, "errorMessage",
+					"Error while loading configuration. Reason: " + e.toString());
 		}
 	}
 
-	@RequestMapping(params = "mailTest", value = "/updateConfiguration", method = RequestMethod.POST)
-	public ModelAndView mailTest(@Valid @ModelAttribute("configuration") Configuration configuration, BindingResult result, Model model) {
+	@RequestMapping(params = "slackTest", value = "/updateConfiguration", method = RequestMethod.POST)
+	public ModelAndView slackTest(@ModelAttribute("configuration") Configuration configuration, BindingResult result,
+			Model model) {
 
 		if (!result.hasErrors()) {
 			try {
-				notificationService.sendMail(configuration.getEmail(), "If you receive this mail, the mail configuration is correct");
+				notificationService.sendSlackNotification(configuration.getSlackConfiguration(),
+						"If you receive this message, Slack configuration is correct");
 			} catch (Exception e) {
-				model.addAttribute("errorMessage", "Cannot send mail. Reason: " + e.toString());
+				model.addAttribute("errorMessage", "Cannot send Slack message. Reason: " + e.toString());
 			}
 		}
 
@@ -76,7 +84,9 @@ public class ConfigurationController {
 	}
 
 	@RequestMapping(value = "/configuration/addCamera", method = RequestMethod.POST)
-	public ModelAndView addCameraConfiguration(@Valid @ModelAttribute("cameraConfiguration") CameraConfiguration cameraConfiguration, BindingResult result, @ModelAttribute("configuration") Configuration configuration) {
+	public ModelAndView addCameraConfiguration(
+			@Valid @ModelAttribute("cameraConfiguration") CameraConfiguration cameraConfiguration, BindingResult result,
+			@ModelAttribute("configuration") Configuration configuration) {
 
 		if (!result.hasErrors()) {
 			configuration.getCameraConfigurations().add(cameraConfiguration);
@@ -87,7 +97,9 @@ public class ConfigurationController {
 	}
 
 	@RequestMapping(value = "/configuration/addCamera/{cameraConfigurationIndex}", method = RequestMethod.POST)
-	public ModelAndView updateCameraConfiguration(@PathVariable int cameraConfigurationIndex, @Valid @ModelAttribute("cameraConfiguration") CameraConfiguration cameraConfiguration, BindingResult result, @ModelAttribute("configuration") Configuration configuration, Model model) {
+	public ModelAndView updateCameraConfiguration(@PathVariable int cameraConfigurationIndex,
+			@Valid @ModelAttribute("cameraConfiguration") CameraConfiguration cameraConfiguration, BindingResult result,
+			@ModelAttribute("configuration") Configuration configuration, Model model) {
 
 		if (!result.hasErrors()) {
 			configuration.getCameraConfigurations().add(cameraConfiguration);
@@ -98,23 +110,27 @@ public class ConfigurationController {
 	}
 
 	@RequestMapping(value = "/configuration/removeCamera/{cameraConfigurationIndex}", method = RequestMethod.GET)
-	public ModelAndView removeCameraConfiguration(@PathVariable int cameraConfigurationIndex, @ModelAttribute("configuration") Configuration configuration, Model model) {
+	public ModelAndView removeCameraConfiguration(@PathVariable int cameraConfigurationIndex,
+			@ModelAttribute("configuration") Configuration configuration, Model model) {
 
 		configuration.getCameraConfigurations().remove(cameraConfigurationIndex);
 		return new ModelAndView(ViewNames.CONFIGURATION, "configuration", configuration);
 	}
 
 	@RequestMapping(value = "/configuration/editCamera/{cameraConfigurationIndex}", method = RequestMethod.GET)
-	public ModelAndView editCameraConfiguration(@PathVariable int cameraConfigurationIndex, @ModelAttribute("configuration") Configuration configuration, Model model) {
+	public ModelAndView editCameraConfiguration(@PathVariable int cameraConfigurationIndex,
+			@ModelAttribute("configuration") Configuration configuration, Model model) {
 
-		ModelAndView modelAndView = new ModelAndView(ViewNames.CAMERA_DETAIL, "cameraConfiguration", configuration.getCameraConfigurations().get(
-			cameraConfigurationIndex));
+		ModelAndView modelAndView = new ModelAndView(ViewNames.CAMERA_DETAIL, "cameraConfiguration",
+				configuration.getCameraConfigurations().get(cameraConfigurationIndex));
 		model.addAttribute("cameraConfigurationIndex", cameraConfigurationIndex);
 		return modelAndView;
 	}
 
 	@RequestMapping(value = "/configuration/editCamera/{cameraConfigurationIndex}", method = RequestMethod.POST)
-	public ModelAndView editCameraConfiguration(@PathVariable int cameraConfigurationIndex, @Valid @ModelAttribute("cameraConfiguration") CameraConfiguration cameraConfiguration, @ModelAttribute("configuration") Configuration configuration, Model model) {
+	public ModelAndView editCameraConfiguration(@PathVariable int cameraConfigurationIndex,
+			@Valid @ModelAttribute("cameraConfiguration") CameraConfiguration cameraConfiguration,
+			@ModelAttribute("configuration") Configuration configuration, Model model) {
 
 		configuration.getCameraConfigurations().remove(cameraConfigurationIndex);
 		configuration.getCameraConfigurations().add(cameraConfigurationIndex, cameraConfiguration);
@@ -122,7 +138,8 @@ public class ConfigurationController {
 	}
 
 	@RequestMapping(value = "/configuration/toggleEnabledAllCameras/{status}", method = RequestMethod.GET)
-	public ModelAndView toggleEnabledAllCameras(@PathVariable boolean status, @ModelAttribute("configuration") Configuration configuration, Model model) {
+	public ModelAndView toggleEnabledAllCameras(@PathVariable boolean status,
+			@ModelAttribute("configuration") Configuration configuration, Model model) {
 
 		for (CameraConfiguration cameraConfiguration : configuration.getCameraConfigurations()) {
 			cameraConfiguration.setEnabled(status);
@@ -131,11 +148,46 @@ public class ConfigurationController {
 	}
 
 	@RequestMapping(value = "/configuration/toggleAlarmAllCameras/{status}", method = RequestMethod.GET)
-	public ModelAndView toggleAlarmAllCameras(@PathVariable boolean status, @ModelAttribute("configuration") Configuration configuration, Model model) {
+	public ModelAndView toggleAlarmAllCameras(@PathVariable boolean status,
+			@ModelAttribute("configuration") Configuration configuration, Model model) {
 
 		for (CameraConfiguration cameraConfiguration : configuration.getCameraConfigurations()) {
 			cameraConfiguration.setAlarmEnabled(status);
 		}
 		return new ModelAndView(ViewNames.CONFIGURATION, "configuration", configuration);
+	}
+
+	@RequestMapping(params = "wakeUpZmHost", value = "/updateConfiguration", method = RequestMethod.POST)
+	public ModelAndView wakeUpZmHost(@Valid @ModelAttribute("configuration") Configuration configuration,
+			BindingResult result, Model model) {
+
+		if (!result.hasErrors()) {
+			try {
+				zoneMinderService.wakeUpZmHost(configuration.getZoneMinderConfiguration());
+				model.addAttribute("infoMessage",
+						"Magic packet sent to " + configuration.getZoneMinderConfiguration().getZmHostMacAddress());
+			} catch (Exception e) {
+				model.addAttribute("errorMessage", "Cannot wake up ZM host. Reason: " + e.toString());
+			}
+		}
+
+		return new ModelAndView(ViewNames.CONFIGURATION, ViewNames.CONFIGURATION, configuration);
+	}
+
+	@RequestMapping(params = "shutdownZmHost", value = "/updateConfiguration", method = RequestMethod.POST)
+	public ModelAndView shutdownZmHost(@Valid @ModelAttribute("configuration") Configuration configuration,
+			BindingResult result, Model model) {
+
+		if (!result.hasErrors()) {
+			try {
+				zoneMinderService.shutdownZmHost(configuration.getZoneMinderConfiguration());
+				model.addAttribute("infoMessage",
+						"Shutdown command sent to " + configuration.getZoneMinderConfiguration().getZmHost());
+			} catch (Exception e) {
+				model.addAttribute("errorMessage", "Cannot wake up ZM host. Reason: " + e.toString());
+			}
+		}
+
+		return new ModelAndView(ViewNames.CONFIGURATION, ViewNames.CONFIGURATION, configuration);
 	}
 }

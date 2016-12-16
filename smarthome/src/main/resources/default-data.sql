@@ -1,1 +1,1 @@
-insert into "CONFIGURATION" ("ID", "DISTANCE_THRESHOLD", "EMAIL", "SERVICE_URL","AUTO_OFF_THRESHOLD") values(1, 50.0, 'cecchisandrone@gmail.com', 'http://cecchisandrone.no-ip.org/raspsonar/rest/sonarservice',62.0);
+insert into "CONFIGURATION" ("ID") values(1);

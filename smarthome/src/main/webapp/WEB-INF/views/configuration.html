@@ -13,34 +13,97 @@
 			<div th:include="../fragments/messages"></div>
 
 			<fieldset>
-				<legend>Raspsonar</legend>
-
+				<legend>Slack</legend>
+				
 				<div class="control-group">
-					<label th:for="email" class="control-label">Email address</label>
+					<label th:for="notificationChannel" class="control-label">Notification channel</label>
 					<div class="controls">
-						<input id="email" size="40" th:field="*{email}" th:errorclass="error" /> <input name="mailTest" type="submit" value="Send test mail" class="btn btn-default" />						
+						<input id="notificationChannel" size="40" th:field="*{slackConfiguration.notificationChannel}" th:errorclass="error" />
+						<input name="slackTest" type="submit" value="Send test message" class="btn btn-default" />						
 					</div>
 				</div>
 				<div class="control-group">
+					<label th:for="locationChangeChannel" class="control-label">Location change channel</label>
+					<div class="controls">
+						<input id="locationChangeChannel" size="40" th:field="*{slackConfiguration.locationChangeChannel}" th:errorclass="error" />						
+					</div>
+				</div>
+				<div class="control-group">
+					<label th:for="token" class="control-label">Token</label>
+					<div class="controls">
+						<input id="token" size="40" th:field="*{slackConfiguration.token}" th:errorclass="error" />
+					</div>
+				</div>
+				<div class="control-group">
+					<label th:for="locationChangeUsers" class="control-label">Location change users</label>
+					<div class="controls">
+						<input id="locationChangeUsers" size="40" th:field="*{slackConfiguration.locationChangeUsers}" th:errorclass="error" />
+					</div>
+				</div>
+			</fieldset>
+
+			<fieldset>
+				<legend>Raspsonar</legend>
+
+				<div class="control-group">
 					<label th:for="serviceUrl" class="control-label">Service URL</label>
 					<div class="controls">
-						<input id="serviceUrl" size="40" th:field="*{serviceUrl}" th:errorclass="error" />
+						<input id="serviceUrl" size="40" th:field="*{raspsonarConfiguration.serviceUrl}" th:errorclass="error" />
 					</div>
 				</div>
 				<div class="control-group">
 					<label th:for="distanceThreshold" class="control-label">Distance threshold</label>
 					<div class="controls">
-						<input id="distanceThreshold" size="40" th:field="*{distanceThreshold}" th:errorclass="error" />
+						<input id="distanceThreshold" size="40" th:field="*{raspsonarConfiguration.distanceThreshold}" th:errorclass="error" />
 					</div>
 				</div>
 				<div class="control-group">
 					<label th:for="autoPowerOffDistanceThreshold" class="control-label">Auto power off distance threshold</label>
 					<div class="controls">
-						<input id="autoPowerOffDistanceThreshold" size="40" th:field="*{autoPowerOffDistanceThreshold}" th:errorclass="error" />
+						<input id="autoPowerOffDistanceThreshold" size="40" th:field="*{raspsonarConfiguration.autoPowerOffDistanceThreshold}" th:errorclass="error" />
 					</div>
 				</div>
 			</fieldset>
 			<br />
+			<fieldset>			
+				<legend>ZoneMinder</legend>
+				<p>Specify addresses relative to Smarthome server network</p>
+				<div class="control-group">
+					<label th:for="automaticActivationEnabled" class="control-label" data-toggle="tooltip" data-placement="right" title="Wakes up ZM host and shutdown it considering toggle hosts">Automatic activation enabled</label>
+					<div class="controls">
+						<input id="automaticActivationEnabled" th:field="*{zoneMinderConfiguration.automaticActivationEnabled}" th:errorclass="error" type="checkbox" />
+					</div>
+				</div>
+				<div class="control-group">
+					<label th:for="zmHost" class="control-label">Host</label>
+					<div class="controls">
+						<input id="zmHost" size="40" th:field="*{zoneMinderConfiguration.zmHost}"
+							th:errorclass="error" />
+					</div>
+				</div>
+				<div class="control-group">
+					<label th:for="zmHostMacAddress" class="control-label">Host MAC Address</label>
+					<div class="controls">
+						<input id="zmHostMacAddress" size="40" th:field="*{zoneMinderConfiguration.zmHostMacAddress}"
+							th:errorclass="error" />
+					</div>
+				</div>
+				<div class="control-group">
+					<label th:for="zmHostUser" class="control-label">Host username</label>
+					<div class="controls">
+						<input id="zmHostUser" size="20" th:field="*{zoneMinderConfiguration.zmHostUser}"
+							th:errorclass="error" />
+					</div>
+				</div>				
+				<div class="control-group">
+					<label th:for="zmHostPassword" class="control-label">Host password</label>
+					<div class="controls">
+						<input id="zmHostPassword" size="20" type="text" th:field="*{zoneMinderConfiguration.zmHostPassword}"
+							th:errorclass="error" />
+					</div>
+				</div>
+			</fieldset>
+			<br />			
 			<fieldset>
 				<legend>Cameras</legend>
 				<!-- Table -->
@@ -95,6 +158,13 @@
 			</fieldset>
 			<br /> <input type="submit" class="btn btn-primary" name="updateConfiguration" value="Update configuration" />
 		</form>
+		
+		<script type="text/javascript">
+			$(function () {
+			  $('[data-toggle="tooltip"]').tooltip()
+			})
+		
+		</script>
 	</div>
 </body>
 </html>

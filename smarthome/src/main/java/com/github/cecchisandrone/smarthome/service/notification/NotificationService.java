@@ -1,28 +1,21 @@
 package com.github.cecchisandrone.smarthome.service.notification;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.MailSender;
-import org.springframework.mail.SimpleMailMessage;
-import org.springframework.stereotype.Service;
+import java.util.Map;
 
+import com.github.cecchisandrone.smarthome.domain.LocationStatus;
+import com.github.cecchisandrone.smarthome.domain.SlackConfiguration;
+import com.github.cecchisandrone.smarthome.service.configuration.ConfigurationServiceException;
 
-@Service
-public class NotificationService {
+public interface NotificationService {
 
-	@Autowired
-	private MailSender mailSender;
+	void sendMail(String to, String text);
 
-	private @Value("${application.name}")
-	String applicationName;
+	void sendSlackNotification(String message) throws ConfigurationServiceException, NotificationServiceException;
 
-	public void sendMail(String to, String text) {
+	void sendSlackNotification(SlackConfiguration slackConfiguration, String message)
+			throws NotificationServiceException;
 
-		SimpleMailMessage message = new SimpleMailMessage();
-		message.setFrom(applicationName);
-		message.setSubject(applicationName + " notification");
-		message.setText(text);
-		message.setTo(to);
-		mailSender.send(message);
-	}
+	Map<String, LocationStatus> getLocationStatus(SlackConfiguration slackConfiguration)
+			throws NotificationServiceException;
+
 }

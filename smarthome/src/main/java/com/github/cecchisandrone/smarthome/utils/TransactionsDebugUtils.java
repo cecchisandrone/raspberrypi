@@ -1,8 +1,8 @@
-package com.github.cecchisandrone.smarthome.service.configuration;
+package com.github.cecchisandrone.smarthome.utils;
 
 import java.lang.reflect.InvocationTargetException;
 
-class DebugUtils {
+class TransactionsDebugUtils {
 
 	private static final Boolean transactionDebugging = true;
 	private static final Boolean verboseTransactionDebugging = true;

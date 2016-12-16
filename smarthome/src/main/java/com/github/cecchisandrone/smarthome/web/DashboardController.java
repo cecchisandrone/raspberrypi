@@ -1,7 +1,11 @@
 package com.github.cecchisandrone.smarthome.web;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,8 +14,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.github.cecchisandrone.smarthome.domain.Configuration;
+import com.github.cecchisandrone.smarthome.service.configuration.ConfigurationService;
+import com.github.cecchisandrone.smarthome.service.configuration.ConfigurationServiceException;
 import com.github.cecchisandrone.smarthome.service.raspsonar.RaspsonarService;
 import com.github.cecchisandrone.smarthome.service.raspsonar.RaspsonarServiceException;
+import com.github.cecchisandrone.smarthome.service.zm.ZoneMinderService;
+import com.github.cecchisandrone.smarthome.service.zm.ZoneMinderServiceException;
+import com.github.cecchisandrone.smarthome.utils.ZoneMinderUtils;
 
 /**
  * Handles requests for the application home page.
@@ -19,24 +29,36 @@ import com.github.cecchisandrone.smarthome.service.raspsonar.RaspsonarServiceExc
 @Controller
 public class DashboardController {
 
+	private final Logger LOGGER = LoggerFactory.getLogger(getClass());
+
 	@Autowired
 	private RaspsonarService raspsonarService;
 
-	@RequestMapping(value = {"/dashboard", "/"}, method = RequestMethod.GET)
+	@Autowired
+	private ZoneMinderService zoneminderService;
+
+	@Autowired
+	private ConfigurationService configurationService;
+
+	@RequestMapping(value = { "/dashboard", "/" }, method = RequestMethod.GET)
 	public ModelAndView home() {
 
 		ModelAndView modelAndView = new ModelAndView(ViewNames.DASHBOARD);
 		try {
+			Configuration configuration = configurationService.getConfiguration();
 			modelAndView.addObject("waterLevel", raspsonarService.getDistance(false));
 			modelAndView.addObject("relayStatus", raspsonarService.isRelayStatus());
+			modelAndView.addObject("zmStatus",
+					ZoneMinderUtils.pingHost(configuration.getZoneMinderConfiguration().getZmHost()));
 			modelAndView.addObject("distanceChartUrl", raspsonarService.getDistanceChartUrl());
-		} catch (RaspsonarServiceException e) {
+		} catch (RaspsonarServiceException | ConfigurationServiceException | IOException e) {
 			modelAndView.addObject("errorMessage", e.toString());
+			LOGGER.error(e.getMessage(), e);
 		}
 		return modelAndView;
 	}
 
-	@RequestMapping(value = {"/dashboard/resetAverageDistance"}, method = RequestMethod.GET)
+	@RequestMapping(value = { "/dashboard/resetAverageDistance" }, method = RequestMethod.GET)
 	public ModelAndView resetAverageDistance() {
 
 		ModelAndView modelAndView = new ModelAndView(ViewNames.DASHBOARD);
@@ -44,11 +66,12 @@ public class DashboardController {
 			modelAndView.addObject("waterLevel", raspsonarService.getDistance(true));
 		} catch (RaspsonarServiceException e) {
 			modelAndView.addObject("errorMessage", e.toString());
+			LOGGER.error(e.getMessage(), e);
 		}
 		return modelAndView;
 	}
 
-	@RequestMapping(value = {"/dashboard/waterPump/{status}"}, method = RequestMethod.GET)
+	@RequestMapping(value = { "/dashboard/waterPump/{status}" }, method = RequestMethod.GET)
 	public ModelAndView toggleRelay(@PathVariable boolean status, Model model) {
 
 		try {
@@ -57,6 +80,34 @@ public class DashboardController {
 			model.addAttribute("errorMessage", e.toString());
 		}
 		return home();
+	}
+
+	@RequestMapping(value = { "/dashboard/zoneminder/shutdown" }, method = RequestMethod.POST)
+	public Model shutdownZoneminderHost(Model model) {
+
+		try {
+			Configuration configuration = configurationService.getConfiguration();
+			zoneminderService.shutdownZmHost(configuration.getZoneMinderConfiguration());
+			model.addAttribute("status", "Operation completed successfully");
+		} catch (ZoneMinderServiceException | ConfigurationServiceException e) {
+			model.addAttribute("status", e.toString());
+			LOGGER.error(e.getMessage(), e);
+		}
+		return model;
+	}
+
+	@RequestMapping(value = { "/dashboard/zoneminder/wake-up" }, method = RequestMethod.POST)
+	public Model wakeUpZoneminderHost(Model model) {
+
+		try {
+			Configuration configuration = configurationService.getConfiguration();
+			zoneminderService.wakeUpZmHost(configuration.getZoneMinderConfiguration());
+			model.addAttribute("status", "Operation completed successfully");
+		} catch (ZoneMinderServiceException | ConfigurationServiceException e) {
+			model.addAttribute("status", e.toString());
+			LOGGER.error(e.getMessage(), e);
+		}
+		return model;
 	}
 
 	@RequestMapping("/error")

@@ -8,11 +8,11 @@
 	        <span th:text="${e.message}">The error message</span>
 	    </div>
 		
-		<div class="alert alert-success" th:if="${infoMessage != null}">
+		<div id="infoMessage" class="alert alert-success" th:if="${infoMessage != null}">
 			<span th:text="${infoMessage}" />
 		</div>
 		
-		<div class="alert alert-danger" th:if="${errorMessage != null}">
+		<div id="errorMessage" class="alert alert-danger" th:if="${errorMessage != null}">
 			<span th:text="${errorMessage}" />
 		</div>
 	</div>

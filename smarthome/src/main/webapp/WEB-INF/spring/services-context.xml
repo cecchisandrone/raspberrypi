@@ -23,8 +23,8 @@
 	<bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl">
 		<property name="host" value="smtp.gmail.com" />
 		<property name="port" value="587" />
-		<property name="username" value="cecchisandrone@gmail.com" />
-		<property name="password" value="jfaladgh83sd" />
+		<property name="username" value="username@gmail.com" />
+		<property name="password" value="password" />
 		<property name="javaMailProperties">
 			<props>
 				<prop key="mail.transport.protocol">smtp</prop>
@@ -33,6 +33,9 @@
 				<prop key="mail.debug">false</prop>
 			</props>
 		</property>
+	</bean>
+	
+	<bean id="slackClient" class="com.github.cecchisandrone.smarthome.client.slack.SlackClient">
 	</bean>
 	
 </beans>

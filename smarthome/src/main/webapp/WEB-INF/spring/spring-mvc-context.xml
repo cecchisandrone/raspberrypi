@@ -19,6 +19,9 @@
 	<mvc:resources mapping="/assets/**" location="/assets/" />
 
 	<bean class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver">
+		<property name="defaultViews">
+			<bean class="org.springframework.web.servlet.view.json.MappingJackson2JsonView"/>		  
+		</property>
 		<property name="viewResolvers">
 			<list>
 				<!-- Used here for 'xml' and 'atom' views -->
@@ -42,16 +45,7 @@
 				<!-- <property name="viewClass" value="org.thymeleaf.spring4.view.ThymeleafView"/> -->
 				<!-- </bean> -->
 			</list>
-		</property>
-		<property name="mediaTypes">
-			<map>
-				<entry key="html" value="text/html" />
-				<entry key="pdf" value="application/pdf" />
-				<entry key="xsl" value="application/vnd.ms-excel" />
-				<entry key="xml" value="application/xml" />
-				<entry key="json" value="application/json" />
-			</map>
-		</property>
+		</property>		
 	</bean>
 
 	<!-- Thymeleaf configuration -->

@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -12,13 +11,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-
-import org.hibernate.validator.constraints.Email;
-import org.hibernate.validator.constraints.NotEmpty;
-import org.hibernate.validator.constraints.URL;
+import javax.persistence.OneToOne;
+import javax.validation.Valid;
 
 @Entity
 public class Configuration implements Serializable {
@@ -29,28 +23,21 @@ public class Configuration implements Serializable {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 
-	@Email
-	@NotEmpty
-	private String email;
+	@OneToOne(cascade = CascadeType.ALL)
+	@Valid
+	private RaspsonarConfiguration raspsonarConfiguration;
 
-	@URL
-	@NotEmpty
-	private String serviceUrl;
-
-	@NotNull
-	@Min(10)
-	@Max(200)
-	private Double distanceThreshold;
-
-	@NotNull
-	@Min(10)
-	@Max(200)
-	@Column(name = "AUTO_OFF_THRESHOLD")
-	private Double autoPowerOffDistanceThreshold;
+	@OneToOne(cascade = CascadeType.ALL)
+	@Valid
+	private SlackConfiguration slackConfiguration;
 
 	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
 	@JoinColumn(name = "CONFIGURATION_ID")
 	private List<CameraConfiguration> cameraConfigurations;
+
+	@OneToOne(cascade = CascadeType.ALL)
+	@Valid
+	private ZoneMinderConfiguration zoneMinderConfiguration;
 
 	public long getId() {
 		return id;
@@ -58,30 +45,6 @@ public class Configuration implements Serializable {
 
 	public void setId(long id) {
 		this.id = id;
-	}
-
-	public String getServiceUrl() {
-		return serviceUrl;
-	}
-
-	public void setServiceUrl(String serviceUrl) {
-		this.serviceUrl = serviceUrl;
-	}
-
-	public String getEmail() {
-		return email;
-	}
-
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public void setDistanceThreshold(Double distanceThreshold) {
-		this.distanceThreshold = distanceThreshold;
-	}
-
-	public Double getDistanceThreshold() {
-		return distanceThreshold;
 	}
 
 	public void setCameraConfigurations(List<CameraConfiguration> cameraConfigurations) {
@@ -92,11 +55,28 @@ public class Configuration implements Serializable {
 		return cameraConfigurations;
 	}
 
-	public void setAutoPowerOffDistanceThreshold(Double autoPowerOffDistanceThreshold) {
-		this.autoPowerOffDistanceThreshold = autoPowerOffDistanceThreshold;
+	public void setZoneMinderConfiguration(ZoneMinderConfiguration zoneMinderConfiguration) {
+		this.zoneMinderConfiguration = zoneMinderConfiguration;
 	}
 
-	public Double getAutoPowerOffDistanceThreshold() {
-		return autoPowerOffDistanceThreshold;
+	public ZoneMinderConfiguration getZoneMinderConfiguration() {
+		return zoneMinderConfiguration;
 	}
+
+	public RaspsonarConfiguration getRaspsonarConfiguration() {
+		return raspsonarConfiguration;
+	}
+
+	public void setRaspsonarConfiguration(RaspsonarConfiguration raspsonarConfiguration) {
+		this.raspsonarConfiguration = raspsonarConfiguration;
+	}
+
+	public SlackConfiguration getSlackConfiguration() {
+		return slackConfiguration;
+	}
+
+	public void setSlackConfiguration(SlackConfiguration slackConfiguration) {
+		this.slackConfiguration = slackConfiguration;
+	}
+
 }
