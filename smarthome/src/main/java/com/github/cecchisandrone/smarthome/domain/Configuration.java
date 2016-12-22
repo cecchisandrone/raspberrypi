@@ -24,6 +24,9 @@ public class Configuration implements Serializable {
 	private long id;
 
 	@OneToOne(cascade = CascadeType.ALL)
+	private Profile profile;
+
+	@OneToOne(cascade = CascadeType.ALL)
 	@Valid
 	private RaspsonarConfiguration raspsonarConfiguration;
 
@@ -79,4 +82,11 @@ public class Configuration implements Serializable {
 		this.slackConfiguration = slackConfiguration;
 	}
 
+	public void setProfile(Profile profile) {
+		this.profile = profile;
+	}
+
+	public Profile getProfile() {
+		return profile;
+	}
 }

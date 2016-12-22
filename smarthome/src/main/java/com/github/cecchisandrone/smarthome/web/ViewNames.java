@@ -13,4 +13,6 @@ public class ViewNames {
 	public static final String LOGIN = "login";
 
 	public static final String ERROR = "error";
+
+	public static final String PROFILE = "profile";
 }

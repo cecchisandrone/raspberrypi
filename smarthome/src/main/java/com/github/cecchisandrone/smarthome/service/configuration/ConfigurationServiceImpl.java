@@ -4,8 +4,10 @@ import java.util.List;
 
 import javax.validation.ConstraintViolationException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.support.DataAccessUtils;
+import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,9 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	@Autowired
 	private CameraService cameraService;
 
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
 	@Override
 	public Configuration getConfiguration() {
 
@@ -35,6 +40,20 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 	@Override
 	public void saveConfiguration(Configuration configuration) throws ConfigurationServiceException {
 		try {
+
+			// Check if password should be changed
+			if (StringUtils.isNotEmpty(configuration.getProfile().getNewPassword())
+					&& StringUtils.isNotEmpty(configuration.getProfile().getNewPassword())) {
+
+				if (passwordEncoder.isPasswordValid(configuration.getProfile().getPassword(),
+						configuration.getProfile().getOldPassword(), null)) {
+					configuration.getProfile().setPassword(
+							passwordEncoder.encodePassword(configuration.getProfile().getNewPassword(), null));
+				} else {
+					throw new ConfigurationServiceException("Old password doesn't match");
+				}
+			}
+
 			configurationRepository.save(configuration);
 
 			// Toggle alarm on every camera

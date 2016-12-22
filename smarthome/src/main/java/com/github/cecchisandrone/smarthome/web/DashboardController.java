@@ -43,17 +43,29 @@ public class DashboardController {
 	@RequestMapping(value = { "/dashboard", "/" }, method = RequestMethod.GET)
 	public ModelAndView home() {
 
+		Configuration configuration = null;
 		ModelAndView modelAndView = new ModelAndView(ViewNames.DASHBOARD);
 		try {
-			Configuration configuration = configurationService.getConfiguration();
-			modelAndView.addObject("waterLevel", raspsonarService.getDistance(false));
-			modelAndView.addObject("relayStatus", raspsonarService.isRelayStatus());
-			modelAndView.addObject("zmStatus",
-					ZoneMinderUtils.pingHost(configuration.getZoneMinderConfiguration().getZmHost()));
-			modelAndView.addObject("distanceChartUrl", raspsonarService.getDistanceChartUrl());
-		} catch (RaspsonarServiceException | ConfigurationServiceException | IOException e) {
+			configuration = configurationService.getConfiguration();
+		} catch (ConfigurationServiceException e) {
 			modelAndView.addObject("errorMessage", e.toString());
 			LOGGER.error(e.getMessage(), e);
+			return modelAndView;
+		}
+
+		try {
+			modelAndView.addObject("waterLevel", raspsonarService.getDistance(false));
+			modelAndView.addObject("relayStatus", raspsonarService.isRelayStatus());
+			modelAndView.addObject("distanceChartUrl", raspsonarService.getDistanceChartUrl());
+		} catch (RaspsonarServiceException e) {
+			modelAndView.addObject("errorMessage", e.toString());
+		}
+
+		try {
+			modelAndView.addObject("zmStatus",
+					ZoneMinderUtils.pingHost(configuration.getZoneMinderConfiguration().getZmHost()));
+		} catch (IOException e) {
+			// Deliberately do nothing here
 		}
 		return modelAndView;
 	}

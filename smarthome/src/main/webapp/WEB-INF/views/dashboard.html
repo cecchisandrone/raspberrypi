@@ -13,7 +13,7 @@
 					<div th:include="../fragments/messages" ></div>
 				</p>
 				<p>
-					<strong>Actual water level (average): </strong><span id="waterLevel" th:if="${waterLevel != null}" th:text="${waterLevel} + ' cm'"></span>
+					<strong>Basement water level: </strong><span id="waterLevel" th:if="${waterLevel != null}" th:text="${waterLevel} + ' cm'"></span>
 					<a class="btn btn-default btn-xs" th:href="@{/dashboard/resetAverageDistance}">Reset</a>					
 					<script th:inline="javascript">
 					    
@@ -43,22 +43,22 @@
 					    
 					</script>	
 				</p>	
-				<div th:fragment="waterPump"> 
+				<p th:fragment="waterPump"> 
 					<strong>Water pump: </strong>
                     <input type="checkbox" th:checked="${relayStatus}" disabled="disabled"/>                            
                     <a class="btn btn-success btn-xs" th:href="@{/dashboard/waterPump/true}">On </a>
 					<a class="btn btn-danger btn-xs" th:href="@{/dashboard/waterPump/false}">Off</a>					
-				</div>		
-				<div th:fragment="zoneMinder"> 
+				</p>		
+				<p th:fragment="zoneMinder"> 
 					<strong>ZoneMinder: </strong>
                     <input type="checkbox" th:checked="${zmStatus}" disabled="disabled"/>                            
                     <a class="btn btn-success btn-xs" id="wakeUpButton" href="#" onclick="wakeUpZmHost()">Wake up host </a>
                     <a class="btn btn-danger btn-xs" id="shutdownButton" href="#" onclick="shutdownZmHost()">Shutdown host</a>       
                     <div id="zmMessage"></div>             	
-				</div>	
+				</p>	
 			</div>
 			<div class="col-md-6">			
-				<img class="img-responsive img-thumbnail" alt="Distance chart" style="margin: 10px" th:src="${distanceChartUrl}"/>	
+				<img class="img-responsive img-thumbnail" alt="Distance chart not available" style="margin: 10px" th:src="${distanceChartUrl}"/>	
 			</div>
 			<script th:inline="javascript">
 					    

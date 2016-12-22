@@ -44,14 +44,24 @@ public class ZoneMinderServiceImpl implements ZoneMinderService {
 
 	public String shutdownZmHost(ZoneMinderConfiguration configuration) {
 		Assert.notNull(configuration, "ZoneMinder configuration should be not null");
+
+		boolean isAlive = false;
 		try {
-			if (ZoneMinderUtils.pingHost(configuration.getZmHost())) {
+			isAlive = ZoneMinderUtils.pingHost(configuration.getZmHost());
+		} catch (IOException e) {
+			logger.info("ZoneMinder host " + configuration.getZmHost() + " is not alive. Reason: " + e.toString());
+		}
+
+		if (isAlive) {
+
+			try {
 				return ZoneMinderUtils.shutdownZmHost(configuration.getZmHost(), configuration.getZmHostUser(),
 						configuration.getZmHostPassword());
+
+			} catch (Exception e) {
+				throw new ZoneMinderServiceException(
+						"Unable to shutdown " + configuration.getZmHost() + " . Reason: " + e.toString(), e);
 			}
-		} catch (Exception e) {
-			throw new ZoneMinderServiceException(
-					"Unable to shutdown " + configuration.getZmHost() + " . Reason: " + e.toString(), e);
 		}
 		return null;
 	}
@@ -59,7 +69,6 @@ public class ZoneMinderServiceImpl implements ZoneMinderService {
 	@Scheduled(fixedDelay = 60000, initialDelay = 60000)
 	public void autoActivation() {
 		try {
-			logger.info("Checking if ZoneMinder automatic activation is needed");
 			Configuration configuration = configurationService.getConfiguration();
 			if (configuration.getZoneMinderConfiguration() != null
 					&& configuration.getZoneMinderConfiguration().getAutomaticActivationEnabled()) {
@@ -67,8 +76,6 @@ public class ZoneMinderServiceImpl implements ZoneMinderService {
 				// Get latest location status for configured users
 				Map<String, LocationStatus> status = notificationService
 						.getLocationStatus(configuration.getSlackConfiguration());
-
-				logger.info("Location status: " + status.toString());
 
 				int exitedCount = 0;
 				for (Entry<String, LocationStatus> entry : status.entrySet()) {
@@ -79,6 +86,7 @@ public class ZoneMinderServiceImpl implements ZoneMinderService {
 					// If at least one user entered the configured location,
 					// shutdown ZoneMinder host
 					if (entry.getValue().equals(LocationStatus.ENTERED)) {
+						logger.info("Shutting down ZoneMinder. Location status: " + status.toString());
 						shutdownZmHost(configuration.getZoneMinderConfiguration());
 						return;
 					}
@@ -87,11 +95,10 @@ public class ZoneMinderServiceImpl implements ZoneMinderService {
 				// If all users exited the configured location, wake up
 				// ZoneMinder host
 				if (exitedCount == configuration.getSlackConfiguration().getUsers().length) {
+					logger.info("Waking up ZoneMinder. Location status: " + status.toString());
 					wakeUpZmHost(configuration.getZoneMinderConfiguration());
 				}
 
-			} else {
-				logger.info("ZoneMinder activation is not needed");
 			}
 		} catch (ConfigurationServiceException e) {
 			logger.error("Unable to read configuration from Configuration Service", e);

@@ -41,7 +41,7 @@
 					</div>
 				</div>
 			</fieldset>
-
+			<br />
 			<fieldset>
 				<legend>Raspsonar</legend>
 
@@ -69,7 +69,7 @@
 				<legend>ZoneMinder</legend>
 				<p>Specify addresses relative to Smarthome server network</p>
 				<div class="control-group">
-					<label th:for="automaticActivationEnabled" class="control-label" data-toggle="tooltip" data-placement="right" title="Wakes up ZM host and shutdown it considering toggle hosts">Automatic activation enabled</label>
+					<label th:for="automaticActivationEnabled" class="control-label" data-toggle="tooltip" data-placement="right" title="Wakes up ZM host and shutdowns it considering location change users">Automatic activation enabled</label>
 					<div class="controls">
 						<input id="automaticActivationEnabled" th:field="*{zoneMinderConfiguration.automaticActivationEnabled}" th:errorclass="error" type="checkbox" />
 					</div>

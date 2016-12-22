@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout/layout">
+<head>
+<title>Profile</title>
+</head>
+<body>
+	<!-- /* Content of this page will be decorated by the elements of layout.html */ -->
+	<div layout:fragment="content">
+
+
+		<form class="form-horizontal" th:action="@{/updateProfile}" th:object="${profile}" action="#" method="post">
+
+			<div th:include="../fragments/messages"></div>
+
+			<fieldset>
+				<legend>Profile</legend>
+				<div class="control-group">
+					<label th:for="name" class="control-label">Name</label>
+					<div class="controls">
+						<input id="name" size="40" th:field="*{name}" th:errorclass="error" />						
+					</div>
+				</div>
+				<div class="control-group">
+					<label th:for="surname" class="control-label">Surname</label>
+					<div class="controls">
+						<input id="surname" size="40" th:field="*{surname}" th:errorclass="error" />						
+					</div>
+				</div>
+				<div class="control-group">
+					<label th:for="password" class="control-label">Old password</label>
+					<div class="controls">
+						<input id="password" type="password" size="20" th:field="*{oldPassword}" th:errorclass="error" />						
+					</div>
+				</div>
+				<div class="control-group">
+					<label th:for="newPassword" class="control-label">New password</label>
+					<div class="controls">
+						<input id="newPassword" type="password" min="5" size="20" th:field="*{newPassword}" th:errorclass="error" />						
+					</div>
+				</div>
+			</fieldset>
+
+			<br /> <input type="submit" class="btn btn-primary" name="updateProfile" value="Update profile" />
+		</form>
+		
+		<script type="text/javascript">
+			$(function () {
+			  $('[data-toggle="tooltip"]').tooltip()
+			})		
+		</script>
+	</div>
+</body>
+</html>

@@ -30,6 +30,6 @@ public class LoggingRequestInterceptor implements ClientHttpRequestInterceptor {
 		StringWriter writer = new StringWriter();
 		IOUtils.copy(response.getBody(), writer, "UTF-8");
 		String bodyString = writer.toString();
-		log.info(bodyString);
+		log.debug(bodyString);
 	}
 }
