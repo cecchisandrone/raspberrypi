@@ -1,5 +1,7 @@
 package com.github.cecchisandrone.smarthome.domain;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -13,7 +15,9 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.hibernate.validator.constraints.URL;
 
 @Entity
-public class RaspsonarConfiguration {
+public class RaspsonarConfiguration implements Serializable {
+
+	private static final long serialVersionUID = -6035293472325449318L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
