@@ -19,7 +19,7 @@ public class SlackConfiguration {
 
 	private String locationChangeChannel;
 
-	@Pattern(message = "Should be a list of host/ip separated by ;", regexp = "[-_0-9a-zA-Z]+(;[-_0-9a-zA-Z]+)*")
+	@Pattern(message = "Should be a list of strings separated by ;", regexp = "[-_0-9a-zA-Z]+(;[-_0-9a-zA-Z]+)*")
 	private String locationChangeUsers;
 
 	public void setNotificationChannel(String channel) {

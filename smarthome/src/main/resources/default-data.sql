@@ -1,5 +1,5 @@
 insert into "PROFILE" ("ID", "PASSWORD","NAME","SURNAME") values (1,'21232f297a57a5a743894a0e4a801fc3','Alessandro','Dionisi');
 insert into "RASPSONAR_CONFIGURATION" ("ID","AUTO_OFF_THRESHOLD","DISTANCE_THRESHOLD","SERVICE_URL") values(1,62,48,'http://raspsonar_url/raspsonar/rest/sonarservice/distance?measurements=10');
 insert into "ZONE_MINDER_CONFIGURATION" ("ID","AUTOMATIC_ACTIVATION_ENABLED","ZM_HOST","ZM_HOST_MAC_ADDRESS","ZM_HOST_USER","ZM_HOST_PASSWORD") values (1,true,'zm-host','aa:bb:cc:dd:ee:ff','username','password');
-insert into "SLACK_CONFIGURATION" ("ID","TOKEN","LOCATION_CHANGE_CHANNEL","LOCATION_CHANGE_USERS","NOTIFICATION_CHANNEL") values (1,'token','location-change','cecchisandrone,miky','alarm');
+insert into "SLACK_CONFIGURATION" ("ID","TOKEN","LOCATION_CHANGE_CHANNEL","LOCATION_CHANGE_USERS","NOTIFICATION_CHANNEL") values (1,'token','location-change','cecchisandrone;miky','alarm');
 insert into "CONFIGURATION" ("ID","PROFILE","RASPSONAR_CONFIGURATION","ZONE_MINDER_CONFIGURATION","SLACK_CONFIGURATION") values(1,1,1,1,1);
