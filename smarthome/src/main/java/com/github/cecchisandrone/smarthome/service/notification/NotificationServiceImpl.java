@@ -122,9 +122,11 @@ public class NotificationServiceImpl implements NotificationService {
 
 	private String getChannelId(String channelName, SlackConfiguration slackConfiguration) {
 		ResponseEntity<ChannelListResponse> channelList = slackClient.getChannelList(slackConfiguration);
-		for (Channel channel : channelList.getBody().getChannels()) {
-			if (channel.getName().equals(channelName)) {
-				return channel.getId();
+		if (channelList.getBody().getOk() == true) {
+			for (Channel channel : channelList.getBody().getChannels()) {
+				if (channel.getName().equals(channelName)) {
+					return channel.getId();
+				}
 			}
 		}
 		throw new IllegalArgumentException("Channel " + channelName + " not found");
