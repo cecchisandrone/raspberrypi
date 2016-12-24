@@ -99,6 +99,8 @@ public class DashboardController {
 
 		try {
 			Configuration configuration = configurationService.getConfiguration();
+			configuration.getZoneMinderConfiguration().setAutomaticActivationEnabled(true);
+			configurationService.saveConfiguration(configuration);
 			zoneminderService.shutdownZmHost(configuration.getZoneMinderConfiguration());
 			model.addAttribute("status", "Operation completed successfully");
 		} catch (ZoneMinderServiceException | ConfigurationServiceException e) {
@@ -113,6 +115,8 @@ public class DashboardController {
 
 		try {
 			Configuration configuration = configurationService.getConfiguration();
+			configuration.getZoneMinderConfiguration().setAutomaticActivationEnabled(false);
+			configurationService.saveConfiguration(configuration);
 			zoneminderService.wakeUpZmHost(configuration.getZoneMinderConfiguration());
 			model.addAttribute("status", "Operation completed successfully");
 		} catch (ZoneMinderServiceException | ConfigurationServiceException e) {
