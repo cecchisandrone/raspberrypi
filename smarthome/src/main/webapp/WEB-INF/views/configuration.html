@@ -52,6 +52,18 @@
 					</div>
 				</div>
 				<div class="control-group">
+					<label th:for="sonarIndex" class="control-label">Sonar index</label>
+					<div class="controls">
+						<input id="sonarIndex" size="3" th:field="*{raspsonarConfiguration.sonarIndex}" th:errorclass="error" />
+					</div>
+				</div>
+				<div class="control-group">
+					<label th:for="relayIndex" class="control-label">Relay index</label>
+					<div class="controls">
+						<input id="relayIndex" size="3" th:field="*{raspsonarConfiguration.relayIndex}" th:errorclass="error" />
+					</div>
+				</div>
+				<div class="control-group">
 					<label th:for="distanceThreshold" class="control-label">Distance threshold</label>
 					<div class="controls">
 						<input id="distanceThreshold" size="40" th:field="*{raspsonarConfiguration.distanceThreshold}" th:errorclass="error" />
@@ -62,7 +74,7 @@
 					<div class="controls">
 						<input id="autoPowerOffDistanceThreshold" size="40" th:field="*{raspsonarConfiguration.autoPowerOffDistanceThreshold}" th:errorclass="error" />
 					</div>
-				</div>
+				</div>				
 			</fieldset>
 			<br />
 			<fieldset>			

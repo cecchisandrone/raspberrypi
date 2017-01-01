@@ -37,6 +37,12 @@ public class RaspsonarConfiguration implements Serializable {
 	@Max(200)
 	@Column(name = "AUTO_OFF_THRESHOLD")
 	private Double autoPowerOffDistanceThreshold;
+	
+	@NotNull
+	private Integer sonarIndex;
+	
+	@NotNull
+	private Integer relayIndex;
 
 	public long getId() {
 		return id;
@@ -68,5 +74,21 @@ public class RaspsonarConfiguration implements Serializable {
 
 	public void setAutoPowerOffDistanceThreshold(Double autoPowerOffDistanceThreshold) {
 		this.autoPowerOffDistanceThreshold = autoPowerOffDistanceThreshold;
+	}
+	
+	public void setRelayIndex(Integer relayIndex) {
+		this.relayIndex = relayIndex;
+	}
+	
+	public void setSonarIndex(Integer sonarIndex) {
+		this.sonarIndex = sonarIndex;
+	}
+	
+	public Integer getSonarIndex() {
+		return sonarIndex;
+	}
+	
+	public Integer getRelayIndex() {
+		return relayIndex;
 	}
 }
