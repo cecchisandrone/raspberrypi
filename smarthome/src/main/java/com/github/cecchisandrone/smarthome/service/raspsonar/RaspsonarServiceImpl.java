@@ -48,11 +48,11 @@ public class RaspsonarServiceImpl implements InitializingBean, RaspsonarService 
 	private static final int MEASUREMENTS = 5;
 
 	private static final int DISTANCE_VALUES_TO_HOLD = 100;
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(RaspsonarServiceImpl.class);
 
 	private static final double WRONG_MEASUREMENT_THRESHOLD = 15;
-	
+
 	private double averageDistance;
 
 	private WebTarget sonarServiceTarget;
@@ -62,7 +62,7 @@ public class RaspsonarServiceImpl implements InitializingBean, RaspsonarService 
 	private LinkedList<Double> distanceMeasurements = new LinkedList<Double>();
 
 	private RaspsonarConfiguration configuration;
-	
+
 	@Autowired
 	private ConfigurationService configurationService;
 
@@ -100,7 +100,8 @@ public class RaspsonarServiceImpl implements InitializingBean, RaspsonarService 
 			throw new RaspsonarServiceException("Can't load Raspsonar configuration. Reason: " + e.toString());
 		}
 
-		WebTarget distanceTarget = sonarServiceTarget.path("sonar").path(configuration.getSonarIndex().toString()).path("distance").queryParam("measurements", MEASUREMENTS);
+		WebTarget distanceTarget = sonarServiceTarget.path("sonar").path(configuration.getSonarIndex().toString())
+				.path("distance").queryParam("measurements", MEASUREMENTS);
 		Builder request = distanceTarget.request();
 		Response response;
 		try {
@@ -170,8 +171,9 @@ public class RaspsonarServiceImpl implements InitializingBean, RaspsonarService 
 
 		logger.info("Toggling relay to status: " + status);
 
-		WebTarget toggleRelayTarget = sonarServiceTarget.path("relay").path(configuration.getRelayIndex().toString()).path("toggleRelay").queryParam("status", status);
-		Builder request = toggleRelayTarget.request();		
+		WebTarget toggleRelayTarget = sonarServiceTarget.path("relay").path(configuration.getRelayIndex().toString())
+				.path("toggleRelay").queryParam("status", status);
+		Builder request = toggleRelayTarget.request();
 		Response response = request.post(null);
 		if (response.getStatus() != HttpURLConnection.HTTP_OK) {
 			throw new RaspsonarServiceException("Can't access remote service. Response code: " + response.getStatus());
@@ -188,6 +190,7 @@ public class RaspsonarServiceImpl implements InitializingBean, RaspsonarService 
 		if (relayStatus) {
 			try {
 				Double distance = getDistance(false);
+				logger.info("Checking if relay should be put off. Distance: " + distance);
 				Configuration configuration = configurationService.getConfiguration();
 				// Toggle relay off is threshold is trespassed
 				if (distance > configuration.getRaspsonarConfiguration().getAutoPowerOffDistanceThreshold()) {
