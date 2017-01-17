@@ -7,11 +7,13 @@ import org.slf4j.Logger;
 import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CDevice;
 import com.pi4j.io.i2c.I2CFactory;
+import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
 
 /**
- * Interface to HMC5883L digital magnetometer device 
+ * Interface to HMC5883L digital magnetometer device
  * 
- * http://www51.honeywell.com/aero/common/documents/myaerospacecatalog-documents/Defense_Brochures-documents/HMC5883L_3-Axis_Digital_Compass_IC.pdf
+ * http://www51.honeywell.com/aero/common/documents/myaerospacecatalog-documents
+ * /Defense_Brochures-documents/HMC5883L_3-Axis_Digital_Compass_IC.pdf
  * 
  * @author Alessandro
  *
@@ -91,7 +93,7 @@ public class HMC5883L {
 		this.offsetZ = offsetZ;
 	}
 
-	public HMC5883L(int busNumber, int address) throws IOException {
+	public HMC5883L(int busNumber, int address) throws IOException, UnsupportedBusNumberException {
 		I2CBus bus = I2CFactory.getInstance(busNumber);
 		device = bus.getDevice(address);
 
