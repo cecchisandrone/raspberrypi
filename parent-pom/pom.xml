@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.cecchisandrone</groupId>
 	<artifactId>parent-pom</artifactId>
-	<version>1.1</version>
+	<version>1.2</version>
 	<packaging>pom</packaging>
 	<name>Raspberry PI projects Parent POM</name>
 	<description>The parent POM to inherit from in Raspberry PI Projects</description>
