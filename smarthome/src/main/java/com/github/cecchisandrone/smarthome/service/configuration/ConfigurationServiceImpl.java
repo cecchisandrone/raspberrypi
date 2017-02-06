@@ -11,7 +11,6 @@ import org.springframework.security.authentication.encoding.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.github.cecchisandrone.smarthome.domain.CameraConfiguration;
 import com.github.cecchisandrone.smarthome.domain.Configuration;
 import com.github.cecchisandrone.smarthome.persistence.repository.ConfigurationRepository;
 import com.github.cecchisandrone.smarthome.service.camera.CameraService;
@@ -55,11 +54,6 @@ public class ConfigurationServiceImpl implements ConfigurationService {
 			}
 
 			configurationRepository.save(configuration);
-
-			// Toggle alarm on every camera
-			for (CameraConfiguration cameraConfiguration : configuration.getCameraConfigurations()) {
-				cameraService.toggleAlarm(cameraConfiguration);
-			}
 
 		} catch (ConstraintViolationException e) {
 			throw new ConfigurationServiceException(e.toString());
