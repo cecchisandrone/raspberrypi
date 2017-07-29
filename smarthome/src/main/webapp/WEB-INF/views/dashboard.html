@@ -12,9 +12,14 @@
 					<button type="button" class="btn btn-danger btn-xs" id="waterLevelError" data-toggle="popover" data-placement="bottom" th:if="${waterLevelError != null}" th:attr="data-content=${waterLevelError}">Error while contacting Raspsonar</button>
 					<div th:include="../fragments/messages" ></div>
 				</p>
+				<p th:fragment="gate"> 
+					<strong>Gate: </strong>
+                    <a class="btn btn-success btn-sm" id="openGateButton" href="#" onclick="openGate()">Open</a>       
+                    <div id="gateMessage"></div>             	
+				</p>
 				<p>
 					<strong>Basement water level: </strong><span id="waterLevel" th:if="${waterLevel != null}" th:text="${waterLevel} + ' cm'"></span>
-					<a class="btn btn-default btn-xs" th:href="@{/dashboard/resetAverageDistance}">Reset</a>					
+					<a class="btn btn-default btn-sm" th:href="@{/dashboard/resetAverageDistance}">Reset</a>					
 					<script th:inline="javascript">
 					    
 						$(function () {
@@ -41,19 +46,29 @@
 					    	  });
 					    };
 					    
+					    function openGate() {
+					    	$.ajax({
+						    	  url: /*[[@{/dashboard/gate/open.json}]]*/,
+						    	  method: 'POST',
+					    		  accepts: 'application/json'
+						    	}).done(function(data) {
+						    	  $("#gateMessage").text(data.status);
+					    	  });
+					    };
+					    
 					</script>	
 				</p>	
 				<p th:fragment="waterPump"> 
 					<strong>Water pump: </strong>
                     <input type="checkbox" th:checked="${relayStatus}" disabled="disabled"/>                            
-                    <a class="btn btn-success btn-xs" th:href="@{/dashboard/waterPump/true}">On </a>
-					<a class="btn btn-danger btn-xs" th:href="@{/dashboard/waterPump/false}">Off</a>					
+                    <a class="btn btn-success btn-sm" th:href="@{/dashboard/waterPump/true}">On </a>
+					<a class="btn btn-danger btn-sm" th:href="@{/dashboard/waterPump/false}">Off</a>					
 				</p>		
 				<p th:fragment="zoneMinder"> 
 					<strong>ZoneMinder: </strong>
                     <input type="checkbox" th:checked="${zmStatus}" disabled="disabled"/>                            
-                    <a class="btn btn-success btn-xs" id="wakeUpButton" href="#" onclick="wakeUpZmHost()">Wake up host </a>
-                    <a class="btn btn-danger btn-xs" id="shutdownButton" href="#" onclick="shutdownZmHost()">Shutdown host</a>       
+                    <a class="btn btn-success btn-sm" id="wakeUpButton" href="#" onclick="wakeUpZmHost()">Wake up host </a>
+                    <a class="btn btn-danger btn-sm" id="shutdownButton" href="#" onclick="shutdownZmHost()">Shutdown host</a>       
                     <div id="zmMessage"></div>             	
 				</p>	
 			</div>

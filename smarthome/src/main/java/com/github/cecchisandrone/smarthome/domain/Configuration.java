@@ -42,6 +42,10 @@ public class Configuration implements Serializable {
 	@Valid
 	private ZoneMinderConfiguration zoneMinderConfiguration;
 
+	@OneToOne(cascade = CascadeType.ALL)
+	@Valid
+	private GateConfiguration gateConfiguration;
+
 	public long getId() {
 		return id;
 	}
@@ -88,5 +92,13 @@ public class Configuration implements Serializable {
 
 	public Profile getProfile() {
 		return profile;
+	}
+
+	public GateConfiguration getGateConfiguration() {
+		return gateConfiguration;
+	}
+
+	public void setGateConfiguration(GateConfiguration gateConfiguration) {
+		this.gateConfiguration = gateConfiguration;
 	}
 }

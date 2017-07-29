@@ -115,6 +115,22 @@
 					</div>
 				</div>
 			</fieldset>
+			<br />
+			<fieldset>			
+				<legend>Gate</legend>
+				<div class="control-group">
+					<label th:for="serviceUrl" class="control-label">Host</label>
+					<div class="controls">
+						<input id="serviceUrl" size="50" th:field="*{gateConfiguration.serviceHost}" th:errorclass="error" />
+					</div>
+				</div>
+				<div class="control-group">
+					<label th:for="delay" class="control-label">Delay</label>
+					<div class="controls">
+						<input id="delay" size="5" th:field="*{gateConfiguration.delay}" th:errorclass="error" />
+					</div>
+				</div>
+			</fieldset>
 			<br />			
 			<fieldset>
 				<legend>Cameras</legend>

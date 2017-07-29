@@ -17,6 +17,8 @@ import org.springframework.web.servlet.ModelAndView;
 import com.github.cecchisandrone.smarthome.domain.Configuration;
 import com.github.cecchisandrone.smarthome.service.configuration.ConfigurationService;
 import com.github.cecchisandrone.smarthome.service.configuration.ConfigurationServiceException;
+import com.github.cecchisandrone.smarthome.service.gate.GateService;
+import com.github.cecchisandrone.smarthome.service.gate.GateServiceException;
 import com.github.cecchisandrone.smarthome.service.raspsonar.RaspsonarService;
 import com.github.cecchisandrone.smarthome.service.raspsonar.RaspsonarServiceException;
 import com.github.cecchisandrone.smarthome.service.zm.ZoneMinderService;
@@ -36,6 +38,9 @@ public class DashboardController {
 
 	@Autowired
 	private ZoneMinderService zoneminderService;
+
+	@Autowired
+	private GateService gateService;
 
 	@Autowired
 	private ConfigurationService configurationService;
@@ -118,6 +123,20 @@ public class DashboardController {
 			zoneminderService.wakeUpZmHost(configuration.getZoneMinderConfiguration());
 			model.addAttribute("status", "Operation completed successfully");
 		} catch (ZoneMinderServiceException | ConfigurationServiceException e) {
+			model.addAttribute("status", e.toString());
+			LOGGER.error(e.getMessage(), e);
+		}
+		return model;
+	}
+
+	@RequestMapping(value = { "/dashboard/gate/open" }, method = RequestMethod.POST)
+	public Model openGate(Model model) {
+
+		try {
+			Configuration configuration = configurationService.getConfiguration();
+			gateService.open(configuration.getGateConfiguration());
+			model.addAttribute("status", "Operation completed successfully");
+		} catch (GateServiceException | ConfigurationServiceException e) {
 			model.addAttribute("status", e.toString());
 			LOGGER.error(e.getMessage(), e);
 		}
