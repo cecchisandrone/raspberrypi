@@ -23,7 +23,7 @@ public class GateConfiguration implements Serializable {
 	private String serviceHost;
 
 	@NotNull
-	private Float delay;
+	private Float duration;
 
 	public long getId() {
 		return id;
@@ -41,11 +41,11 @@ public class GateConfiguration implements Serializable {
 		this.serviceHost = serviceHost;
 	}
 
-	public Float getDelay() {
-		return delay;
+	public Float getDuration() {
+		return duration;
 	}
 
-	public void setDelay(Float delay) {
-		this.delay = delay;
+	public void setDuration(Float duration) {
+		this.duration = duration;
 	}
 }

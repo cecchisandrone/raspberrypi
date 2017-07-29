@@ -14,8 +14,9 @@ public class GateServiceImpl implements GateService {
 	public void open(GateConfiguration gateConfiguration) throws GateServiceException {
 
 		try {
-			restTemplate.postForEntity("http://" + gateConfiguration.getServiceHost() + "/toggle-relay?delay={delay}",
-					null, Void.class, gateConfiguration.getDelay());
+			restTemplate.postForEntity(
+					"http://" + gateConfiguration.getServiceHost() + "/toggle-relay?duration={duration}", null,
+					Void.class, gateConfiguration.getDuration());
 		} catch (Exception e) {
 			throw new GateServiceException("Unable to open gate. Reason: " + e.toString(), e);
 		}
