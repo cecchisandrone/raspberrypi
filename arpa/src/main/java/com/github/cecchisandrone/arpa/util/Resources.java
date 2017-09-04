@@ -2,7 +2,10 @@ package com.github.cecchisandrone.arpa.util;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
@@ -21,7 +24,14 @@ public final class Resources {
 
 	public static final File getFile(String resource) {
 		try {
-			return new ClassPathResource(resource).getFile();
+			InputStream inputStream = new ClassPathResource(resource).getInputStream();
+			File file = File.createTempFile(resource.replace("/", "-"), ".wav");
+			try {
+				FileUtils.copyInputStreamToFile(inputStream, file);
+			} finally {
+				IOUtils.closeQuietly(inputStream);
+			}
+			return file;
 		} catch (IOException e) {
 			LOGGER.error(e.toString(), e);
 			throw new RuntimeException(e);
