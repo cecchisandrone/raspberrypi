@@ -53,6 +53,8 @@
 					    		  accepts: 'application/json'
 						    	}).done(function(data) {
 						    	  $("#gateMessage").text(data.status);
+						    	  $("#gateMessage").fadeIn(1000);
+						    	  $("#gateMessage").fadeOut(3000);
 					    	  });
 					    };
 					    

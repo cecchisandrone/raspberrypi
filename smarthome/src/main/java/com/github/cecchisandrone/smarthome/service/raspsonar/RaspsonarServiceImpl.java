@@ -94,48 +94,53 @@ public class RaspsonarServiceImpl implements InitializingBean, RaspsonarService 
 	@Override
 	public synchronized Double getDistance(boolean resetAverageDistance) throws RaspsonarServiceException {
 
-		try {
-			loadClientConfiguration();
-		} catch (ConfigurationServiceException e) {
-			throw new RaspsonarServiceException("Can't load Raspsonar configuration. Reason: " + e.toString());
-		}
-
-		WebTarget distanceTarget = sonarServiceTarget.path("sonar").path(configuration.getSonarIndex().toString())
-				.path("distance").queryParam("measurements", MEASUREMENTS);
-		Builder request = distanceTarget.request();
-		Response response;
-		try {
-			response = request.get();
-			if (response.getStatus() == HttpURLConnection.HTTP_OK) {
-				String distanceAsString = response.readEntity(String.class);
-				Double distance = new Double(distanceAsString);
-
-				// Check wrong measurements, maybe due to CPU allocation
-				if (averageDistance != 0 && (distance - averageDistance) > WRONG_MEASUREMENT_THRESHOLD) {
-
-					logger.warn("Wrong measurement detected. Previous distance value: " + averageDistance + ". Actual: "
-							+ distance);
-
-					// Do another measurement
-					getDistance(resetAverageDistance);
-				}
-
-				if (averageDistance == 0 || resetAverageDistance) {
-					averageDistance = distance;
-				}
-				averageDistance = (distance + averageDistance) / 2;
-
-				// Update distance measurements for chart
-				if (distanceMeasurements.size() > DISTANCE_VALUES_TO_HOLD) {
-					distanceMeasurements.removeFirst();
-				}
-				distanceMeasurements.add(averageDistance);
-
-				return new BigDecimal(averageDistance).setScale(1, RoundingMode.CEILING).doubleValue();
+		if (!resetAverageDistance && averageDistance != 0) {
+			return averageDistance;
+		} else {
+			try {
+				loadClientConfiguration();
+			} catch (ConfigurationServiceException e) {
+				throw new RaspsonarServiceException("Can't load Raspsonar configuration. Reason: " + e.toString());
 			}
-			throw new RaspsonarServiceException("Can't access remote service. Response code: " + response.getStatus());
-		} catch (Exception e) {
-			throw new RaspsonarServiceException("Can't access remote service. Reason: " + e.toString(), e);
+
+			WebTarget distanceTarget = sonarServiceTarget.path("sonar").path(configuration.getSonarIndex().toString())
+					.path("distance").queryParam("measurements", MEASUREMENTS);
+			Builder request = distanceTarget.request();
+			Response response;
+			try {
+				response = request.get();
+				if (response.getStatus() == HttpURLConnection.HTTP_OK) {
+					String distanceAsString = response.readEntity(String.class);
+					Double distance = new Double(distanceAsString);
+
+					// Check wrong measurements, maybe due to CPU allocation
+					if (averageDistance != 0 && (distance - averageDistance) > WRONG_MEASUREMENT_THRESHOLD) {
+
+						logger.warn("Wrong measurement detected. Previous distance value: " + averageDistance
+								+ ". Actual: " + distance);
+
+						// Do another measurement
+						getDistance(resetAverageDistance);
+					}
+
+					if (averageDistance == 0 || resetAverageDistance) {
+						averageDistance = distance;
+					}
+					averageDistance = (distance + averageDistance) / 2;
+
+					// Update distance measurements for chart
+					if (distanceMeasurements.size() > DISTANCE_VALUES_TO_HOLD) {
+						distanceMeasurements.removeFirst();
+					}
+					distanceMeasurements.add(averageDistance);
+
+					return new BigDecimal(averageDistance).setScale(1, RoundingMode.CEILING).doubleValue();
+				}
+				throw new RaspsonarServiceException(
+						"Can't access remote service. Response code: " + response.getStatus());
+			} catch (Exception e) {
+				throw new RaspsonarServiceException("Can't access remote service. Reason: " + e.toString(), e);
+			}
 		}
 	}
 
@@ -146,7 +151,7 @@ public class RaspsonarServiceImpl implements InitializingBean, RaspsonarService 
 
 		try {
 			logger.info("Checking distance threshold...");
-			Double distance = getDistance(false);
+			Double distance = getDistance(true);
 			logger.info("Distance is " + distance);
 			Configuration configuration = configurationService.getConfiguration();
 			if (distance < configuration.getRaspsonarConfiguration().getDistanceThreshold()) {
