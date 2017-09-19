@@ -131,7 +131,17 @@
 					</div>
 				</div>
 			</fieldset>
-			<br />			
+			<br />		
+			<fieldset>			
+				<legend>Temperature sensor</legend>
+				<div class="control-group">
+					<label th:for="serviceUrl" class="control-label">Host</label>
+					<div class="controls">
+						<input id="serviceUrl" size="50" th:field="*{temperatureSensorConfiguration.serviceHost}" th:errorclass="error" />
+					</div>
+				</div>
+			</fieldset>
+			<br />	
 			<fieldset>
 				<legend>Cameras</legend>
 				<!-- Table -->

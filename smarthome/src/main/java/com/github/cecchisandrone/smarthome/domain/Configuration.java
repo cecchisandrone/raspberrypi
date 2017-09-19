@@ -46,6 +46,10 @@ public class Configuration implements Serializable {
 	@Valid
 	private GateConfiguration gateConfiguration;
 
+	@OneToOne(cascade = CascadeType.ALL)
+	@Valid
+	private TemperatureSensorConfiguration temperatureSensorConfiguration;
+
 	public long getId() {
 		return id;
 	}
@@ -100,5 +104,13 @@ public class Configuration implements Serializable {
 
 	public void setGateConfiguration(GateConfiguration gateConfiguration) {
 		this.gateConfiguration = gateConfiguration;
+	}
+
+	public TemperatureSensorConfiguration getTemperatureSensorConfiguration() {
+		return temperatureSensorConfiguration;
+	}
+
+	public void setTemperatureSensorConfiguration(TemperatureSensorConfiguration temperatureSensorConfiguration) {
+		this.temperatureSensorConfiguration = temperatureSensorConfiguration;
 	}
 }

@@ -60,6 +60,9 @@
 					    
 					</script>	
 				</p>	
+				<p>
+					<strong>Outdoor temperature: </strong><span id="temperature" th:if="${temperature != null}" th:text="${temperature}"></span><span>&deg;C</span>
+				</p>
 				<p th:fragment="waterPump"> 
 					<strong>Water pump: </strong>
                     <input type="checkbox" th:checked="${relayStatus}" disabled="disabled"/>                            

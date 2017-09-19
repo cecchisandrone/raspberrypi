@@ -21,6 +21,7 @@ import com.github.cecchisandrone.smarthome.service.gate.GateService;
 import com.github.cecchisandrone.smarthome.service.gate.GateServiceException;
 import com.github.cecchisandrone.smarthome.service.raspsonar.RaspsonarService;
 import com.github.cecchisandrone.smarthome.service.raspsonar.RaspsonarServiceException;
+import com.github.cecchisandrone.smarthome.service.temperature.TemperatureSensorService;
 import com.github.cecchisandrone.smarthome.service.zm.ZoneMinderService;
 import com.github.cecchisandrone.smarthome.service.zm.ZoneMinderServiceException;
 import com.github.cecchisandrone.smarthome.utils.ZoneMinderUtils;
@@ -45,6 +46,9 @@ public class DashboardController {
 	@Autowired
 	private ConfigurationService configurationService;
 
+	@Autowired
+	private TemperatureSensorService temperatureSensorService;
+
 	@RequestMapping(value = { "/dashboard", "/" }, method = RequestMethod.GET)
 	public ModelAndView home() {
 
@@ -61,6 +65,7 @@ public class DashboardController {
 		try {
 			modelAndView.addObject("waterLevel", raspsonarService.getDistance(false));
 			modelAndView.addObject("relayStatus", raspsonarService.isRelayStatus());
+			modelAndView.addObject("temperature", temperatureSensorService.getTemperature());
 			modelAndView.addObject("distanceChartUrl", raspsonarService.getDistanceChartUrl());
 		} catch (RaspsonarServiceException e) {
 			modelAndView.addObject("errorMessage", e.toString());
