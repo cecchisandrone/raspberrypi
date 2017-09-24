@@ -1,6 +1,7 @@
 package com.github.cecchisandrone.smarthome.service.temperature;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -12,7 +13,15 @@ public class TemperatureSensorServiceImpl implements TemperatureSensorService {
 
 	private static final String TEMPERATURE_ENDPOINT = "/temp";
 
-	private RestTemplate restTemplate = new RestTemplate();
+	private RestTemplate restTemplate;
+
+	public TemperatureSensorServiceImpl() {
+		HttpComponentsClientHttpRequestFactory httpRequestFactory = new HttpComponentsClientHttpRequestFactory();
+		httpRequestFactory.setConnectionRequestTimeout(5000);
+		httpRequestFactory.setConnectTimeout(5000);
+		httpRequestFactory.setReadTimeout(5000);
+		restTemplate = new RestTemplate(httpRequestFactory);
+	}
 
 	@Autowired
 	private ConfigurationService configurationService;
