@@ -1,12 +1,18 @@
 from flask import Flask
 from flask import request
+from flask import jsonify
 
 app = Flask(__name__)
 id = '28-0316a02752ff'
 
 @app.route('/temp', methods=['GET'])
 def gettemp_enpoint():
-  return gettemp(id), 200
+  format = request.args.get('format')
+  if format == "json":
+    return jsonify(temperature=gettemp(id)), 200
+  else:
+    return gettemp(id), 200
+   
     
 def gettemp(id):
   
