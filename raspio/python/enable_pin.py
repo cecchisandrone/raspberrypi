@@ -12,15 +12,23 @@ args = parser.parse_args()
 pin = args.pin
 
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(pin, GPIO.OUT)
 
 def signal_handler(signal, frame):
-	GPIO.output(pin, False)
+        GPIO.output(pin, False)
         print('You pressed Ctrl+C!')
         sys.exit(0)
 
 signal.signal(signal.SIGINT, signal_handler)
-GPIO.output(pin, True)
 print('Press Ctrl+C to quit')
-signal.pause()
 
+status = True
+
+while(True):
+
+  GPIO.setup(pin, GPIO.OUT)
+  print('Setting status to %s' % (not status))
+  status = not status
+  GPIO.output(pin, status)
+  status = bool(GPIO.input(pin))
+  print('Status is %s' % status)
+  time.sleep(5)
