@@ -13,7 +13,7 @@
 	</parent>
 
 	<properties>
-		<spring.version>4.1.4.RELEASE</spring.version>
+		<spring.version>5.2.2.RELEASE</spring.version>
 	</properties>
 
 	<dependencies>
