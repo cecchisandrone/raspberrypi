@@ -59,7 +59,7 @@ def metrics_endpoint():
     for i in range(len(output)):
       number = output[i].lstrip().split(" ")[0]
       if i in fields:
-        json[fields[i]] = number
+        json[fields[i]] = float(number)
   except subprocess.CalledProcessError as e:
     print e.returncode
     print e.output
