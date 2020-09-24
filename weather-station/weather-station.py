@@ -13,7 +13,7 @@ dht11Sensor = dht11.DHT11(pin=24)
 
 def rainfallTick(channel):
   global rainfallTicks
-  print "Rainfall tick"
+  print("Rainfall tick")
   rainfallTicks = rainfallTicks + 1
 
 GPIO.setmode(GPIO.BCM)
@@ -59,6 +59,6 @@ def humidity_endpoint():
   return "Error while reading humidity", 500
 
 if __name__ == '__main__':
-  app.run(host='0.0.0.0', port=6000)
+  app.run(host='0.0.0.0', port=7000)
   GPIO.cleanup()
 
