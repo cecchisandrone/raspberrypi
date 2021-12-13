@@ -4,7 +4,7 @@ from flask import jsonify
 from time import sleep
 import subprocess
 
-cmd = ["bash -o pipefail -c \"aurora -a 2 -D -d 0 -e /dev/ttyUSB0 | cut -f2 -d '=' | tr -s '\n' '\n'\""]
+cmd = ["bash -o pipefail -c \"aurora --retries 3 -a 2 -D -d 0 -e /dev/ttyUSB0 | cut -f2 -d '=' | tr -s '\n' '\n'\""]
 fields = {
             0: "input_1_voltage",
             1: "input_1_current",
