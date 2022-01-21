@@ -1,15 +1,14 @@
-import dht11
 import RPi.GPIO as GPIO
 from flask import Flask
 from flask import request
 from flask import jsonify
 from time import sleep
+import Adafruit_DHT
 
 rainfallPin = 23
 millimetersPerTick = 0.455
 rainfallTicks = 0
-maxAttempts = 200
-dht11Sensor = dht11.DHT11(pin=24)
+dht22Pin = 17
 
 def rainfallTick(channel):
   global rainfallTicks
@@ -35,27 +34,23 @@ def rainfall_endpoint():
 @app.route('/temperature', methods=['GET'])
 def temperature_endpoint():
   format = request.args.get('format')
-  for x in range(0, maxAttempts):
-    result = dht11Sensor.read()
-    if result.is_valid():
-      if format == "json":
-        return jsonify(temperature=result.temperature), 200
-      else:
-        return str(result.temperature), 200
-    sleep(0.01)
+  humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.DHT22, dht22Pin)
+  if temperature is not None:
+    if format == "json":
+      return jsonify(temperature=temperature), 200
+    else:
+      return str(temperature), 200
   return "Error while reading temperature", 500
 
 @app.route('/humidity', methods=['GET'])
 def humidity_endpoint():
   format = request.args.get('format')
-  for x in range(0, maxAttempts):
-    result = dht11Sensor.read()
-    if result.is_valid():
-      if format == "json":
-        return jsonify(humidity=result.humidity), 200
-      else:
-        return str(result.humidity), 200
-    sleep(0.01)
+  humidity, temperature = Adafruit_DHT.read_retry(Adafruit_DHT.DHT22, dht22Pin)
+  if humidity is not None:
+    if format == "json":
+      return jsonify(humidity=humidity), 200
+    else:
+      return str(humidity), 200
   return "Error while reading humidity", 500
 
 if __name__ == '__main__':
