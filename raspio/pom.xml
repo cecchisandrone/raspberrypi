@@ -13,7 +13,7 @@
 
 	<properties>
 		<tomcat.url>192.168.1.25:8080</tomcat.url>
-		<spring.version>4.1.4.RELEASE</spring.version>
+		<spring.version>5.3.18</spring.version>
 	</properties>
 
 	<dependencies>
